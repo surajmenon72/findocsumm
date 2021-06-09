@@ -4,8 +4,9 @@ import Levenshtein
 
 ###** MAIN **###
 
-#look_for = ['Total Net Sales', '2020']
-look_for = ['Total Revenue', '2019']
+#look_for = ['Total Net Sales', '2020'] #apple
+look_for = ['Total Revenue', '2020'] #mcds
+#look_for = ['Total Sales and Revenues', '2020'] #cat
 
 #Creating argument dictionary for the default arguments needed in the code. 
 args = {"image0":"/Users/surajmenon/Desktop/findocDocs/apple_test1.png", "image1":"/Users/surajmenon/Desktop/findocDocs/apple_test1.png", "east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
@@ -23,13 +24,16 @@ args['height'] = 160
 image0, results0 = process_image(args['image0'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=150, hyst_Y=15)
 (origH0, origW0) = image0.shape[:2]
 
-image1, results1 = process_image(args['image1'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=30, hyst_Y=10, offset_X=origW0, offset_Y=origH0)
+image1, results1 = process_image(args['image1'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=30, hyst_Y=5, offset_X=origW0, offset_Y=origH0)
+
+#for printing image
+#image1, results1 = process_image(args['image1'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=30, hyst_Y=5, offset_X=0, offset_Y=0)
 
 #append results
 results = results0 + results1
 
 #show image
-#show_image(image0, results0)
+#show_image(image1, results1)
 
 #do spellcheck, embedding check, join texts that are close horizontally
 

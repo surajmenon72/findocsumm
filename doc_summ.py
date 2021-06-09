@@ -4,13 +4,14 @@ import Levenshtein
 
 ###** MAIN **###
 
-look_for = ['Total Net Sales', '2020']
+#look_for = ['Total Net Sales', '2020']
+look_for = ['Total Revenue', '2019']
 
 #Creating argument dictionary for the default arguments needed in the code. 
 args = {"image0":"/Users/surajmenon/Desktop/findocDocs/apple_test1.png", "image1":"/Users/surajmenon/Desktop/findocDocs/apple_test1.png", "east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
 
-args['image0']="/Users/surajmenon/Desktop/findocDocs/apple_tc1.png"
-args['image1']="/Users/surajmenon/Desktop/findocDocs/apple_tc2.png"
+args['image0']="/Users/surajmenon/Desktop/findocDocs/mcds_tc1.png"
+args['image1']="/Users/surajmenon/Desktop/findocDocs/mcds_tc2.png"
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
 args['min_confidence'] = 1e-4
 args['width'] = 160
@@ -19,10 +20,10 @@ args['height'] = 160
 #split image
 
 #process image
-image0, results0 = process_image(args['image0'], args['east'], args['min_confidence'], args['width'], args['height'])
+image0, results0 = process_image(args['image0'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=150, hyst_Y=15)
 (origH0, origW0) = image0.shape[:2]
 
-image1, results1 = process_image(args['image1'], args['east'], args['min_confidence'], args['width'], args['height'], offset_X=origW0, offset_Y=origH0)
+image1, results1 = process_image(args['image1'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=30, hyst_Y=10, offset_X=origW0, offset_Y=origH0)
 
 #append results
 results = results0 + results1
@@ -47,6 +48,7 @@ for look in look_for:
 	best_dist = 1e6
 	for ((start_X, start_Y, end_X, end_Y), text) in results:
 		text = "".join([x if ord(x) < 128 else "" for x in text]).strip()
+		text = text.lower()
 		dist = Levenshtein.distance(look, text)
 
 		if (dist < best_dist):
@@ -56,26 +58,19 @@ for look in look_for:
 			Y_start[index] = start_Y
 			Y_end[index] = end_Y
 			pieces[index] = text
-			if (index == 1):
+			if (index == 0):
 				print (text)
 
 	index += 1
+
+print (pieces)
 
 #crosshair in, for now assume year is the column
 total_distance = 1e6
 answer = 'None'
 
-print (X_start)
-print (X_end)
-print (Y_start)
-print (Y_end)
 
 for ((start_X, start_Y, end_X, end_Y), text) in results:
-	print (text)
-	print (start_X)
-	print (end_X)
-	print (start_Y)
-	print (end_Y)
 	d1 = np.abs(Y_start[0] - start_Y)
 	d2 = np.abs(Y_end[0] - end_Y)
 	d3 = np.abs(X_start[1] - start_X)
@@ -86,9 +81,9 @@ for ((start_X, start_Y, end_X, end_Y), text) in results:
 		total_distance = new_distance
 
 		print ('New Best Value!')
+		print (text)
 
 		text = "".join([x if ord(x) < 128 else "" for x in text]).strip()
-		print (text)
 
 		answer = text
 

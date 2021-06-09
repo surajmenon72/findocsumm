@@ -51,7 +51,7 @@ def predictions(prob_score, geo, min_confidence):
 
 ######** MAIN **#########
 
-def process_image(image, east, min_confidence, width, height, offset_X=0, offset_Y=0):
+def process_image(image, east, min_confidence, width, height, hyst_X=0, hyst_Y=0, offset_X=0, offset_Y=0):
 
 	#unnecessary default
 	args = {"image":"/Users/surajmenon/Desktop/findocDocs/apple_test1.png", "east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
@@ -67,6 +67,10 @@ def process_image(image, east, min_confidence, width, height, offset_X=0, offset
 	#Saving a original image and shape
 	orig = image.copy()
 	(origH, origW) = image.shape[:2]
+
+	print ('Image Size')
+	print (origH)
+	print (origW)
 
 	# set the new height and width to default 320 by using args #dictionary.  
 	(newW, newH) = (args["width"], args["height"])
@@ -107,18 +111,28 @@ def process_image(image, east, min_confidence, width, height, offset_X=0, offset
 	results = []
 
 	count = 0
-	hysteresis_X = 30
-	hysteresis_Y = 15
 
 	extra_distance = 2
 
 	# loop over the bounding boxes to find the coordinate of bounding boxes
 	for (startX, startY, endX, endY) in boxes:
 		# scale the coordinates based on the respective ratios in order to reflect bounding box on the original image
-		startX = int(startX * rW) - hysteresis_X 
-		startY = int(startY * rH) - hysteresis_Y 
-		endX = int(endX * rW) + hysteresis_X 
-		endY = int(endY * rH) + hysteresis_Y 
+		startX = int(startX * rW) - hyst_X 
+		startY = int(startY * rH) - hyst_Y 
+		endX = int(endX * rW) + hyst_X 
+		endY = int(endY * rH) + hyst_Y 
+
+		#bound the bound
+		if (startX < 0):
+			startX = 0
+	   
+		if (startY < 0):
+			startY = 0
+
+		if (endX > origW):
+			endX = origW-1
+		if (endY > origH):
+			endY = origH-1
 
 		#extract the region of interest
 		r = orig[startY:endY, startX:endX]
@@ -127,6 +141,7 @@ def process_image(image, east, min_confidence, width, height, offset_X=0, offset
 		#configuration = ("-l eng --oem 1 --psm 8")
 		configuration = ("-l eng --oem 1 --psm 7")
 	    ##This will recognize the text from the image of bounding box
+
 
 		try:
 			text = pytesseract.image_to_string(r, config=configuration)
@@ -145,7 +160,44 @@ def process_image(image, east, min_confidence, width, height, offset_X=0, offset
 		results.append(((startX, startY, endX, endY), text))
 		count += 1
 
+	#merge similar results
+	# results_m = []
+	# merge_ind = []
+	# overlap_thresh = 1000
+
+	# print ('Beginning Merging')
+	# #only merge the nearest
+	# curr_index = 0
+	# for ((start_X0, start_Y0, end_X0, end_Y0), text0) in results:
+	# 	index = 0
+	# 	merge_index = 1e6
+	# 	for ((start_X1, start_Y1, end_X1, end_Y1), text1) in results:
+	# 		#overlapping
+	# 		if (start_X1 < end_X0):
+	# 			if (np.abs(start_X1 - end_X0) > overlap_thresh):
+	# 				print ('overlapping')
+	# 				print (np.abs(start_X1 - end_X0))
+	# 				print (text0)
+	# 				print (text1)
+	# 				if (index not in merge_ind):
+	# 					merge_index = index
+	# 			index += 1
+
+	# 	#do a merge
+	# 	if (merge_index != 1e6):
+	# 		merge_ind.append(curr_index)
+	# 		merge_ind.append(merge_index)
+	# 		new_text = text0 + text1
+
+	# 		results_m.append(((start_X0, start_Y0, end_X1, end_Y0), new_text))
+
+	# 	else:
+	# 		results_m.append(((start_X0, start_Y0, end_X0, end_Y0), text0))
+
+	# 	curr_index += 1 
+
 	return orig, results
+	#return orig, results_m
 
 def show_image(image, results):
 

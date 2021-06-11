@@ -20,20 +20,60 @@ args['min_confidence'] = 1e-3
 args['width'] = 160
 args['height'] = 160
 
-#split image
-split_images = split_image(args['full_image'], horiz_slices=4, horiz_buffer=50, vert_slices=6, vert_buffer=50)
-
 #process image
-image0, results0 = process_image(args['image0'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=400, hyst_Y=15)
-(origH0, origW0) = image0.shape[:2]
+# image0, results0 = process_image(image=args['image0'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=400, hyst_Y=15)
+# (origH0, origW0) = image0.shape[:2]
 
-image1, results1 = process_image(args['image1'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=30, hyst_Y=5, offset_X=origW0, offset_Y=origH0)
+# image1, results1 = process_image(image=args['image1'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=30, hyst_Y=5, offset_X=origW0, offset_Y=origH0)
 
 #for printing image
-#image1, results1 = process_image(args['image1'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=30, hyst_Y=5, offset_X=0, offset_Y=0)
+#image1, results1 = process_image(image=args['image1'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=30, hyst_Y=5, offset_X=0, offset_Y=0)
 
 #append results
-results = results0 + results1
+#results = results0 + results1
+
+num_horiz_slices = 4
+num_vert_slices = 6
+
+#split image
+split_images = split_image(args['full_image'], horiz_slices=num_horiz_slices, horiz_buffer=50, vert_slices=num_vert_slices, vert_buffer=50)
+
+#capture sizes
+sub_image_width = split_images[0].shape[1]
+sub_image_height = split_images[0].shape[0]
+
+#process the sets of images
+process_short_threshold = 1
+header_results = []
+date_counts_results = []
+full_results = []
+process_wide_x = 400
+process_wide_y = 15
+process_short_x = 30
+process_short_y = 5
+
+for i in range(num_vert_slices):
+	for j in range(num_horiz_slices):
+		index = (i*num_horiz_slices + j)
+		image_to_process = split_images[index]
+
+		#calculate offset
+		X_offset = j*sub_image_width
+		Y_offset = i*sub_image_height
+
+		#dumb, sending image0 when it does nothing: TODO: FIX
+		if (j > process_short_threshold):
+			r_image, results = process_image(args['image0'], args['east'], args['min_confidence'], args['width'], args['height'], image_real=image_to_process, hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=X_offset, offset_Y=Y_offset)
+			header_results += results
+		else:
+			r_image, results = process_image(args['image0'], args['east'], args['min_confidence'], args['width'], args['height'], image_real=image_to_process, hyst_X=process_short_x, hyst_Y=process_short_y, offset_X=X_offset, offset_Y=Y_offset)
+			date_counts_results += results
+
+		full_results += results
+
+#Now clean up results, remove punctuation and duplicates
+
+#Select headers and mark dates if they are there
 
 #show image
 #show_image(image0, results0)

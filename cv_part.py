@@ -67,19 +67,37 @@ def split_image(input_image, horiz_slices=2, horiz_buffer=5, vert_slices=2, vert
 
 	for i in range(vert_slices):
 		for j in range(horiz_slices):
-			start_v_index = (0 if (i==0) else (i*slice_height)-vert_buffer)
-			end_v_index = (origH if (i == (vert_slices-1)) else (((i+1)*slice_height)+vert_buffer))
+			if (i == 0):
+				start_v_index = 0
+				end_v_index = slice_height+(vert_buffer*2)
+			elif (i == (vert_slices-1)):
+				start_v_index = (i*slice_height)-(vert_buffer*2)
+				end_v_index = origH
+			else:
+				start_v_index = (i*slice_height)-vert_buffer
+				end_v_index = ((i+1)*slice_height)+vert_buffer
 
-			start_h_index = (0 if (j==0) else (j*slice_width)-horiz_buffer)
-			end_h_index = (origW if (j == (horiz_slices-1)) else (((j+1)*slice_width)+horiz_buffer))
+			if (j == 0):
+				start_h_index = 0
+				end_h_index = slice_width+(horiz_buffer*2)
+			elif (j == (horiz_slices-1)):
+				start_h_index = (j*slice_width)-(horiz_buffer*2)
+				end_h_index = origW
+			else:
+				start_h_index = (i*slice_width)-horiz_buffer
+				end_h_index = ((i+1)*slice_width)+horiz_buffer
+
+			# start_v_index = (0 if (i==0) else (i*slice_height)-vert_buffer)
+			# end_v_index = (origH if (i == (vert_slices-1)) else (((i+1)*slice_height)+vert_buffer))
+
+			# start_h_index = (0 if (j==0) else (j*slice_width)-horiz_buffer)
+			# end_h_index = (origW if (j == (horiz_slices-1)) else (((j+1)*slice_width)+horiz_buffer))
 
 			sliced_image = image[start_v_index:end_v_index, start_h_index:end_h_index, :]
-			plt.imshow(sliced_image)
-			output_images.append(sliced_image)
 
 	return output_images
 
-def process_image(image, east, min_confidence, width, height, hyst_X=0, hyst_Y=0, offset_X=0, offset_Y=0):
+def process_image(image, east, min_confidence, width, height, image_real=None, hyst_X=0, hyst_Y=0, offset_X=0, offset_Y=0):
 
 	#unnecessary default
 	args = {"image":"/Users/surajmenon/Desktop/findocDocs/apple_test1.png", "east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
@@ -90,7 +108,10 @@ def process_image(image, east, min_confidence, width, height, hyst_X=0, hyst_Y=0
 	args['width'] = width
 	args['height'] = height
 
-	image = cv2.imread(args['image'])
+	if (image_real == None):
+		image = cv2.imread(args['image'])
+	else:
+		image = image_real
 
 	#Saving a original image and shape
 	orig = image.copy()
@@ -140,7 +161,7 @@ def process_image(image, east, min_confidence, width, height, hyst_X=0, hyst_Y=0
 
 	count = 0
 
-	extra_distance = 2
+	extra_distance = 1
 
 	# loop over the bounding boxes to find the coordinate of bounding boxes
 	for (startX, startY, endX, endY) in boxes:

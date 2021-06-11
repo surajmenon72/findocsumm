@@ -51,6 +51,34 @@ def predictions(prob_score, geo, min_confidence):
 
 ######** MAIN **#########
 
+#takes in a full page image and returns a split image according to specifications
+def split_image(input_image, horiz_slices=2, horiz_buffer=5, vert_slices=2, vert_buffer=5):
+
+	image = cv2.imread(input_image)
+
+	orig = image.copy()
+	(origH, origW) = image.shape[:2]
+
+	#lets assume for now these divisions don't need to exactly divide it due to our buffer
+	slice_width = int(origW/horiz_slices)
+	slice_height = int(origH/vert_slices)
+
+	output_images = []
+
+	for i in range(vert_slices):
+		for j in range(horiz_slices):
+			start_v_index = (0 if (i==0) else (i*slice_height)-vert_buffer)
+			end_v_index = (origH if (i == (vert_slices-1)) else (((i+1)*slice_height)+vert_buffer))
+
+			start_h_index = (0 if (j==0) else (j*slice_width)-horiz_buffer)
+			end_h_index = (origW if (j == (horiz_slices-1)) else (((j+1)*slice_width)+horiz_buffer))
+
+			sliced_image = image[start_v_index:end_v_index, start_h_index:end_h_index, :]
+			plt.imshow(sliced_image)
+			output_images.append(sliced_image)
+
+	return output_images
+
 def process_image(image, east, min_confidence, width, height, hyst_X=0, hyst_Y=0, offset_X=0, offset_Y=0):
 
 	#unnecessary default
@@ -68,9 +96,9 @@ def process_image(image, east, min_confidence, width, height, hyst_X=0, hyst_Y=0
 	orig = image.copy()
 	(origH, origW) = image.shape[:2]
 
-	print ('Image Size')
-	print (origH)
-	print (origW)
+	# print ('Image Size')
+	# print (origH)
+	# print (origW)
 
 	# set the new height and width to default 320 by using args #dictionary.  
 	(newW, newH) = (args["width"], args["height"])

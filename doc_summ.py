@@ -2,6 +2,60 @@ import numpy as np
 from matplotlib import pyplot as plt
 from cv_part import split_image, process_image, show_image
 import Levenshtein
+from dateutil.parser import *
+import datefinder
+import string
+
+
+#janky date finding: TODO: Make this work for various dates
+def find_date(result):
+
+	year_beg = 1990
+	year_end = 2030
+	date_x_threshold = 100 #TODO: Tune this for all dates
+	date_y_threshold = 50
+
+	day = 0
+	month = 0
+	year = 0
+
+	((start_X, start_Y, end_X, end_Y), text) = result
+
+	matches = datefinder.find_dates(text) 
+	#assume only one match TODO: make this more general
+	year_found = False
+	dates = []
+	for match in matches:
+		day = match.day
+		month = match.month
+		year = match.year
+
+		#ok, we need to find the year, TODO: make this smarter
+		#for now, just see if there is a date below
+		for ((start_Xy, start_Yy, end_Xy, end_Yy), text) in results:
+
+			start_diff_x = np.abs(start_Xy - start_X)
+			end_diff_x = np.abs(end_Xy - end_X)
+			start_diff_y = start_Yy - start_Y
+			end_diff_y = end_Yy - end_Y
+			total_diff_x = start_diff_x + end_diff_x
+			total_diff_y = start_diff_y + end_diff_y
+
+			if ((total_diff_y > 0) and (total_diff_y < date_y_threshold) and (total_diff_x < date_x_threshold)):
+				new_text = text.split() 
+				for t in new_text:
+					to = t.translate(str.maketrans('', '', string.punctuation))
+					try:
+						pot_year = int(to)
+						if ((pot_year > year_beg) and (pot_year < year_end)):
+							year = pot_year
+							dates.append((day, month, year))
+							year_found = True
+					except:
+						year = year
+
+	return year_found, dates
+
 
 ###** MAIN **###
 
@@ -16,9 +70,9 @@ args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png"
 args['image0']="/Users/surajmenon/Desktop/findocDocs/cat_tc1.png"
 args['image1']="/Users/surajmenon/Desktop/findocDocs/cat_tc2.png"
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
-args['min_confidence'] = 1e-3
-args['width'] = 160
-args['height'] = 160
+args['min_confidence'] = 1e-3 #TODO: tune this
+args['width'] = 320 #TODO: verify these
+args['height'] = 320
 
 #process image
 # image0, results0 = process_image(image=args['image0'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=400, hyst_Y=15)
@@ -34,46 +88,64 @@ args['height'] = 160
 
 num_horiz_slices = 4
 num_vert_slices = 6
+horiz_buffer = 50
+vert_buffer = 50
 
 #split image
-split_images = split_image(args['full_image'], horiz_slices=num_horiz_slices, horiz_buffer=50, vert_slices=num_vert_slices, vert_buffer=50)
+split_images = split_image(args['full_image'], horiz_slices=num_horiz_slices, horiz_buffer=horiz_buffer, vert_slices=num_vert_slices, vert_buffer=vert_buffer)
 
-#capture sizes
+#capture sizes, we assume all widths and heights are the same
+image = split_images[0]
 sub_image_width = split_images[0].shape[1]
 sub_image_height = split_images[0].shape[0]
 
 #process the sets of images
 process_short_threshold = 1
 header_results = []
-date_counts_results = []
+date_results = []
+count_results = []
 full_results = []
 process_wide_x = 400
-process_wide_y = 15
-process_short_x = 30
-process_short_y = 5
+process_wide_y = 4
+process_date_x = 40
+process_date_y = 4
 
 for i in range(num_vert_slices):
 	for j in range(num_horiz_slices):
 		index = (i*num_horiz_slices + j)
 		image_to_process = split_images[index]
 
-		#calculate offset
+		#calculate offset, TODO: Verify this works even though we have the buffer
 		X_offset = j*sub_image_width
 		Y_offset = i*sub_image_height
 
-		#dumb, sending image0 when it does nothing: TODO: FIX
-		if (j > process_short_threshold):
-			r_image, results = process_image(args['image0'], args['east'], args['min_confidence'], args['width'], args['height'], image_real=image_to_process, hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=X_offset, offset_Y=Y_offset)
+		if (j < process_short_threshold):
+			r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=X_offset, offset_Y=Y_offset, remove_boxes=True)
+			#r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=0, offset_Y=0, remove_boxes=True)
 			header_results += results
 		else:
-			r_image, results = process_image(args['image0'], args['east'], args['min_confidence'], args['width'], args['height'], image_real=image_to_process, hyst_X=process_short_x, hyst_Y=process_short_y, offset_X=X_offset, offset_Y=Y_offset)
-			date_counts_results += results
+			r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y, offset_X=X_offset, offset_Y=Y_offset, remove_boxes=False)
+			#r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y, offset_X=0, offset_Y=0, remove_boxes=False)
+
+			#show_image(r_image, results)
+
+			for ((start_X, start_Y, end_X, end_Y), text) in results:
+
+				result = ((start_X, start_Y, end_X, end_Y), text)
+				date_found, dates = find_date(result)
+
+				if (date_found == True):
+					for date in dates:
+						(day, month, year) = date
+						date_results.append(((start_X, start_Y, end_X, end_Y), text, (day, month, year)))
+				else:
+					count_results.append(((start_X, start_Y, end_X, end_Y), text))
 
 		full_results += results
 
-#Now clean up results, remove punctuation and duplicates
+#Now clean up results, remove excess headers and dates, add spellcheck
 
-#Select headers and mark dates if they are there
+
 
 #show image
 #show_image(image0, results0)

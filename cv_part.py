@@ -73,6 +73,7 @@ def remove_nearby_boxes(boxes, threshold=10):
 
 	#remove index from copy
 	removed = 0
+	index_remove.sort()
 	for i in index_remove:
 		i_remove = i - removed
 		boxes_copy = np.delete(boxes_copy, i_remove, axis=0)
@@ -148,6 +149,7 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 	else:
 		image = args['image']
 
+	print ('Processing Image')
 	print (image.shape)
 
 	#Saving a original image and shape
@@ -242,9 +244,9 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 
 		#shift the coordinates before returning
 		startX += (offset_X*extra_distance)
-		#startY += (offset_Y*extra_distance)
+		startY += (offset_Y*extra_distance)
 		endX += (offset_X*extra_distance)
-		#endY += (offset_Y*extra_distance)
+		endY += (offset_Y*extra_distance)
 
 		# append bbox coordinate and associated text to the list of results 
 		results.append(((startX, startY, endX, endY), text))

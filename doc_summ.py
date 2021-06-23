@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 from matplotlib import pyplot as plt
 from cv_part import split_image, process_image, show_image
 import Levenshtein
@@ -89,7 +90,7 @@ def get_closeness(result, n_result):
 	return total_diff
 
 
-def get_similar_items(results, threshold=10):
+def get_similar_headers(results, threshold=10):
 	#find similar headers, TODO: Look for better algorithm for this
 	sim_results = []
 	for i in range(len(results)):
@@ -127,6 +128,12 @@ def print_headers(headers):
 	for oh in ordered_headers:
 		((start_X, start_Y, end_X, end_Y), text) = oh
 		print (text)
+
+def sort_headers(headers):
+	ordered_headers = sorted(headers, key=lambda tup: tup[0][1])
+
+	return ordered_headers
+
 
 #TODO: This func sucks, fix it to make it more efficient
 def delete_similar_headers(results, sim_items):
@@ -166,9 +173,7 @@ def delete_similar_headers(results, sim_items):
 
 		if (found == False):
 			result_to_copy = results[i]
-			((start_X, start_Y, end_X, end_Y), text) = result_to_copy
 			results_new.append(result_to_copy)
-
 
 	#now cleanup, remove punctuation, and remove those with too few real words
 	for i in range(len(results_new)):
@@ -198,8 +203,113 @@ def delete_similar_headers(results, sim_items):
 
 	return results_final
 
+def get_date_closeness(result, n_result, date_a, date_b):
+	((start_X, start_Y, end_X, end_Y), text) = result
+	((start_Xn, start_Yn, end_Xn, end_Yn), textn) = n_result
+
+	#word_thresh = 5 #TODO: Tune this better, and fix this whole distance system
+	frac_thresh = .5 #1 distance per 10 chars
+
+	len1 = len(text)
+	len2 = len(textn)
+	min_len = np.minimum(len1, len2)
+
+	word_thresh = frac_thresh*min_len
+
+	dist = Levenshtein.distance(text, textn) #TODO: probably is a better way to do this
+	if (dist < word_thresh):	
+		startx_diff = np.abs(start_X - start_Xn)
+		endx_diff = np.abs(end_X - end_Xn)
+		starty_diff = np.abs(start_Y - start_Yn)
+		endy_diff = np.abs(end_Y - end_Yn)
+
+		total_diff = startx_diff+endx_diff+starty_diff+endy_diff
+	else:
+		#words aren't close, just let it pass
+		total_diff = 1e6
+	return total_diff
+
+def get_similar_dates(results, clean_dates, threshold=10):
+	sim_results = []
+	for i in range(len(results)):
+		result = results[i]
+		similar = []
+		in_list = any(i in sublist for sublist in sim_results) #TODO: Verify our vals are tuned so that this is never needed
+		if (in_list == False):
+			similar.append(i)
+			for j in range(len(results)):
+				n_result = results[j]
+				if (i != j):
+					closeness = get_date_closeness(result, n_result, clean_dates[i], clean_dates[j])
+					if (closeness < threshold):
+							also_in_list = any(j in sublist for sublist in sim_results)
+							if (also_in_list == False):
+								similar.append(j)
+
+			if (len(similar) > 1):
+				sim_results.append(similar)
+
+	return sim_results
+
 def delete_similar_dates(results, dates, sim_items):
-	print ('Deleting Similar Dates')
+	d = enchant.Dict("en_US")
+	results_new = []
+	dates_new = []
+	for l in sim_items:
+		#keep the item that has the most real words
+		most_real_words = 0
+		best_i = 0
+		for i in range(len(l)):
+			index = l[i]
+			result = results[index]
+			((start_X, start_Y, end_X, end_Y), text) = result
+			words = text.split()
+			current_real_words = 0
+			for word in words:
+				if (d.check(str(word))):
+					current_real_words += 1
+
+			if (current_real_words > most_real_words):
+				most_real_words = current_real_words
+				best_i = i
+
+		best_index = l[best_i]
+		result_to_copy = results[best_index]
+		date_to_copy = dates[best_index]
+		results_new.append(result_to_copy)
+		dates_new.append(date_to_copy)
+
+	#add the non similar pieces
+	for i in range(len(results)):
+		found = False
+		for l in sim_items:
+			if (i in l):
+				found = True
+				break
+
+		if (found == False):
+			result_to_copy = results[i]
+			date_to_copy = dates[i]
+			results_new.append(result_to_copy)
+			dates_new.append(date_to_copy)
+
+	return results_new, dates_new
+
+def delete_false_counts(results):
+	clean_results = []
+	dummy = 0
+	for result in results:
+		((start_X, start_Y, end_X, end_Y), text) = result
+		clean_text = text.translate(str.maketrans({key: "".format(key) for key in string.punctuation}))
+
+		try:
+			count = int(clean_text)
+			result_to_append = ((start_X, start_Y, end_X, end_Y), count)
+			clean_results.append(result_to_append)
+		except:
+			dummy = dummy
+
+	return clean_results
 
 def get_crosshair_distance(header, date, count):
 	((start_X, start_Y, end_X, end_Y), text) = header
@@ -211,9 +321,11 @@ def get_crosshair_distance(header, date, count):
 	d3 = np.abs(start_Xd - start_Xc)
 	d4 = np.abs(end_Xd - end_Xc)
 
+	header_distance = d1+d2
+	date_distance = d3+d4
 	new_distance = d1+d2+d3+d4
 
-	return new_distance
+	return new_distance, header_distance, date_distance
 
 
 def crosshair_results(headers, dates, counts):
@@ -221,6 +333,9 @@ def crosshair_results(headers, dates, counts):
 	total_dates = len(dates)
 
 	results = np.zeros((total_headers, total_dates))
+
+	header_thresh = 50 #TODO: Tune these values
+	date_thresh = 200
 
 	for i in range(len(headers)):
 		for j in range(len(dates)): 
@@ -233,37 +348,126 @@ def crosshair_results(headers, dates, counts):
 
 			best_distance = 1e6
 			best_index = 0
+			hd_valid = False
+
 			#look for a result
 			for k in range(len(counts)):
 				count = counts[k]
 
 				((start_Xc, start_Yc, end_Xc, end_Yc), textc) = count
-				distance = get_crosshair_distance(header, date, count)
+				distance, hd, dd = get_crosshair_distance(header, date, count)
 
-				if (distance < best_distance):
-					best_distance = distance
-					best_index = k
+				if ((hd < header_thresh) and (dd < date_thresh)):
+					if (distance < best_distance):
+						hd_valid = True
+						best_distance = distance
+						best_index = k
 
-			results[i, j] = best_index
+			if (hd_valid == True):
+				results[i, j] = best_index
+			else:
+				results[i, j] = 0
 
 	return results
 
-def print_results(headers, dates, dates_full, results):
-	filename = 'results.csv'
-	with open('results.csv', mode='w') as csv_file:
-	    fieldnames = ['Field']
+def clean_results(results):
+	rows = results.shape[0]
+	cols = results.shape[1]
 
-	    for date in dates_fuull:
-	    	(day, month, year) = date
-	    	d = datetime.date(year, month, day)
-	    	fieldnames.append(d)
+	results_copy = results.copy()
 
-	    writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
-	    writer.writeheader()
+	row_header = np.arange(rows).reshape(rows, 1) 
+	col_header = (np.arange(cols+1) - 1).reshape(1, cols+1)
 
-	    #This might not work
-	    writer.writerow({'emp_name': 'John Smith', 'dept': 'Accounting', 'birth_month': 'November'})
-	    writer.writerow({'emp_name': 'Erica Meyers', 'dept': 'IT', 'birth_month': 'March'})
+	results_copy = np.concatenate((row_header, results_copy), axis=1)
+
+	results_copy = np.concatenate((col_header, results_copy), axis=0)
+
+	rows = results_copy.shape[0]
+	cols = results_copy.shape[1]
+
+	#del cols
+	col_thresh = int(rows/2)
+	del_cols = []
+
+	for j in range(cols):
+		arr = results_copy[:, j]
+		count = np.count_nonzero(arr)
+		if (count < col_thresh):
+			del_cols.append(j)
+
+	c = 0
+	for d in del_cols:
+		ind = d - c
+		results_copy = np.delete(results_copy, ind, axis=1)
+		c += 1
+
+	#del rows, actually just leave, and just BOLD in the printing section
+	# new_cols = results_copy.shape[1]
+	# row_thresh = int(new_cols-1)
+	# del_rows = []
+
+	# for i in range(rows):
+	# 	arr = results_copy[i, :]
+	# 	count = np.count_nonzero(arr)
+	# 	if (count < row_thresh):
+	# 		del_rows.append(i)
+
+	# c = 0
+	# for d in del_rows:
+	# 	ind = d - c
+	# 	results_copy = np.delete(results_copy, ind, axis=0)
+	# 	c += 1
+
+	return results_copy
+
+
+def print_results(headers, dates, dates_full, counts, clean_results, filename):
+	headers_text = []
+
+	num_cols = clean_results.shape[1]-1
+	col_thresh = num_cols-1 #TODO: Verify, but allow one zero
+	zero_rows = []
+	c = 1
+	for header in headers:
+		((start_X, start_Y, end_X, end_Y), text) = header
+		arr = clean_results[c, :]
+		count = np.count_nonzero(arr)
+		if (count < col_thresh):
+			zero_rows.append(c)
+			text = text.upper()
+			headers_text.append(text)
+		else:
+			headers_text.append(text)
+		c += 1
+
+	df = pd.DataFrame({'Headers': headers_text})
+
+	date_cols = clean_results[0, :]
+
+	for c in range(1, num_cols+1):
+		ind_dc = int(date_cols[c])
+		date = dates[ind_dc]
+		date_full = dates_full[ind_dc]
+		date_str = str(c) + '-' + str(date_full[0]) + '/' + str(date_full[1]) + '/' + str(date_full[2])
+
+		#fill in values
+		col_arr = clean_results[:, c]
+		values = []
+		for i in range(1, len(col_arr)):
+			if (i not in zero_rows):
+				val_ind = int(col_arr[i])
+				count = counts[val_ind]
+				((start_Xc, start_Yc, end_Xc, end_Yc), textc) = count
+				values.append(int(textc))
+			else:
+				values.append('--')
+
+		#add to dateframe
+		df[date_str] = values
+
+	print (df)
+	df.to_excel(filename, sheet_name='sheet1', index=False)
 
 
 ###** MAIN **###
@@ -275,9 +479,10 @@ def print_results(headers, dates, dates_full, results):
 #Creating argument dictionary for the default arguments needed in the code. 
 args = {"full_image":"/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png","east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
 
-#args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
+filename = 'apple.xlsx'
+args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full1.png" #cat
-args['full_image']="/Users/surajmenon/Desktop/findocDocs/mcds_tc_full1.png" #mcds
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/mcds_tc_full1.png" #mcds
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
 args['min_confidence'] = 1e-3 #TODO: tune this
 args['width'] = 320 #TODO: verify these
@@ -360,44 +565,53 @@ header_threshold = 300
 date_threshold = 150
 count_threshold = 50
 
-sim_headers = get_similar_items(header_results, threshold=header_threshold)
-sim_dates = get_similar_items(date_results, threshold=date_threshold)
-sim_counts = get_similar_items(count_results, threshold=count_threshold)
+sim_headers = get_similar_headers(header_results, threshold=header_threshold)
+sim_dates = get_similar_dates(date_results, dates_parsed, threshold=date_threshold)
+#sim_counts = get_similar_items(count_results, threshold=count_threshold)
 
-print ('Similar Pieces')
-print (sim_headers)
-print (sim_dates)
-print (sim_counts)
+# print ('Similar Pieces')
+# print (sim_headers)
+# print (sim_dates)
+# print (sim_counts)
 
 #print (header_results)
 #print_similar(header_results, sim_headers)
 
 #now delete items based on some metric, for now just get rid of headers
 trim_headers = delete_similar_headers(header_results, sim_headers)
+trim_headers = sort_headers(trim_headers)
 
 #add something here to remove excess dates
-trim_dates = delete_similar_dates(date_results, dates_parsed, sim_dates)
+trim_dates_r, trim_dates = delete_similar_dates(date_results, dates_parsed, sim_dates)
 
-#delete headers and dates that don't have crosshairs
+#clean counts of non counts
+trim_counts = delete_false_counts(count_results)
 
 #print headers in order
-print_headers(trim_headers)
+#print_headers(trim_headers)
 
-print ('Current Output')
-print (trim_headers)
-print (date_results)
-print (dates_parsed)
-exit()
+# print ('Current Output')
+# print (trim_headers)
+#print (trim_dates_r)
+#print (trim_dates)
 
 #Add something here for context
 				
 #do spellcheck, embedding check
 
 #Now find all the crosshairs and save in an array
-final_results = crosshair_results(trim_headers, date_results, count_results)
+final_results = crosshair_results(trim_headers, trim_dates_r, trim_counts)
+
+#print (final_results)
+
+#delete headers and dates that don't have crosshairs, or we could do that in cross_hair results
+clean_final_results = clean_results(final_results)
+
+#print ('Clean Results')
+#print (clean_final_results)
 
 #print results
-printed_results = print_results(trim_headers, date_results, dates_parsed, final_results)
+printed_results = print_results(trim_headers, trim_dates_r, trim_dates, trim_counts, clean_final_results, filename)
 
 #output to csv
 

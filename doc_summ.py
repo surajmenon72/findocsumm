@@ -1,5 +1,5 @@
 import numpy as np
-import pandas as pd
+import pandas as pd #need openpyxl as well
 from matplotlib import pyplot as plt
 from cv_part import split_image, process_image, show_image
 import Levenshtein
@@ -10,58 +10,140 @@ import string
 import enchant
 import csv
 
-#janky date finding: TODO: Make this work for various dates
-def find_date(results, result):
+def find_years(results):
 	year_beg = 1990
 	year_end = 2030
-	date_x_threshold = 100 #TODO: Tune this for all dates
-	date_y_threshold = 50
-
-	day = 0
-	month = 0
+	years = []
 	year = 0
+	for ((start_Xy, start_Yy, end_Xy, end_Yy), text) in results:
+		new_text = text.split()
+		for word in new_text:
+			word_c = word.translate(str.maketrans({key: " ".format(key) for key in string.punctuation}))
+			try:
+				pot_year = int(word_c)
+				if ((pot_year > year_beg) and (pot_year < year_end)):
+					year = pot_year
+					year_to_append = ((start_Xy, start_Yy, end_Xy, end_Yy), pot_year)
+					years.append(year_to_append)
+			except:
+				year = year
+	return years
 
-	((start_X, start_Y, end_X, end_Y), text) = result
+def find_dates(results):
+	d = enchant.Dict("en_US")
+	months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+	dates = []
+	for ((start_Xy, start_Yy, end_Xy, end_Yy), text) in results:
+		matches = datefinder.find_dates(text)
+		try:
+			for match in matches:
+				day = match.day
+				month = match.month
+				year = match.year
 
-	matches = datefinder.find_dates(text)
+				#check to make sure this is real text
+				words = text.split()
+				current_real_words = 0
+				for word in words:
+					if (word in months):
+						current_real_words += 1
 
-	#assume only one match TODO: make this more general
-	try:
-		year_found = False
-		dates = []
-		for match in matches:
-			day = match.day
-			month = match.month
-			year = match.year
+				if (current_real_words > 0):
+					date_to_append = ((start_Xy, start_Yy, end_Xy, end_Yy), text, (day, month, year))
+					dates.append(date_to_append)
+		except:
+			print ('No Date')
+	return dates
 
-			#ok, we need to find the year, TODO: make this smarter
-			#for now, just see if there is a date below
-			for ((start_Xy, start_Yy, end_Xy, end_Yy), text) in results:
 
-				start_diff_x = np.abs(start_Xy - start_X)
-				end_diff_x = np.abs(end_Xy - end_X)
-				start_diff_y = start_Yy - start_Y
-				end_diff_y = end_Yy - end_Y
-				total_diff_x = start_diff_x + end_diff_x
-				total_diff_y = start_diff_y + end_diff_y
+def match_years_dates(years, dates):
+	date_threshold = 500
+	final_dates = []
+	final_dates_full = []
+	for year in years:
+		((start_Xy, start_Yy, end_Xy, end_Yy), year_v) = year
+		date_found = False
+		closest_date = 1e6
+		pot_date = 0
+		dt = 0
+		for date in dates:
+			((start_X, start_Y, end_X, end_Y), date_text, (day, month, year)) = date
 
-				if ((total_diff_y > 0) and (total_diff_y < date_y_threshold) and (total_diff_x < date_x_threshold)):
-					new_text = text.split() 
-					for t in new_text:
-						#to = t.translate(str.maketrans(' ', ' ', string.punctuation))
-						to = t.translate(str.maketrans({key: " ".format(key) for key in string.punctuation}))
-						try:
-							pot_year = int(to)
-							if ((pot_year > year_beg) and (pot_year < year_end)):
-								year = pot_year
-								dates.append((day, month, year))
-								year_found = True
-						except:
-							year = year
-	except:
-		print ('No Date')
+			start_diff_x = np.abs(start_Xy - start_X)
+			end_diff_x = np.abs(end_Xy - end_X)
+			start_diff_y = np.abs(start_Yy - start_Y) #added back abs value here, allow year to be anywhere around date
+			end_diff_y = np.abs(end_Yy - end_Y)
+			total_diff_x = start_diff_x + end_diff_x
+			total_diff_y = start_diff_y + end_diff_y
+			total_diff = total_diff_x + total_diff_y
 
-	return year_found, dates
+			if (total_diff < date_threshold):
+				if (total_diff < closest_date):
+					date_found = True
+					closest_date = total_diff
+					pot_date = (day, month, year_v)
+					dt = date_text
+
+		if (date_found == True):
+			final_date_to_append = ((start_Xy, start_Yy, end_Xy, end_Yy), dt) # the year is the standard
+			final_full_date_to_append = pot_date
+
+			final_dates.append(final_date_to_append)
+			final_dates_full.append(final_full_date_to_append)
+
+	return final_dates, final_dates_full
+
+
+
+#janky date finding: TODO: Make this work for various dates
+# def find_date(result, years):
+# 	date_x_threshold = 100 #TODO: Tune this for all dates
+# 	date_y_threshold = 50
+
+# 	day = 0
+# 	month = 0
+# 	year = 0
+
+# 	((start_X, start_Y, end_X, end_Y), text) = result
+
+# 	matches = datefinder.find_dates(text)
+
+# 	#assume only one match TODO: make this more general
+# 	try:
+# 		dates = []
+# 		for match in matches:
+# 			day = match.day
+# 			month = match.month
+# 			year = match.year
+
+# 			#ok, we need to find the year, TODO: make this smarter
+# 			#for now, just see if there is a date below
+# 			closest_year = 1e6
+# 			year_found = False
+# 			pot_year = 0
+# 			for year in years:
+# 				((start_Xy, start_Yy, end_Xy, end_Yy), year_v) = year
+
+# 				start_diff_x = np.abs(start_Xy - start_X)
+# 				end_diff_x = np.abs(end_Xy - end_X)
+# 				start_diff_y = np.abs(start_Yy - start_Y) #added back abs value here, allow year to be anywhere around date
+# 				end_diff_y = np.abs(end_Yy - end_Y)
+# 				total_diff_x = start_diff_x + end_diff_x
+# 				total_diff_y = start_diff_y + end_diff_y
+# 				total_diff = total_diff_x + total_diff_y
+
+# 				#if ((total_diff_y > 0) and (total_diff_y < date_y_threshold) and (total_diff_x < date_x_threshold)):
+# 				if (total_diff < closest_year):
+# 					year_found = True
+# 					pot_year = year_v
+# 					closest_year = total_diff
+
+# 			if (year_found == True):
+# 				dates.append((day, month, pot_year))
+# 	except:
+# 		print ('No Date')
+
+# 	return year_found, dates
 
 def get_closeness(result, n_result):
 	((start_X, start_Y, end_X, end_Y), text) = result
@@ -300,10 +382,17 @@ def delete_false_counts(results):
 	dummy = 0
 	for result in results:
 		((start_X, start_Y, end_X, end_Y), text) = result
-		clean_text = text.translate(str.maketrans({key: "".format(key) for key in string.punctuation}))
-
+		trans_dict = {}
+		for key in string.punctuation:
+			if (key == '.'):
+				trans_dict[key] = '.'.format(key)
+			else:
+				trans_dict[key] = ''.format(key)
+		clean_text = text.translate(str.maketrans(trans_dict))
+		#clean_text = text.translate(str.maketrans({key: "".format(key) for key in string.punctuation}))
+		#clean_text = text
 		try:
-			count = int(clean_text)
+			count = float(clean_text)
 			result_to_append = ((start_X, start_Y, end_X, end_Y), count)
 			clean_results.append(result_to_append)
 		except:
@@ -432,7 +521,7 @@ def print_results(headers, dates, dates_full, counts, clean_results, filename):
 	for header in headers:
 		((start_X, start_Y, end_X, end_Y), text) = header
 		arr = clean_results[c, :]
-		count = np.count_nonzero(arr)
+		count = (np.count_nonzero(arr)-1) #include the column header, except for first row
 		if (count < col_thresh):
 			zero_rows.append(c)
 			text = text.upper()
@@ -459,7 +548,7 @@ def print_results(headers, dates, dates_full, counts, clean_results, filename):
 				val_ind = int(col_arr[i])
 				count = counts[val_ind]
 				((start_Xc, start_Yc, end_Xc, end_Yc), textc) = count
-				values.append(int(textc))
+				values.append(float(textc))
 			else:
 				values.append('--')
 
@@ -467,7 +556,8 @@ def print_results(headers, dates, dates_full, counts, clean_results, filename):
 		df[date_str] = values
 
 	print (df)
-	df.to_excel(filename, sheet_name='sheet1', index=False)
+	#df.to_excel(filename, sheet_name='sheet1', index=False)
+	df.to_csv(filename, index=False)
 
 
 ###** MAIN **###
@@ -479,9 +569,10 @@ def print_results(headers, dates, dates_full, counts, clean_results, filename):
 #Creating argument dictionary for the default arguments needed in the code. 
 args = {"full_image":"/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png","east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
 
-filename = 'apple.xlsx'
-args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
-#args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full1.png" #cat
+filename = 'cat.csv'
+
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
+args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full1.png" #cat
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/mcds_tc_full1.png" #mcds
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
 args['min_confidence'] = 1e-3 #TODO: tune this
@@ -516,6 +607,8 @@ sub_image_height = split_images[0].shape[0]
 #process the sets of images
 process_short_threshold = 1
 header_results = []
+year_results = []
+dm_results = []
 date_results = []
 dates_parsed = []
 count_results = []
@@ -544,20 +637,32 @@ for i in range(num_vert_slices):
 
 			#show_image(r_image, results)
 
-			for ((start_X, start_Y, end_X, end_Y), text) in results:
+			years = find_years(results)
 
-				result = ((start_X, start_Y, end_X, end_Y), text)
-				date_found, dates = find_date(results, result)
+			dm = find_dates(results)
 
-				if (date_found == True):
-					for date in dates:
-						(day, month, year) = date
-						date_results.append(((start_X, start_Y, end_X, end_Y), text))
-						dates_parsed.append(date)
-				else:
-					count_results.append(((start_X, start_Y, end_X, end_Y), text))
+			year_results += years
+			dm_results += dm
+
+			count_results += results
+
+			# for result in results:
+			# 	((start_X, start_Y, end_X, end_Y), text) = result
+			# 	date_found, dates = find_date(result, years)
+
+			# 	if (date_found == True):
+			# 		for date in dates:
+			# 			(day, month, year) = date
+			# 			date_results.append(((start_X, start_Y, end_X, end_Y), text))
+			# 			dates_parsed.append(date)
+			# 	else:
+			# 		count_results.append(((start_X, start_Y, end_X, end_Y), text))
 
 		full_results += results
+
+date_results_new, dates_parsed_new = match_years_dates(year_results, dm_results)
+date_results += date_results_new
+dates_parsed += dates_parsed_new
 
 #Now clean up results, remove excess headers and dates, add spellcheck
 #TODO: Tune these values
@@ -584,6 +689,10 @@ trim_headers = sort_headers(trim_headers)
 #add something here to remove excess dates
 trim_dates_r, trim_dates = delete_similar_dates(date_results, dates_parsed, sim_dates)
 
+print ('Trimmed Dates')
+print (trim_dates_r)
+print (trim_dates)
+
 #clean counts of non counts
 trim_counts = delete_false_counts(count_results)
 
@@ -606,6 +715,10 @@ final_results = crosshair_results(trim_headers, trim_dates_r, trim_counts)
 
 #delete headers and dates that don't have crosshairs, or we could do that in cross_hair results
 clean_final_results = clean_results(final_results)
+
+print (final_results)
+print ('Clean')
+print (clean_final_results)
 
 #print ('Clean Results')
 #print (clean_final_results)

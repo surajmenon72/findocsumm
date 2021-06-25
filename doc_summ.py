@@ -84,7 +84,7 @@ def find_dates(results):
 
 
 def match_years_dates(years, dates):
-	date_threshold = 500
+	date_threshold = 500 #TODO: Need to tune this
 	final_dates = []
 	final_dates_full = []
 	for year in years:
@@ -121,7 +121,7 @@ def match_years_dates(years, dates):
 	return final_dates, final_dates_full
 
 def find_contexts(results):
-	date_contexts = ['Months Ended']
+	date_contexts = ['Months Ended', 'Months ended', 'months ended', 'Weeks Ended', 'Weeks ended', 'weeks ended']
 	count_contexts = ['in millions', 'In Millions', 'In millions', 'in billions', 'In Billions', 'In billions']
 
 	new_date_contexts = []
@@ -554,9 +554,11 @@ def print_results(headers, dates, dates_full, counts, date_contexts, count_conte
 	headers_text = []
 
 	#select the count context, for now just pick the first one. TODO: Make this more sophis
-	cc = count_contexts[0]
-	((start_X, start_Y, end_X, end_Y), text) = cc
-	start_header = text
+	start_header = ''
+	if (len(count_contexts) > 0):
+		cc = count_contexts[0]
+		((start_X, start_Y, end_X, end_Y), text) = cc
+		start_header = text
 
 	num_cols = clean_results.shape[1]-1
 	col_thresh = num_cols-1 #TODO: Verify, but allow one zero
@@ -584,9 +586,14 @@ def print_results(headers, dates, dates_full, counts, date_contexts, count_conte
 		ind_dc = int(date_cols[c])
 		date = dates[ind_dc]
 		date_full = dates_full[ind_dc]
-		ctxt = date_contexts[c-1]
-		((start_Xc, start_Yc, end_Xc, end_Yc), textc) = ctxt
-		date_str = str(c) + '-' + str(date_full[0]) + '/' + str(date_full[1]) + '/' + str(date_full[2]) + '--' + textc
+		c_text = ''
+		print (date_contexts)
+		if (len(date_contexts) > 0):
+			ctxt = date_contexts[c-1]
+			if (ctxt):
+				((start_Xc, start_Yc, end_Xc, end_Yc), textc) = ctxt
+				c_text = textc
+		date_str = str(c) + '-' + str(date_full[0]) + '/' + str(date_full[1]) + '/' + str(date_full[2]) + '--' + c_text
 
 		#fill in values
 		col_arr = clean_results[:, c]
@@ -616,8 +623,10 @@ args = {"full_image":"/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png","
 filename = 'apple.csv'
 
 args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
-#args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full1.png" #cat
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full2.png" #cat
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/mcds_tc_full1.png" #mcds
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/gme_tc_full1.png" #gme
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full1.png" #adobe
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
 args['min_confidence'] = 1e-3 #TODO: tune this
 args['width'] = 320 #TODO: verify these
@@ -700,15 +709,6 @@ count_threshold = 50
 
 sim_headers = get_similar_headers(header_results, threshold=header_threshold)
 sim_dates = get_similar_dates(date_results, dates_parsed, threshold=date_threshold)
-#sim_counts = get_similar_items(count_results, threshold=count_threshold)
-
-# print ('Similar Pieces')
-# print (sim_headers)
-# print (sim_dates)
-# print (sim_counts)
-
-#print (header_results)
-#print_similar(header_results, sim_headers)
 
 #now delete items based on some metric, for now just get rid of headers
 trim_headers = delete_similar_headers(header_results, sim_headers)
@@ -717,42 +717,18 @@ trim_headers = sort_headers(trim_headers)
 #add something here to remove excess dates
 trim_dates_r, trim_dates = delete_similar_dates(date_results, dates_parsed, sim_dates)
 
-# print ('Trimmed Dates')
-# print (trim_dates_r)
-# print (trim_dates)
-
 trim_date_contexts = connect_date_contexts(trim_dates_r, trim_dates, date_contexts)
-#print (trim_date_contexts)
 
 #clean counts of non counts
 trim_counts = delete_false_counts(count_results)
-
-#print headers in order
-#print_headers(trim_headers)
-
-# print ('Current Output')
-# print (trim_headers)
-#print (trim_dates_r)
-#print (trim_dates)
-
-#Add something here for context
 				
 #do spellcheck, embedding check
 
 #Now find all the crosshairs and save in an array
 final_results = crosshair_results(trim_headers, trim_dates_r, trim_counts)
 
-#print (final_results)
-
 #delete headers and dates that don't have crosshairs, or we could do that in cross_hair results
 clean_final_results = clean_results(final_results)
-
-# print (final_results)
-# print ('Clean')
-# print (clean_final_results)
-
-#print ('Clean Results')
-#print (clean_final_results)
 
 #print results
 printed_results = print_results(trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, filename)

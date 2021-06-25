@@ -149,8 +149,9 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 	else:
 		image = args['image']
 
-	print ('Processing Image')
-	print (image.shape)
+	#print ('Processing Image')
+	#print (image.shape)
+	print ('.')
 
 	#Saving a original image and shape
 	orig = image.copy()

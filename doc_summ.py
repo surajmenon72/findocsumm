@@ -171,57 +171,6 @@ def connect_date_contexts(dates, full_dates, date_contexts):
 
 	return date_contexts_final
 
-
-#janky date finding: TODO: Make this work for various dates
-# def find_date(result, years):
-# 	date_x_threshold = 100 #TODO: Tune this for all dates
-# 	date_y_threshold = 50
-
-# 	day = 0
-# 	month = 0
-# 	year = 0
-
-# 	((start_X, start_Y, end_X, end_Y), text) = result
-
-# 	matches = datefinder.find_dates(text)
-
-# 	#assume only one match TODO: make this more general
-# 	try:
-# 		dates = []
-# 		for match in matches:
-# 			day = match.day
-# 			month = match.month
-# 			year = match.year
-
-# 			#ok, we need to find the year, TODO: make this smarter
-# 			#for now, just see if there is a date below
-# 			closest_year = 1e6
-# 			year_found = False
-# 			pot_year = 0
-# 			for year in years:
-# 				((start_Xy, start_Yy, end_Xy, end_Yy), year_v) = year
-
-# 				start_diff_x = np.abs(start_Xy - start_X)
-# 				end_diff_x = np.abs(end_Xy - end_X)
-# 				start_diff_y = np.abs(start_Yy - start_Y) #added back abs value here, allow year to be anywhere around date
-# 				end_diff_y = np.abs(end_Yy - end_Y)
-# 				total_diff_x = start_diff_x + end_diff_x
-# 				total_diff_y = start_diff_y + end_diff_y
-# 				total_diff = total_diff_x + total_diff_y
-
-# 				#if ((total_diff_y > 0) and (total_diff_y < date_y_threshold) and (total_diff_x < date_x_threshold)):
-# 				if (total_diff < closest_year):
-# 					year_found = True
-# 					pot_year = year_v
-# 					closest_year = total_diff
-
-# 			if (year_found == True):
-# 				dates.append((day, month, pot_year))
-# 	except:
-# 		print ('No Date')
-
-# 	return year_found, dates
-
 def get_closeness(result, n_result):
 	((start_X, start_Y, end_X, end_Y), text) = result
 	((start_Xn, start_Yn, end_Xn, end_Yn), textn) = n_result
@@ -471,21 +420,15 @@ def delete_false_counts(results):
 		clean_text = text.translate(str.maketrans(trans_dict))
 		#clean_text = text.translate(str.maketrans({key: "".format(key) for key in string.punctuation}))
 		#clean_text = text
-		print (text)
-		print (clean_text)
 
 		try:
 			count = float(clean_text)
-			print ('Found count!')
-			print (count)
+
 			#try to reject high decimal points
 			s_count = str(count)
 			append = True
 			if ('.' in s_count):
-				print ('Checking for Decimal')
 				sct = s_count.split('.')
-				print (sct[1])
-				print (len(sct[1]))
 				if (len(sct[1]) > dec_place_limit):
 					append = False
 			if (append == True):
@@ -667,10 +610,6 @@ def print_results(headers, dates, dates_full, counts, date_contexts, count_conte
 
 ###** MAIN **###
 
-#look_for = ['Total Net Sales', '2020'] #apple
-#look_for = ['Revenues from franchised restaurants', '2019'] #mcds
-#look_for = ['Total Sales and Revenues', '2020'] #cat
-
 #Creating argument dictionary for the default arguments needed in the code. 
 args = {"full_image":"/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png","east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
 
@@ -684,17 +623,6 @@ args['min_confidence'] = 1e-3 #TODO: tune this
 args['width'] = 320 #TODO: verify these
 args['height'] = 320
 
-#process image
-# image0, results0 = process_image(image=args['image0'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=400, hyst_Y=15)
-# (origH0, origW0) = image0.shape[:2]
-
-# image1, results1 = process_image(image=args['image1'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=30, hyst_Y=5, offset_X=origW0, offset_Y=origH0)
-
-#for printing image
-#image1, results1 = process_image(image=args['image1'], args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=30, hyst_Y=5, offset_X=0, offset_Y=0)
-
-#append results
-#results = results0 + results1
 
 num_horiz_slices = 4
 num_vert_slices = 6
@@ -755,18 +683,6 @@ for i in range(num_vert_slices):
 			count_results += results
 			context_results += cresults
 
-			# for result in results:
-			# 	((start_X, start_Y, end_X, end_Y), text) = result
-			# 	date_found, dates = find_date(result, years)
-
-			# 	if (date_found == True):
-			# 		for date in dates:
-			# 			(day, month, year) = date
-			# 			date_results.append(((start_X, start_Y, end_X, end_Y), text))
-			# 			dates_parsed.append(date)
-			# 	else:
-			# 		count_results.append(((start_X, start_Y, end_X, end_Y), text))
-
 		full_results += results
 
 date_results_new, dates_parsed_new = match_years_dates(year_results, dm_results)
@@ -801,13 +717,12 @@ trim_headers = sort_headers(trim_headers)
 #add something here to remove excess dates
 trim_dates_r, trim_dates = delete_similar_dates(date_results, dates_parsed, sim_dates)
 
-print ('Trimmed Dates')
-print (trim_dates_r)
-print (trim_dates)
+# print ('Trimmed Dates')
+# print (trim_dates_r)
+# print (trim_dates)
 
-print (date_contexts)
 trim_date_contexts = connect_date_contexts(trim_dates_r, trim_dates, date_contexts)
-print (trim_date_contexts)
+#print (trim_date_contexts)
 
 #clean counts of non counts
 trim_counts = delete_false_counts(count_results)
@@ -832,9 +747,9 @@ final_results = crosshair_results(trim_headers, trim_dates_r, trim_counts)
 #delete headers and dates that don't have crosshairs, or we could do that in cross_hair results
 clean_final_results = clean_results(final_results)
 
-print (final_results)
-print ('Clean')
-print (clean_final_results)
+# print (final_results)
+# print ('Clean')
+# print (clean_final_results)
 
 #print ('Clean Results')
 #print (clean_final_results)

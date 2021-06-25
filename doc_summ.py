@@ -10,6 +10,33 @@ import string
 import enchant
 import csv
 
+def get_result_distance(result1, result2):
+	((start_X, start_Y, end_X, end_Y), text) = result1
+	((start_Xy, start_Yy, end_Xy, end_Yy), texty) = result2
+
+	d1 = np.abs(start_X-start_Xy)
+	d2 = np.abs(end_X-end_Xy)
+	d3 = np.abs(start_Y-start_Yy)
+	d4 = np.abs(end_Y-end_Yy)
+
+	total_distance = d1+d2+d3+d4
+	return total_distance
+
+def get_mid_result_distance(result1, result2):
+	((start_X, start_Y, end_X, end_Y), text) = result1
+	((start_Xy, start_Yy, end_Xy, end_Yy), texty) = result2
+
+	X1 = int((end_X - start_X)/2)
+	Y1 = int((end_Y - start_Y)/2)
+
+	d1 = np.abs(X1-start_Xy)
+	d2 = np.abs(X1-end_Xy)
+	d3 = np.abs(Y1-start_Yy)
+	d4 = np.abs(Y1-end_Yy)
+
+	total_distance = d1+d2
+	return total_distance
+
 def find_years(results):
 	year_beg = 1990
 	year_end = 2030
@@ -93,6 +120,56 @@ def match_years_dates(years, dates):
 
 	return final_dates, final_dates_full
 
+def find_contexts(results):
+	date_contexts = ['Months Ended']
+	count_contexts = ['in millions', 'In Millions', 'In millions', 'in billions', 'In Billions', 'In billions']
+
+	new_date_contexts = []
+	new_count_contexts = []
+	for result in results:
+		((start_X, start_Y, end_X, end_Y), text) = result
+
+		context_found = False
+		for c in date_contexts:
+			if (c in text):
+				context_found = True
+				s_text = text.split()
+				index = 0
+				for i in range(len(s_text)):
+					if (s_text[i] == c[0]): #should be 'Months'
+						if (i > 0):
+							index = i-1
+
+				text_to_append = s_text[index] + ' ' + s_text[index+1] + ' ' + s_text[index+2]
+				context_to_append = ((start_X, start_Y, end_X, end_Y), text_to_append)
+				new_date_contexts.append(context_to_append)
+
+		if (context_found == False):
+			for c in count_contexts:
+				if (c in text):
+					context_found = True
+					text_to_append = c.lower()
+					context_to_append = ((start_X, start_Y, end_X, end_Y), text_to_append)
+					new_count_contexts.append(context_to_append)
+
+	return new_date_contexts, new_count_contexts
+
+def connect_date_contexts(dates, full_dates, date_contexts):
+	date_contexts_final = []
+	for date in dates:
+		((start_X, start_Y, end_X, end_Y), text) = date
+		best_dist = 1e6
+		pot_c = 0
+		for dc in date_contexts:
+			((start_Xc, start_Yc, end_Xc, end_Yc), textc) = dc
+			dist = get_result_distance(dc, date)
+			if (dist < best_dist):
+				best_dist = dist
+				pot_c = dc
+
+		date_contexts_final.append(pot_c)
+
+	return date_contexts_final
 
 
 #janky date finding: TODO: Make this work for various dates
@@ -530,8 +607,13 @@ def clean_results(results):
 	return results_copy
 
 
-def print_results(headers, dates, dates_full, counts, clean_results, filename):
+def print_results(headers, dates, dates_full, counts, date_contexts, count_contexts, clean_results, filename):
 	headers_text = []
+
+	#select the count context, for now just pick the first one. TODO: Make this more sophis
+	cc = count_contexts[0]
+	((start_X, start_Y, end_X, end_Y), text) = cc
+	start_header = text
 
 	num_cols = clean_results.shape[1]-1
 	col_thresh = num_cols-1 #TODO: Verify, but allow one zero
@@ -539,6 +621,8 @@ def print_results(headers, dates, dates_full, counts, clean_results, filename):
 	c = 1
 	for header in headers:
 		((start_X, start_Y, end_X, end_Y), text) = header
+		if (c == 1): #TODO: Dumb, but make it better later
+			text += '--' + start_header
 		arr = clean_results[c, :]
 		count = (np.count_nonzero(arr)-1) #include the column header, except for first row
 		if (count < col_thresh):
@@ -557,7 +641,9 @@ def print_results(headers, dates, dates_full, counts, clean_results, filename):
 		ind_dc = int(date_cols[c])
 		date = dates[ind_dc]
 		date_full = dates_full[ind_dc]
-		date_str = str(c) + '-' + str(date_full[0]) + '/' + str(date_full[1]) + '/' + str(date_full[2])
+		ctxt = date_contexts[c-1]
+		((start_Xc, start_Yc, end_Xc, end_Yc), textc) = ctxt
+		date_str = str(c) + '-' + str(date_full[0]) + '/' + str(date_full[1]) + '/' + str(date_full[2]) + '--' + textc
 
 		#fill in values
 		col_arr = clean_results[:, c]
@@ -651,8 +737,10 @@ for i in range(num_vert_slices):
 			r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=X_offset, offset_Y=Y_offset, remove_boxes=True)
 			#r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=0, offset_Y=0, remove_boxes=True)
 			header_results += results
+			context_results += results
 		else:
 			r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y, offset_X=X_offset, offset_Y=Y_offset, remove_boxes=False)
+			cr_image, cresults = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=X_offset, offset_Y=Y_offset, remove_boxes=True)
 			#r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y, offset_X=0, offset_Y=0, remove_boxes=False)
 
 			#show_image(r_image, results)
@@ -665,6 +753,7 @@ for i in range(num_vert_slices):
 			dm_results += dm
 
 			count_results += results
+			context_results += cresults
 
 			# for result in results:
 			# 	((start_X, start_Y, end_X, end_Y), text) = result
@@ -683,6 +772,9 @@ for i in range(num_vert_slices):
 date_results_new, dates_parsed_new = match_years_dates(year_results, dm_results)
 date_results += date_results_new
 dates_parsed += dates_parsed_new
+
+#find contexts
+date_contexts, count_contexts = find_contexts(context_results)
 
 #Now clean up results, remove excess headers and dates, add spellcheck
 #TODO: Tune these values
@@ -712,6 +804,10 @@ trim_dates_r, trim_dates = delete_similar_dates(date_results, dates_parsed, sim_
 print ('Trimmed Dates')
 print (trim_dates_r)
 print (trim_dates)
+
+print (date_contexts)
+trim_date_contexts = connect_date_contexts(trim_dates_r, trim_dates, date_contexts)
+print (trim_date_contexts)
 
 #clean counts of non counts
 trim_counts = delete_false_counts(count_results)
@@ -744,6 +840,6 @@ print (clean_final_results)
 #print (clean_final_results)
 
 #print results
-printed_results = print_results(trim_headers, trim_dates_r, trim_dates, trim_counts, clean_final_results, filename)
+printed_results = print_results(trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, filename)
 
 print ('Done!')

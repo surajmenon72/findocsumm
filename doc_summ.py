@@ -380,21 +380,40 @@ def delete_similar_dates(results, dates, sim_items):
 def delete_false_counts(results):
 	clean_results = []
 	dummy = 0
+	dec_place_limit = 2
 	for result in results:
 		((start_X, start_Y, end_X, end_Y), text) = result
 		trans_dict = {}
 		for key in string.punctuation:
 			if (key == '.'):
 				trans_dict[key] = '.'.format(key)
+			#elif (key == '$'): #reject dollar signs
+			#	trans_dict[key] = '$'.format(key)
 			else:
 				trans_dict[key] = ''.format(key)
 		clean_text = text.translate(str.maketrans(trans_dict))
 		#clean_text = text.translate(str.maketrans({key: "".format(key) for key in string.punctuation}))
 		#clean_text = text
+		print (text)
+		print (clean_text)
+
 		try:
 			count = float(clean_text)
-			result_to_append = ((start_X, start_Y, end_X, end_Y), count)
-			clean_results.append(result_to_append)
+			print ('Found count!')
+			print (count)
+			#try to reject high decimal points
+			s_count = str(count)
+			append = True
+			if ('.' in s_count):
+				print ('Checking for Decimal')
+				sct = s_count.split('.')
+				print (sct[1])
+				print (len(sct[1]))
+				if (len(sct[1]) > dec_place_limit):
+					append = False
+			if (append == True):
+				result_to_append = ((start_X, start_Y, end_X, end_Y), count)
+				clean_results.append(result_to_append)
 		except:
 			dummy = dummy
 
@@ -424,7 +443,7 @@ def crosshair_results(headers, dates, counts):
 	results = np.zeros((total_headers, total_dates))
 
 	header_thresh = 50 #TODO: Tune these values
-	date_thresh = 200
+	date_thresh = 300
 
 	for i in range(len(headers)):
 		for j in range(len(dates)): 
@@ -569,10 +588,10 @@ def print_results(headers, dates, dates_full, counts, clean_results, filename):
 #Creating argument dictionary for the default arguments needed in the code. 
 args = {"full_image":"/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png","east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
 
-filename = 'cat.csv'
+filename = 'apple.csv'
 
-#args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
-args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full1.png" #cat
+args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full1.png" #cat
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/mcds_tc_full1.png" #mcds
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
 args['min_confidence'] = 1e-3 #TODO: tune this
@@ -612,6 +631,7 @@ dm_results = []
 date_results = []
 dates_parsed = []
 count_results = []
+context_results = []
 full_results = []
 process_wide_x = 400
 process_wide_y = 5 #TODO: Tune y values

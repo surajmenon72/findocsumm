@@ -587,7 +587,6 @@ def print_results(headers, dates, dates_full, counts, date_contexts, count_conte
 		date = dates[ind_dc]
 		date_full = dates_full[ind_dc]
 		c_text = ''
-		print (date_contexts)
 		if (len(date_contexts) > 0):
 			ctxt = date_contexts[c-1]
 			if (ctxt):

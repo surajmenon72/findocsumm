@@ -627,7 +627,8 @@ args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #ap
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/gme_tc_full1.png" #gme
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full1.png" #adobe
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
-args['min_confidence'] = 1e-3 #TODO: tune this
+#args['min_confidence'] = 1e-3 #TODO: tune this
+args['min_confidence'] = .99
 args['width'] = 320 #TODO: verify these
 args['height'] = 320
 
@@ -674,6 +675,8 @@ for i in range(num_vert_slices):
 			#r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=0, offset_Y=0, remove_boxes=True)
 			header_results += results
 			context_results += results
+
+			#show_image(r_image, results)
 		else:
 			r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y, offset_X=X_offset, offset_Y=Y_offset, remove_boxes=False)
 			cr_image, cresults = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=X_offset, offset_Y=Y_offset, remove_boxes=True)

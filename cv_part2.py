@@ -3,6 +3,7 @@ import cv2
 from imutils.object_detection import non_max_suppression
 import pytesseract
 from matplotlib import pyplot as plt
+import copy
 
 #predictions function
 def predictions(prob_score, geo, min_confidence):
@@ -48,6 +49,70 @@ def predictions(prob_score, geo, min_confidence):
 
 	# return bounding boxes and associated confidence_val
 	return (boxes, confidence_val)
+
+def connect_horizontal_boxes(boxes, x_threshold=30, y_threshold=30):
+	boxes_copy = boxes.copy()
+	box_it = sorted(boxes_copy, key=lambda tup: tup[0])
+	print (box_it)
+
+	done = False
+	print ('Connecting Boxes')
+	while (done == False):
+		print ('Starting Loop')
+		print (len(box_it))
+		merger = (1e6, 1e6)
+		box_to_merge = (0, 0, 0, 0)
+		found = False
+		i = 0
+		for box in box_it:
+			(start_X, start_Y, end_X, end_Y) = box
+			j = 0
+			for new_box in box_it:
+				if (i < j):
+					#if ((start_X == 103) and (start_Y == 722) and (end_X == 199) and (end_Y == 746)):
+					#	print (new_box)
+					(start_Xn, start_Yn, end_Xn, end_Yn) = new_box
+					startYdiff = np.abs(start_Yn - start_Y)
+					endYdiff = np.abs(end_Yn - end_Y)
+					Ydiff = startYdiff + endYdiff
+					if (Ydiff < y_threshold):
+						Xdiff = np.abs(start_Xn - end_X) 
+						if ((start_Xn <= end_X) or (Xdiff < x_threshold)):
+							merger = (i, j)
+							sY = np.minimum(start_Y, start_Yn)
+							eY = np.maximum(end_Y, end_Yn)
+							found = True
+
+							if (start_Xn <= end_X):
+								eX = np.maximum(end_X, end_Xn)
+								box_to_merge = (start_X, sY, eX, eY)
+							else:
+								box_to_merge = (start_X, sY, end_Xn, eY)
+							break
+				j += 1
+			if (found == True):
+				break
+			i += 1
+
+		#delete merger, and add new box, assume i before j
+		if (found == True):
+			print ('We found something!')
+			print (merger)
+			print (box_to_merge)
+			box_change = copy.deepcopy(box_it)
+			print (box_change[merger[0]])
+			box_change.pop(merger[0])
+			print (box_change[merger[1]-1])
+			box_change.pop(merger[1]-1)
+			box_change.append(box_to_merge)
+			box_change = sorted(box_change, key=lambda tup: tup[0])
+			box_it = copy.deepcopy(box_change)
+		else:
+			print ('Were done!')
+			done = True
+
+	return box_it
+
 
 # def remove_nearby_boxes(boxes, threshold=10):
 
@@ -193,6 +258,9 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 
 	(boxes, confidence_val) = predictions(scores, geometry, args['min_confidence'])
 	boxes = non_max_suppression(np.array(boxes), probs=confidence_val)
+	
+	#connect nearby boxes in the x-direction
+	#boxes = connect_horizontal_boxes(boxes, x_threshold=10, y_threshold=10)
 
 	#extra box removal
 	# if (remove_boxes==True):
@@ -207,6 +275,7 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 
 	extra_distance = 1
 
+	adjusted_boxes = []
 	# loop over the bounding boxes to find the coordinate of bounding boxes
 	for (startX, startY, endX, endY) in boxes:
 		# scale the coordinates based on the respective ratios in order to reflect bounding box on the original image
@@ -227,6 +296,12 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 		if (endY > origH):
 			endY = origH-1
 
+		adjusted_box = (startX, startY, endX, endY)
+		adjusted_boxes.append(adjusted_box)
+
+	adjusted_boxes = connect_horizontal_boxes(adjusted_boxes, x_threshold=10, y_threshold=10) 
+
+	for (startX, startY, endX, endY) in adjusted_boxes:
 		#extract the region of interest
 		r = orig[startY:endY, startX:endX]
 
@@ -248,6 +323,8 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 		# startY += (offset_Y*extra_distance)
 		# endX += (offset_X*extra_distance)
 		# endY += (offset_Y*extra_distance)
+
+		#print (((startX, startY, endX, endY), text))
 
 		# append bbox coordinate and associated text to the list of results 
 		results.append(((startX, startY, endX, endY), text))

@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd #need openpyxl as well
 from matplotlib import pyplot as plt
-from cv_part import split_image, process_image, show_image
+from cv_part2 import process_image, show_image
 import Levenshtein
 from dateutil.parser import *
 import datefinder
@@ -621,87 +621,97 @@ args = {"full_image":"/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png","
 
 filename = 'apple.csv'
 
-args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full2.png" #cat
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/mcds_tc_full1.png" #mcds
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/gme_tc_full1.png" #gme
-#args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full1.png" #adobe
+args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full1.png" #adobe
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
 #args['min_confidence'] = 1e-3 #TODO: tune this
 args['min_confidence'] = .99
-args['width'] = 320 #TODO: verify these
-args['height'] = 320
+args['width'] = 5120 #TODO: verify these
+args['height'] = 5120
 
 
-num_horiz_slices = 4
-num_vert_slices = 6
-horiz_buffer = 50
-vert_buffer = 50
+# num_horiz_slices = 4
+# num_vert_slices = 6
+# horiz_buffer = 50
+# vert_buffer = 50
 
 #split image
-split_images = split_image(args['full_image'], horiz_slices=num_horiz_slices, horiz_buffer=horiz_buffer, vert_slices=num_vert_slices, vert_buffer=vert_buffer)
+# split_images = split_image(args['full_image'], horiz_slices=num_horiz_slices, horiz_buffer=horiz_buffer, vert_slices=num_vert_slices, vert_buffer=vert_buffer)
 
 #capture sizes, we assume all widths and heights are the same
-image = split_images[0]
-sub_image_width = split_images[0].shape[1]
-sub_image_height = split_images[0].shape[0]
+# image = split_images[0]
+# sub_image_width = split_images[0].shape[1]
+# sub_image_height = split_images[0].shape[0]
 
 #process the sets of images
-process_short_threshold = 1
-header_results = []
-year_results = []
-dm_results = []
-date_results = []
-dates_parsed = []
-count_results = []
-context_results = []
-full_results = []
-process_wide_x = 400
-process_wide_y = 5 #TODO: Tune y values
-process_date_x = 40
-process_date_y = 5
+# process_short_threshold = 1
+# header_results = []
+# year_results = []
+# dm_results = []
+# date_results = []
+# dates_parsed = []
+# count_results = []
+# context_results = []
+# full_results = []
+# process_wide_x = 400
+# process_wide_y = 5 #TODO: Tune y values
+# process_date_x = 40
+# process_date_y = 5
 
-for i in range(num_vert_slices):
-	for j in range(num_horiz_slices):
-		index = (i*num_horiz_slices + j)
-		image_to_process = split_images[index]
+# for i in range(num_vert_slices):
+# 	for j in range(num_horiz_slices):
+# 		index = (i*num_horiz_slices + j)
+# 		image_to_process = split_images[index]
 
-		#calculate offset, TODO: Verify this works even though we have the buffer
-		X_offset = j*sub_image_width 
-		Y_offset = i*sub_image_height
+# 		#calculate offset, TODO: Verify this works even though we have the buffer
+# 		X_offset = j*sub_image_width 
+# 		Y_offset = i*sub_image_height
 
-		if (j < process_short_threshold):
-			r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=X_offset, offset_Y=Y_offset, remove_boxes=True)
-			#r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=0, offset_Y=0, remove_boxes=True)
-			header_results += results
-			context_results += results
+# 		if (j < process_short_threshold):
+# 			r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=X_offset, offset_Y=Y_offset, remove_boxes=True)
+# 			#r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=0, offset_Y=0, remove_boxes=True)
+# 			header_results += results
+# 			context_results += results
 
-			#show_image(r_image, results)
-		else:
-			r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y, offset_X=X_offset, offset_Y=Y_offset, remove_boxes=False)
-			cr_image, cresults = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=X_offset, offset_Y=Y_offset, remove_boxes=True)
-			#r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y, offset_X=0, offset_Y=0, remove_boxes=False)
+# 			#show_image(r_image, results)
+# 		else:
+# 			r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y, offset_X=X_offset, offset_Y=Y_offset, remove_boxes=False)
+# 			cr_image, cresults = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_wide_x, hyst_Y=process_wide_y, offset_X=X_offset, offset_Y=Y_offset, remove_boxes=True)
+# 			#r_image, results = process_image(False, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y, offset_X=0, offset_Y=0, remove_boxes=False)
 
-			#show_image(r_image, results)
+# 			#show_image(r_image, results)
 
-			years = find_years(results)
+# 			years = find_years(results)
 
-			dm = find_dates(results)
+# 			dm = find_dates(results)
 
-			year_results += years
-			dm_results += dm
+# 			year_results += years
+# 			dm_results += dm
 
-			count_results += results
-			context_results += cresults
+# 			count_results += results
+# 			context_results += cresults
 
-		full_results += results
+# 		full_results += results
 
-date_results_new, dates_parsed_new = match_years_dates(year_results, dm_results)
-date_results += date_results_new
-dates_parsed += dates_parsed_new
+
+process_date_x = 30
+process_date_y = 3
+image_to_process = args['full_image']
+r_image, results = process_image(True, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y)
+
+show_image(r_image, results)
+exit()
+
+years = find_years(results)
+dm = find_dates(results)
+
+date_results, dates_parsed = match_years_dates(years, dm)
 
 #find contexts
-date_contexts, count_contexts = find_contexts(context_results)
+date_contexts, count_contexts = find_contexts(results)
 
 #Now clean up results, remove excess headers and dates, add spellcheck
 #TODO: Tune these values
@@ -709,7 +719,7 @@ header_threshold = 300
 date_threshold = 150
 count_threshold = 50
 
-sim_headers = get_similar_headers(header_results, threshold=header_threshold)
+sim_headers = get_similar_headers(results, threshold=header_threshold)
 sim_dates = get_similar_dates(date_results, dates_parsed, threshold=date_threshold)
 
 #now delete items based on some metric, for now just get rid of headers
@@ -722,17 +732,19 @@ trim_dates_r, trim_dates = delete_similar_dates(date_results, dates_parsed, sim_
 trim_date_contexts = connect_date_contexts(trim_dates_r, trim_dates, date_contexts)
 
 #clean counts of non counts
-trim_counts = delete_false_counts(count_results)
+#trim_counts = delete_false_counts(count_results)
 				
 #do spellcheck, embedding check
 
 #Now find all the crosshairs and save in an array
-final_results = crosshair_results(trim_headers, trim_dates_r, trim_counts)
+#final_results = crosshair_results(trim_headers, trim_dates_r, trim_counts)
+final_results = crosshair_results(trim_headers, trim_dates_r, results)
 
 #delete headers and dates that don't have crosshairs, or we could do that in cross_hair results
 clean_final_results = clean_results(final_results)
 
 #print results
-printed_results = print_results(trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, filename)
+#printed_results = print_results(trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, filename)
+printed_results = print_results(trim_headers, trim_dates_r, trim_dates, results, trim_date_contexts, count_contexts, clean_final_results, filename)
 
 print ('Done!')

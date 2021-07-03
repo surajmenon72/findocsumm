@@ -53,13 +53,9 @@ def predictions(prob_score, geo, min_confidence):
 def connect_horizontal_boxes(boxes, x_threshold=30, y_threshold=30):
 	boxes_copy = boxes.copy()
 	box_it = sorted(boxes_copy, key=lambda tup: tup[0])
-	print (box_it)
 
 	done = False
-	print ('Connecting Boxes')
 	while (done == False):
-		print ('Starting Loop')
-		print (len(box_it))
 		merger = (1e6, 1e6)
 		box_to_merge = (0, 0, 0, 0)
 		found = False
@@ -96,19 +92,13 @@ def connect_horizontal_boxes(boxes, x_threshold=30, y_threshold=30):
 
 		#delete merger, and add new box, assume i before j
 		if (found == True):
-			print ('We found something!')
-			print (merger)
-			print (box_to_merge)
 			box_change = copy.deepcopy(box_it)
-			print (box_change[merger[0]])
 			box_change.pop(merger[0])
-			print (box_change[merger[1]-1])
 			box_change.pop(merger[1]-1)
 			box_change.append(box_to_merge)
 			box_change = sorted(box_change, key=lambda tup: tup[0])
 			box_it = copy.deepcopy(box_change)
 		else:
-			print ('Were done!')
 			done = True
 
 	return box_it
@@ -225,6 +215,7 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 	# print ('Image Size')
 	# print (origH)
 	# print (origW)
+	# exit()
 
 	# set the new height and width to default 320 by using args #dictionary.  
 	(newW, newH) = (args["width"], args["height"])

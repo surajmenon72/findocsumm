@@ -65,8 +65,6 @@ def connect_horizontal_boxes(boxes, x_threshold=30, y_threshold=30):
 			j = 0
 			for new_box in box_it:
 				if (i < j):
-					#if ((start_X == 103) and (start_Y == 722) and (end_X == 199) and (end_Y == 746)):
-					#	print (new_box)
 					(start_Xn, start_Yn, end_Xn, end_Yn) = new_box
 					startYdiff = np.abs(start_Yn - start_Y)
 					endYdiff = np.abs(end_Yn - end_Y)
@@ -266,11 +264,13 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 
 	extra_distance = 1
 
+	x_start_buffer = 20 #TODO: FIX, hack since the vision tends to underestimate the start, so shift it 5
+
 	adjusted_boxes = []
 	# loop over the bounding boxes to find the coordinate of bounding boxes
 	for (startX, startY, endX, endY) in boxes:
 		# scale the coordinates based on the respective ratios in order to reflect bounding box on the original image
-		startX = int(startX * rW) - hyst_X 
+		startX = int(startX * rW) - hyst_X - x_start_buffer
 		startY = int(startY * rH) - hyst_Y 
 		endX = int(endX * rW) + hyst_X 
 		endY = int(endY * rH) + hyst_Y 

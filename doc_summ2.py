@@ -503,7 +503,7 @@ def crosshair_results(headers, dates, counts):
 
 	results = np.zeros((total_headers, total_dates))
 
-	header_thresh = 50 #TODO: Tune these values
+	header_thresh = 40 #TODO: Tune these values
 	date_thresh = 300
 
 	for i in range(len(headers)):
@@ -660,13 +660,13 @@ def print_results(headers, dates, dates_full, counts, date_contexts, count_conte
 #Creating argument dictionary for the default arguments needed in the code. 
 args = {"full_image":"/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png","east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
 
-filename = 'adobe1.csv'
+filename = 'apple.csv'
 
-#args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
+args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full2.png" #cat
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/mcds_tc_full1.png" #mcds
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/gme_tc_full1.png" #gme
-args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full1.png" #adobe
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full1.png" #adobe
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
 #args['min_confidence'] = 1e-3 #TODO: tune this
 args['min_confidence'] = .99

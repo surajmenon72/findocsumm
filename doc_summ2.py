@@ -86,7 +86,8 @@ def find_dates(results):
 
 
 def match_years_dates(years, dates):
-	date_threshold = 500 #TODO: Need to tune this
+	date_threshold = 1e6
+	#date_threshold = 500 #TODO: Need to tune this
 	final_dates = []
 	final_dates_full = []
 	for year in years:
@@ -659,13 +660,13 @@ def print_results(headers, dates, dates_full, counts, date_contexts, count_conte
 #Creating argument dictionary for the default arguments needed in the code. 
 args = {"full_image":"/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png","east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
 
-filename = 'apple.csv'
+filename = 'adobe1.csv'
 
-args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full2.png" #cat
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/mcds_tc_full1.png" #mcds
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/gme_tc_full1.png" #gme
-#args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full1.png" #adobe
+args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full1.png" #adobe
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
 #args['min_confidence'] = 1e-3 #TODO: tune this
 args['min_confidence'] = .99
@@ -673,7 +674,7 @@ args['width'] = 5120 #TODO: verify these
 args['height'] = 5120
 
 
-process_date_x = 20
+process_date_x = 25
 process_date_y = 5
 image_to_process = args['full_image']
 r_image, results = process_image(True, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y)

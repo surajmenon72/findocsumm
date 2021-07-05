@@ -272,7 +272,7 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 		# scale the coordinates based on the respective ratios in order to reflect bounding box on the original image
 		startX = int(startX * rW) - hyst_X - x_start_buffer
 		startY = int(startY * rH) - hyst_Y 
-		endX = int(endX * rW) + hyst_X 
+		endX = int(endX * rW) + hyst_X  - x_start_buffer
 		endY = int(endY * rH) + hyst_Y 
 
 		#bound the bound

@@ -4,6 +4,7 @@ from torch import nn
 from torch.optim import lr_scheduler
 from dataset import custom_dataset
 from model import EAST
+from model2 import EASTER
 from loss import Loss
 import os
 import time
@@ -21,6 +22,7 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	device = torch.device("cpu")
 	print ('Picked Device')
 	model = EAST()
+	#model = EASTER()
 	data_parallel = False
 	# if torch.cuda.device_count() > 1:
 	# 	model = nn.DataParallel(model)

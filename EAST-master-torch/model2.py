@@ -102,15 +102,15 @@ class merge(nn.Module):
 		self.bn6 = nn.BatchNorm2d(32)
 		self.relu6 = nn.ReLU()
 
-		self.conv7 = nn.Conv2d(96, 16, 1)
-		self.bn7 = nn.BatchNorm2d(16)
+		self.conv7 = nn.Conv2d(96, 32, 1)
+		self.bn7 = nn.BatchNorm2d(32)
 		self.relu7 = nn.ReLU()
-		self.conv8 = nn.Conv2d(16, 16, 3, padding=1)
-		self.bn8 = nn.BatchNorm2d(16)
+		self.conv8 = nn.Conv2d(32, 32, 3, padding=1)
+		self.bn8 = nn.BatchNorm2d(32)
 		self.relu8 = nn.ReLU()
 
-		self.conv9 = nn.Conv2d(16, 16, 3, padding=1)
-		self.bn9 = nn.BatchNorm2d(16)
+		self.conv9 = nn.Conv2d(32, 32, 3, padding=1)
+		self.bn9 = nn.BatchNorm2d(32)
 		self.relu9 = nn.ReLU()
 		
 		for m in self.modules():
@@ -149,11 +149,11 @@ class merge(nn.Module):
 class output(nn.Module):
 	def __init__(self, scope=512):
 		super(output, self).__init__()
-		self.conv1 = nn.Conv2d(16, 1, 1)
+		self.conv1 = nn.Conv2d(32, 1, 1)
 		self.sigmoid1 = nn.Sigmoid()
-		self.conv2 = nn.Conv2d(16, 4, 1)
+		self.conv2 = nn.Conv2d(32, 4, 1)
 		self.sigmoid2 = nn.Sigmoid()
-		self.conv3 = nn.Conv2d(16, 1, 1)
+		self.conv3 = nn.Conv2d(32, 1, 1)
 		self.sigmoid3 = nn.Sigmoid()
 		self.scope = 512
 		for m in self.modules():

@@ -1,43 +1,30 @@
 import numpy as np
-import sister
 import string
+from sentence_transformers import SentenceTransformer
+model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 
-buckets_counts = ['Total Revenues', 'Total Costs', 'Elegy of Emptiness']
+headers = ['Total Revenues', 'Total Costs', 'Elegy of Emptiness', 'Total Sales']
 
-def bucket_results(headers, dates, dates_full, counts, date_contexts, count_contexts, clean_results):
-	print ('Bucketing Results')
-	embedder = sister.MeanEmbedding(lang="en")
-	num_buckets = len(buckets_counts)
-	embedding_size = 300 #given by sister
+def embedding_sentences(sentences):
+	s_embeddings = model.encode(sentences)
 
-	bucket_embeddings = np.zeros((num_buckets, embedding_size))
-	i = 0
-	for bucket in buckets_counts:
-		bucket_embeddings[i, :] = embedder(bucket) 
-		i += 1
+	for sentence, embedding in zip(sentences, s_embeddings):
+		print("Sentence:", sentence)
+		print("Embedding:", embedding)
+		print("")
 
-	num_headers = len(headers)
-	header_embeddings = np.zeros((num_headers, embedding_size))
-	i = 0
-	for header in headers:
-		((start_X, start_Y, end_X, end_Y), text) = header
-		text_c = text.translate(str.maketrans({key: " ".format(key) for key in string.punctuation}))
-		header_embeddings[i, :] = embedder(text_c)
-		i += 1
+	return s_embeddings
 
-	embedding_calc = np.matmul(header_embeddings, bucket_embeddings.T)
-	embedding_max = np.argmax(embedding_calc, axis=1)
+print ('Starting')
+e = embedding_sentences(headers)
 
-	#print bucket results
-	for i in range(len(headers)):
-		print ('Match')
-		print (headers[i])
-		ind = embedding_max[i]
-		print (buckets_counts[ind])
+e1 = np.dot(e[0], e[1])
+e2 = np.dot(e[0], e[2])
+e3 = np.dot(e[1], e[2])
+e4 = np.dot(e[0], e[3])
 
-
-
-
-
-
+print (e1)
+print (e2)
+print (e3)
+print (e4)
 

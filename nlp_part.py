@@ -32,18 +32,19 @@ def bucket_headers(headers, header_labels):
 	for i, t in enumerate(trees): #tree
 		tree_match = []
 		for j, l in enumerate(t): #layer
-			list_match = []
 			if (len(l) > 0):
 				for k, p in enumerate(l): #synonym
+					list_match = []
+					sub_list_match = []
 					p_embed = model.encode(p)
 					num_syn = len(p)
 					header_distances = np.zeros((num_headers, num_syn))
 					count_distances = np.zeros((num_headers, num_syn))
 
 					header_distances = np.sum(np.dot(header_embeddings, p_embed.T), axis=1)
-					s_header_distances = np.divide(header_distances, header_labels[:, 0])
+					s_header_distances = np.divide(header_distances, header_labels[:, 0]) #TODO: consider this
 					count_distances = np.sum(np.dot(count_embeddings, p_embed.T), axis=1)
-					
+
 					max_index = 1e6
 					if (j == 0): #favor header
 						if (np.amax(s_header_distances) >= distance_threshold):
@@ -59,11 +60,31 @@ def bucket_headers(headers, header_labels):
 					if (max_index != 1e6):
 						header_append = headers[max_index]
 						((start_X, start_Y, end_X, end_Y), text) = header_append
-						print (text)
 						list_match.append(text)
+
+						#find sublevels
+						done = False
+						start_level = header_labels[max_index: 0]
+						index_it = max_index
+						sub_list = []
+						while (done == False):
+							if ((index_it+1) < num_headers):
+								index_it += 1
+								new_level = header_labels[index_it, 0]
+								if ((new_level < start_level) or (new_level == 1)):
+									done = True
+								else:
+									new_header_append = headers[index_it]
+									((start_X, start_Y, end_X, end_Y), text) = new_header_append
+									sub_list.append(text)
+							else:
+								done = True
+						sub_list_match.append(sub_list)
+						#sub_list_match.append('')
 					else:
 						list_match.append('')
-			tree_match.append(list_match)
+						sub_list_match.append('')
+					tree_match.append((list_match, sub_list_match))
 		matches.append(tree_match)
 
 	print ('Came up with these matches')

@@ -675,6 +675,7 @@ def label_headers(headers, clean_results):
 	indent_thresh_norm = 25
 	header_level = 1
 	current_indent = 0
+	prev_row_zero = False
 	for i, header in enumerate(headers):
 		((start_X, start_Y, end_X, end_Y), text) = header
 		if (i == 0):
@@ -686,15 +687,26 @@ def label_headers(headers, clean_results):
 				thresh = indent_thresh_zero
 			else:
 				thresh = indent_thresh_norm
+
 			if ((start_X - current_indent) >= thresh):
 				header_level += 1
 			elif ((start_X - current_indent) <= -thresh):
 				header_level = 1
+			else: #no indent
+				if (i in zero_rows):
+					header_level = 1
+				elif (prev_row_zero == True):
+					if (i not in zero_rows):
+						header_level += 1
+		
 			header_labels[i, 0] = header_level
 			current_indent = start_X
 
 		if (i not in zero_rows):
 			header_labels[i, 1] = 1
+			prev_row_zero = False
+		else:
+			prev_row_zero = True
 
 	print ('Printing Headers')
 	for i, header in enumerate(headers):
@@ -709,11 +721,11 @@ def label_headers(headers, clean_results):
 #Creating argument dictionary for the default arguments needed in the code. 
 args = {"full_image":"/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png","east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
 
-filename = 'cat.csv'
+filename = 'mcds.csv'
 
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
-args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full2.png" #cat
-#args['full_image']="/Users/surajmenon/Desktop/findocDocs/mcds_tc_full1.png" #mcds
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full2.png" #cat
+args['full_image']="/Users/surajmenon/Desktop/findocDocs/mcds_tc_full1.png" #mcds
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/gme_tc_full1.png" #gme
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full1.png" #adobe
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"

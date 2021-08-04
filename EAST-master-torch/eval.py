@@ -34,7 +34,8 @@ def eval_model(model_name, test_img_path, submit_path, save_flag=True):
 
 
 if __name__ == '__main__': 
-	model_name = './pths/east_vgg16.pth'
+	#model_name = './pths/east_vgg16.pth'
+	model_name = 's3://sagemaker-studio-orivpqecjps/models/pths/east_vgg16.pth'
 	test_img_path = os.path.abspath('../ICDAR_2015/test_img')
 	submit_path = './submit'
 	eval_model(model_name, test_img_path, submit_path)

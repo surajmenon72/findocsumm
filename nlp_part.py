@@ -5,68 +5,127 @@ from sentence_transformers import SentenceTransformer
 model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 embedding_size = 384
 
-s_test = ['Research and development', 'Selling, general, and administrative', 'Sales and marketing']
-
 revenue_tree = [[['Total Revenues', 'Total Sales']], []]
 cogs_tree = [[['Cost of goods sold', 'Cost of sales']], []]
 opex_tree = [[['Operating expenses', 'Operating costs']], [['Research and development'], ['Selling, general, and administrative'], ['Sales and marketing']]]
+income_tree = [[['Operating Income', 'Total Income']], []]
 
-trees = [revenue_tree, cogs_tree, opex_tree]
+trees = [revenue_tree, cogs_tree, opex_tree, income_tree]
 
-def bucket_headers(headers, header_labels):
+def match_top(headers, header_labels):
 	#do some pre-embeddings of the headers, and then search w/ matrix multiplication later
 	num_headers = len(headers)
 	header_embeddings = np.zeros((num_headers, embedding_size))
-	count_embeddings =  np.zeros((num_headers, embedding_size))
+	#count_embeddings =  np.zeros((num_headers, embedding_size))
 
 	for i, header in enumerate(headers):
 		((start_X, start_Y, end_X, end_Y), text) = header
 		e = model.encode(text)
-		if (header_labels[i, 1] == 0):
-			header_embeddings[i, :] = copy.deepcopy(e)
-		else:
-			count_embeddings[i, :] = copy.deepcopy(e)
+		header_embeddings[i, :] = copy.deepcopy(e)
 
 	matches = []
-	distance_threshold = 10 #TODO: Tune
+	distance_difference_threshold = 50 #TODO: Tune this
+	num_matches = 3
 	for i, t in enumerate(trees): #tree
 		tree_match = []
 		for j, l in enumerate(t): #layer
+			layer_match = []
 			if (len(l) > 0):
 				for k, p in enumerate(l): #synonym
 					list_match = []
-					sub_list_match = []
 					p_embed = model.encode(p)
 					num_syn = len(p)
 					header_distances = np.zeros((num_headers, num_syn))
-					count_distances = np.zeros((num_headers, num_syn))
 
-					header_distances = np.sum(np.dot(header_embeddings, p_embed.T), axis=1)
-					s_header_distances = np.divide(header_distances, header_labels[:, 0]) #TODO: consider this
-					count_distances = np.sum(np.dot(count_embeddings, p_embed.T), axis=1)
+					header_distances = np.sum(np.dot(header_embeddings, p_embed.T), axis=1)/num_syn
+					s_header_distances = np.flip(np.argsort(header_distances, axis=0), axis=0)
 
-					max_index = 1e6
-					if (j == 0): #favor header
-						if (np.amax(s_header_distances) >= distance_threshold):
-							max_index = np.argmax(s_header_distances)
-						elif (np.amax(count_distances) >= distance_threshold):
-							max_index = np.argmax(count_distances)
-					else: #favor count
-						if (np.amax(count_distances) >= distance_threshold):
-							max_index = np.argmax(count_distances)
-						elif (np.amax(s_header_distances) >= distance_threshold):
-							max_index = np.argmax(s_header_distances)
+					#Manner of taking into account different levels
+					level_best = []
+					nonlevel_best = []
+					for h in s_header_distances:
+						if (header_labels[h, 0] == j):
+							level_best.append((h, header_distances[h]))
+						else:
+							nonlevel_best.append((h, header_distances[h]))
+					c = 0
+					for h, dist in level_best:
+						nl_h = nonlevel_best[c][0]
+						nl_dist = nonlevel_best[c][1]
+						if ((dist - nl_dist) > distance_difference_threshold):
+							list_match.append((h, dist))
+						else:
+							list_match.append((nl_h, dist))
+							c += 1
 
-					if (max_index != 1e6):
-						header_append = headers[max_index]
-						((start_X, start_Y, end_X, end_Y), text) = header_append
-						list_match.append(text)
+						if (len(list_match) > num_matches):
+							break
+				layer_match.append(list_match)
+			tree_match.append(layer_match)
+		matches.append(tree_match)
+	print ('Came up with these matches')
+	print (matches)
+	return matches
 
-						#find sublevels
+def compute_confidence(pot_headers):
+	#TODO: make this more efficient...
+	all_distances = []
+	for i, t in enumerate(pot_headers):
+		for j, l in enumerate(t):
+			for k, p in enumerate(l):
+				for h, dist in p:
+					all_distances.append(dist)
+
+	a_all_distances = np.array(all_distances)
+	max_dist = np.amax(a_all_distances)
+	n_all_distances = a_all_distances/max_dist #TODO: consider additional factors
+
+	new_pot_headers = []
+	c = 0
+	for i, t in enumerate(pot_headers):
+		tree_match = []
+		for j, l in enumerate(t):
+			layer_match = []
+			for k, p in enumerate(l)
+				list_match = []
+				for h, dist in p:
+					conf = n_all_distances[c]
+					list_match.append((h, dist, conf))
+					c += 1
+				layer_match.append(list_match)
+			tree_match.append(layer_match)
+		new_pot_headers.append(tree_match)
+
+	return new_pot_headers
+
+def match_bottom(pot_headers, headers, header_labels):
+
+	num_headers = len(headers)
+	final_selections = []
+	conf_thresh = .50 #TODO: Tune
+	for i, t in enumerate(pot_headers):
+		tree_match = []
+		for j, l in enumerate(t):
+			layer_match = []
+			for k, p in enumerate(l):
+				list_match = []
+				list_suggest = []
+				sub_list_match = []
+				for h, dist, conf in p:
+					matched = False
+					if (conf > conf_thresh):
+						if (len(list_match) == 0):
+							matched = True
+							list_match.append((h, conf))
+						else:
+							list_suggest.append((h, conf))
+					else:
+						list_suggest.append((h, conf))
+
+					if (matched == True): #put in sublevels
 						done = False
-						start_level = header_labels[max_index: 0]
-						index_it = max_index
-						sub_list = []
+						start_level = header_labels[h, 0]
+						index_it = h
 						while (done == False):
 							if ((index_it+1) < num_headers):
 								index_it += 1
@@ -74,42 +133,25 @@ def bucket_headers(headers, header_labels):
 								if ((new_level < start_level) or (new_level == 1)):
 									done = True
 								else:
-									new_header_append = headers[index_it]
-									((start_X, start_Y, end_X, end_Y), text) = new_header_append
-									sub_list.append(text)
+									sub_list_match.append((h, conf))
 							else:
 								done = True
-						sub_list_match.append(sub_list)
-						#sub_list_match.append('')
-					else:
-						list_match.append('')
-						sub_list_match.append('')
-					tree_match.append((list_match, sub_list_match))
-		matches.append(tree_match)
+				layer_match.append((list_match, list_suggest, sub_list_match))
+			tree_match.append(layer_match)
+		final_selections.append(tree_match)
 
-	print ('Came up with these matches')
-	print (matches)
+	return final_selections
+
+def bucket_headers(headers, header_labels):
+
+	pot_headers = match_top(headers, header_labels)
+
+	pot_headers = compute_confidence(pot_headers)
+
+	final_selections = match_bottom(pot_headers, headers, header_labels)
+
+	return final_selections
 
 
-# def embedding_sentences(sentences):
-# 	s_embeddings = model.encode(sentences)
-
-# 	for sentence, embedding in zip(sentences, s_embeddings):
-# 		print("Sentence:", sentence)
-# 		print("Embedding:", embedding)
-# 		print("")
-
-# 	return s_embeddings
-
-# print ('Starting')
-# e = embedding_sentences(s_test)
-
-# e1 = np.dot(e[0], e[1])
-# e2 = np.dot(e[0], e[2])
-# e3 = np.dot(e[1], e[2])
-
-# print (e1)
-# print (e2)
-# print (e3)
 
 

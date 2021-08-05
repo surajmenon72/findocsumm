@@ -2,7 +2,7 @@ import numpy as np
 import pandas as pd #need openpyxl as well
 from matplotlib import pyplot as plt
 from cv_part2 import process_image, show_image
-from nlp_part import bucket_headers
+from nlp_part import label_headers, bucket_headers, print_buckets
 import Levenshtein
 from dateutil.parser import *
 import datefinder
@@ -655,66 +655,6 @@ def print_results(headers, dates, dates_full, counts, date_contexts, count_conte
 	#df.to_excel(filename, sheet_name='sheet1', index=False)
 	df.to_csv(filename, index=False)
 
-def label_headers(headers, clean_results):
-
-	num_headers = len(headers)
-	header_labels = np.zeros((num_headers, 2))
-	num_cols = clean_results.shape[1]-1
-	col_thresh = num_cols-1 #TODO: Verify, but allow one zero
-	zero_rows = []
-	c = 1
-	for header in headers:
-		((start_X, start_Y, end_X, end_Y), text) = header
-		arr = clean_results[c, :]
-		count = (np.count_nonzero(arr)-1) #include the column header, except for first row
-		if (count < col_thresh):
-			zero_rows.append(c-1)
-		c += 1
-
-	indent_thresh_zero = 5 #TODO: tune
-	indent_thresh_norm = 25
-	header_level = 1
-	current_indent = 0
-	prev_row_zero = False
-	for i, header in enumerate(headers):
-		((start_X, start_Y, end_X, end_Y), text) = header
-		if (i == 0):
-			header_labels[i, 0] = header_level
-			current_indent = start_X
-		else:
-			thresh = 0
-			if (current_indent == 0):
-				thresh = indent_thresh_zero
-			else:
-				thresh = indent_thresh_norm
-
-			if ((start_X - current_indent) >= thresh):
-				header_level += 1
-			elif ((start_X - current_indent) <= -thresh):
-				header_level = 1
-			else: #no indent
-				if (i in zero_rows):
-					header_level = 1
-				elif (prev_row_zero == True):
-					if (i not in zero_rows):
-						header_level += 1
-		
-			header_labels[i, 0] = header_level
-			current_indent = start_X
-
-		if (i not in zero_rows):
-			header_labels[i, 1] = 1
-			prev_row_zero = False
-		else:
-			prev_row_zero = True
-
-	print ('Printing Headers')
-	for i, header in enumerate(headers):
-		print (header)
-		print (header_labels[i, 0])
-
-	return header_labels
-
 
 ###** MAIN **###
 
@@ -788,12 +728,15 @@ final_results = crosshair_results(trim_headers, trim_dates_r, trim_counts)
 clean_final_results = clean_results(final_results)
 
 #print results
-printed_results = print_results(trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, filename)
+print_results(trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, filename)
 
 #headers for bucketing results
 header_labels = label_headers(trim_headers, clean_final_results)
 
 #bucket results
 bucketed_headers = bucket_headers(trim_headers, header_labels)
+
+#print buckets w/ data structure as defined by nlp file
+print_buckets(bucketed_headers, header_labels, trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, filename)
 
 print ('Done!')

@@ -1,14 +1,15 @@
 import numpy as np
+import pandas as pd #need openpyxl as well
 import string
 import copy
 from sentence_transformers import SentenceTransformer
 model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 embedding_size = 384
 
-revenue_tree = [[['Total Revenues', 'Total Sales']], []]
+revenue_tree = [[['Revenues', 'Sales']], []]
 cogs_tree = [[['Cost of goods sold', 'Cost of sales']], []]
 opex_tree = [[['Operating expenses', 'Operating costs']], [['Research and development'], ['Selling, general, and administrative'], ['Sales and marketing']]]
-income_tree = [[['Operating Income', 'Total Income']], []]
+income_tree = [[['Operating income', 'Operating profit']], []]
 
 trees = [revenue_tree, cogs_tree, opex_tree, income_tree]
 
@@ -71,11 +72,40 @@ def label_headers(headers, clean_results):
 
 	return header_labels
 
+def print_tree(matches):
+	for i, t in enumerate(matches):
+		ct = trees[i]
+		for j, l in enumerate(t):
+			cl = ct[j]
+			for k, p in enumerate(l):
+				cp = cl[k]
+				
+				print ('Tree Part')
+				print (cp)
+				print ('Match')
+				print (p)
+
+def print_final_tree(matches):
+	for i, t in enumerate(matches):
+		ct = trees[i]
+		for j, l in enumerate(t):
+			cl = ct[j]
+			for k, p in enumerate(l):
+				cp = cl[k]
+				match, suggest, sub_match = p
+				
+				print ('Tree Part')
+				print (cp)
+				print ('Match')
+				print (match)
+				print ('Suggest')
+				print (suggest)
+				print ('Sub-Match')
+				print (sub_match)
+
 def match_top(headers, header_labels):
-	#do some pre-embeddings of the headers, and then search w/ matrix multiplication later
 	num_headers = len(headers)
 	header_embeddings = np.zeros((num_headers, embedding_size))
-	#count_embeddings =  np.zeros((num_headers, embedding_size))
 
 	for i, header in enumerate(headers):
 		((start_X, start_Y, end_X, end_Y), text) = header
@@ -83,7 +113,7 @@ def match_top(headers, header_labels):
 		header_embeddings[i, :] = copy.deepcopy(e)
 
 	matches = []
-	distance_difference_threshold = 50 #TODO: Tune this
+	distance_difference_threshold = 15 #TODO: Tune this
 	num_matches = 3
 	for i, t in enumerate(trees): #tree
 		tree_match = []
@@ -103,7 +133,7 @@ def match_top(headers, header_labels):
 					level_best = []
 					nonlevel_best = []
 					for h in s_header_distances:
-						if (header_labels[h, 0] == j):
+						if (header_labels[h, 0] == (j+1)): #match the layer, j+1
 							level_best.append((h, header_distances[h]))
 						else:
 							nonlevel_best.append((h, header_distances[h]))
@@ -111,19 +141,27 @@ def match_top(headers, header_labels):
 					for h, dist in level_best:
 						nl_h = nonlevel_best[c][0]
 						nl_dist = nonlevel_best[c][1]
-						if ((dist - nl_dist) > distance_difference_threshold):
-							list_match.append((h, dist))
+						if ((nl_dist - dist) < distance_difference_threshold):
+							header_to_append = headers[h]
+							((start_X, start_Y, end_X, end_Y), text) = header_to_append
+							list_match.append((h, dist, text))
 						else:
-							list_match.append((nl_h, dist))
+							header_to_append = headers[nl_h]
+							((start_X, start_Y, end_X, end_Y), text) = header_to_append
+							list_match.append((nl_h, dist, text))
 							c += 1
 
-						if (len(list_match) > num_matches):
+						if (len(list_match) >= num_matches):
 							break
 					layer_match.append(list_match)
 			tree_match.append(layer_match)
 		matches.append(tree_match)
-	print ('Came up with these matches')
-	print (matches)
+
+	# print ('')
+	# print ('Match Top!')
+	# print ('')
+	# print_tree(matches)
+
 	return matches
 
 def compute_confidence(pot_headers):
@@ -132,7 +170,7 @@ def compute_confidence(pot_headers):
 	for i, t in enumerate(pot_headers):
 		for j, l in enumerate(t):
 			for k, p in enumerate(l):
-				for h, dist in p:
+				for h, dist, text in p:
 					all_distances.append(dist)
 
 	a_all_distances = np.array(all_distances)
@@ -147,15 +185,39 @@ def compute_confidence(pot_headers):
 			layer_match = []
 			for k, p in enumerate(l):
 				list_match = []
-				for h, dist in p:
+				for h, dist, text in p:
 					conf = n_all_distances[c]
-					list_match.append((h, dist, conf))
+					list_match.append((h, dist, conf, text))
 					c += 1
 				layer_match.append(list_match)
 			tree_match.append(layer_match)
 		new_pot_headers.append(tree_match)
 
+	# print ('')
+	# print ('Set Confidence!')
+	# print ('')
+	# print_tree(new_pot_headers)
+
 	return new_pot_headers
+
+def is_marked(phrases, tree):
+	marked = False
+	marked_threshold = 30
+	for s in phrases:
+		s_e = model.encode(s)
+		for m in tree:
+			for m_l in m:
+				lm, ls, lsub = m_l
+				for a in lsub:
+					a_h, a_conf, a_text = a
+					#a_text = a_text.rstrip('\n\x0c')
+					a_e = model.encode(a_text)
+					if (np.dot(s_e, a_e) >= marked_threshold):
+						#print ('MARKED')
+						#print (s)
+						#print (a_text)
+						marked = True
+	return marked
 
 def match_bottom(pot_headers, headers, header_labels):
 
@@ -163,23 +225,32 @@ def match_bottom(pot_headers, headers, header_labels):
 	final_selections = []
 	conf_thresh = .50 #TODO: Tune
 	for i, t in enumerate(pot_headers):
+		ct = trees[i]
 		tree_match = []
 		for j, l in enumerate(t):
+			cl = ct[j]
 			layer_match = []
 			for k, p in enumerate(l):
+				cp = cl[k]
+				marked = is_marked(cp, tree_match)
+
+				if (marked == True): #TODO: for now skipping, but we could change to suggestions
+					layer_match.append(([], [], []))
+					continue
+
 				list_match = []
 				list_suggest = []
 				sub_list_match = []
-				for h, dist, conf in p:
+				for h, dist, conf, text in p:
 					matched = False
 					if (conf > conf_thresh):
 						if (len(list_match) == 0):
 							matched = True
-							list_match.append((h, conf))
-						else:
-							list_suggest.append((h, conf))
+							list_match.append((h, conf, text))
+						# else:
+						# 	list_suggest.append((h, conf, text))
 					else:
-						list_suggest.append((h, conf))
+						list_suggest.append((h, conf, text))
 
 					if (matched == True): #put in sublevels
 						done = False
@@ -189,15 +260,22 @@ def match_bottom(pot_headers, headers, header_labels):
 							if ((index_it+1) < num_headers):
 								index_it += 1
 								new_level = header_labels[index_it, 0]
-								if ((new_level < start_level) or (new_level == 1)):
+								if ((new_level <= start_level) or (new_level == 1)):
 									done = True
 								else:
-									sub_list_match.append((index_it, conf))
+									header_to_append = headers[index_it]
+									((start_X, start_Y, end_X, end_Y), new_text) = header_to_append
+									sub_list_match.append((index_it, conf, new_text))
 							else:
 								done = True
 				layer_match.append((list_match, list_suggest, sub_list_match))
 			tree_match.append(layer_match)
 		final_selections.append(tree_match)
+
+	# print ('')
+	# print ('Set Final!')
+	# print ('')
+	# print_final_tree(final_selections)
 
 	return final_selections
 
@@ -211,7 +289,7 @@ def bucket_headers(headers, header_labels):
 
 	return final_selections
 
-def print_buckets(bucketed_headers, header_labels, trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, filename):
+def print_buckets(bucketed_headers, header_labels, headers, dates, dates_full, counts, date_contexts, count_contexts, clean_results, filename):
 	headers_text = []
 
 	#TODO: make this less stupid
@@ -232,24 +310,24 @@ def print_buckets(bucketed_headers, header_labels, trim_headers, trim_dates_r, t
 				cp = cl[k][0]
 				match, suggest, sub_match = p
 				if (len(match) > 0): #list match
-					h, conf = match[0]
-					pot_header = trim_headers[h]
+					h, conf, t = match[0]
+					pot_header = headers[h]
 					((start_X, start_Y, end_X, end_Y), text) = pot_header
-					header_text = cp + '--MATCH--' + text
+					header_text = cp + ' --MATCH-- ' + text
 					header_order.append(h)
 					headers_text.append(header_text)
 
-					for s, s_conf in sub_match:
-						pot_header = trim_headers[s]
+					for s, s_conf, s_t in sub_match:
+						pot_header = headers[s]
 						((start_X, start_Y, end_X, end_Y), text) = pot_header
-						header_text = text
+						header_text = 'SUBLEVEL-SUGGEST-- ' + text 
 						header_order.append(s)
 						headers_text.append(header_text)
 				elif (len(suggest) > 0):
-					h, conf = suggest[0]
-					pot_header = trim_headers[h]
+					h, conf, t = suggest[0]
+					pot_header = headers[h]
 					((start_X, start_Y, end_X, end_Y), text) = pot_header
-					header_text = cp + '--SUGGEST--' + text
+					header_text = cp + ' --SUGGEST-- ' + text
 					header_order.append(h)
 					headers_text.append(header_text)
 
@@ -271,8 +349,9 @@ def print_buckets(bucketed_headers, header_labels, trim_headers, trim_dates_r, t
 		date_str = str(c) + '-' + str(date_full[0]) + '/' + str(date_full[1]) + '/' + str(date_full[2]) + '--' + c_text
 
 		#fill in values
-		col_arr = clean_results[:, c]
+		col_arr = clean_results[1:, c]
 		values = []
+		values.append('--') #dummy for first row
 		for i in header_order:
 			if (header_labels[i, 1] == 1): #check if a zero row
 				val_ind = int(col_arr[i])
@@ -285,6 +364,6 @@ def print_buckets(bucketed_headers, header_labels, trim_headers, trim_dates_r, t
 		#add to dateframe
 		df[date_str] = values
 
-	print (df)
+	#print (df)
 	#df.to_excel(filename, sheet_name='sheet1', index=False)
 	df.to_csv(filename, index=False)

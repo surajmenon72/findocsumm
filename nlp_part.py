@@ -220,10 +220,9 @@ def is_marked(phrases, tree):
 	return marked
 
 def match_bottom(pot_headers, headers, header_labels):
-
 	num_headers = len(headers)
 	final_selections = []
-	conf_thresh = .50 #TODO: Tune
+	conf_thresh = .40 #TODO: Tune
 	for i, t in enumerate(pot_headers):
 		ct = trees[i]
 		tree_match = []
@@ -279,6 +278,49 @@ def match_bottom(pot_headers, headers, header_labels):
 
 	return final_selections
 
+
+def fit_hierarchy(pot_headers, headers, header_labels):
+	num_headers = len(headers)
+	cleaned_selection = []
+	for i, t in enumerate(pot_headers):
+		tree_match = []
+		for j, l in enumerate(t):
+			layer_match = []
+			top_level_matches = [] #assume for now the top level has only one concept
+			possible_sub_matches = []
+			for k, p in enumerate(l):
+				match, suggest, sub_match = p
+				if (j == 0): #set the header label, assuem just one
+					if (len(match) > 0):
+						h, conf, text = match[0]
+						if (header_labels[h, 0] == 1):
+							top_level_matches.append(h)
+							done = False
+							index_it = h+1
+							while (done == False):
+								if (index_it < num_headers):
+									if (header_labels[index_it, 0] > 1):
+										possible_sub_matches.append(index_it)
+									else:
+										done = True
+								else:
+									done = True
+								index_it += 1
+				else: #prune based on header label
+					#check match, suggests
+					if (len(match) > 0):
+						h, conf, text = match[0]
+						if (h not in possible_sub_matches):
+							suggest.insert(0, (match[0])) #for now just clear matches and add to suggest
+							match = []
+
+				layer_match.append((match, suggest, sub_match))
+			tree_match.append(layer_match)
+		cleaned_selection.append(tree_match)
+
+	return cleaned_selection
+
+
 def bucket_headers(headers, header_labels):
 
 	pot_headers = match_top(headers, header_labels)
@@ -286,6 +328,8 @@ def bucket_headers(headers, header_labels):
 	pot_headers = compute_confidence(pot_headers)
 
 	final_selections = match_bottom(pot_headers, headers, header_labels)
+
+	final_selections = fit_hierarchy(final_selections, headers, header_labels)
 
 	return final_selections
 
@@ -330,6 +374,13 @@ def print_buckets(bucketed_headers, header_labels, headers, dates, dates_full, c
 					header_text = cp + ' --SUGGEST-- ' + text
 					header_order.append(h)
 					headers_text.append(header_text)
+					
+					for s, s_conf, s_t in sub_match:
+						pot_header = headers[s]
+						((start_X, start_Y, end_X, end_Y), text) = pot_header
+						header_text = 'SUBLEVEL-SUGGEST-- ' + text 
+						header_order.append(s)
+						headers_text.append(header_text)
 
 	df = pd.DataFrame({'Headers': headers_text})
 

@@ -264,9 +264,13 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 
 	extra_distance = 1
 
-	x_start_buffer = 20 #TODO: FIX, hack since the vision tends to underestimate the start, so shift it 5
+	#x_start_buffer = 20 #TODO: FIX, hack since the vision tends to underestimate the start, so shift it 5
+	#TEST
+	x_start_buffer = 0
 
+	boxes = connect_horizontal_boxes(boxes, x_threshold=50, y_threshold=20) 
 	adjusted_boxes = []
+
 	# loop over the bounding boxes to find the coordinate of bounding boxes
 	for (startX, startY, endX, endY) in boxes:
 		# scale the coordinates based on the respective ratios in order to reflect bounding box on the original image
@@ -290,7 +294,7 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 		adjusted_box = (startX, startY, endX, endY)
 		adjusted_boxes.append(adjusted_box)
 
-	adjusted_boxes = connect_horizontal_boxes(adjusted_boxes, x_threshold=10, y_threshold=10) 
+	#adjusted_boxes = connect_horizontal_boxes(adjusted_boxes, x_threshold=5, y_threshold=15) 
 
 	for (startX, startY, endX, endY) in adjusted_boxes:
 		#extract the region of interest

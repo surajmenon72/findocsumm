@@ -18,15 +18,15 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
                                    shuffle=True, num_workers=num_workers, drop_last=True)
 	
 	criterion = Loss()
-	#device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-	device = torch.device("cpu")
+	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+	#device = torch.device("cpu")
 	print ('Picked Device')
 	model = EAST()
 	#model = EASTER()
 	data_parallel = False
-	# if torch.cuda.device_count() > 1:
-	# 	model = nn.DataParallel(model)
-	# 	data_parallel = True
+	if torch.cuda.device_count() > 1:
+		model = nn.DataParallel(model)
+		data_parallel = True
 	model.to(device)
 	optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=0.1)
@@ -62,6 +62,8 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 if __name__ == '__main__':
 	train_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_img')
 	train_gt_path  = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_gt')
+	#train_img_path = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_img')
+	#train_gt_path  = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_gt')
 	pths_path      = './pths'
 	batch_size     = 24 
 	lr             = 1e-3

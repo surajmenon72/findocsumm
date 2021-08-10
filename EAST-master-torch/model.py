@@ -64,8 +64,7 @@ class extractor(nn.Module):
 		super(extractor, self).__init__()
 		vgg16_bn = VGG(make_layers(cfg, batch_norm=True))
 		if pretrained:
-			vgg16_bn.load_state_dict(torch.load('s3://sagemaker-studio-orivpqecjps/models/pths/vgg16_bn-6c64b313.pth'))
-			#vgg16_bn.load_state_dict(torch.load('./pths/vgg16_bn-6c64b313.pth'))
+			vgg16_bn.load_state_dict(torch.load('./pths/vgg16_bn-6c64b313.pth'))
 		self.features = vgg16_bn.features
 	
 	def forward(self, x):

@@ -60,15 +60,9 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 
 
 if __name__ == '__main__':
-	#train_img_path = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_img')
-	#train_gt_path  = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_gt')
-	path = 's3://sagemaker-studio-orivpqecjps/datasets/data/ICDAR_2015/'
-	train_img = path + 'train_img'
-	train_gt = path + 'train_gt'
-	train_img_path = os.path.abspath(train_img)
-	train_gt_path  = os.path.abspath(train_gt)
-	#pths_path      = './pths'
-	pths_path = 's3://sagemaker-studio-orivpqecjps/models/pths'
+	train_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_img')
+	train_gt_path  = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_gt')
+	pths_path      = './pths'
 	batch_size     = 24 
 	lr             = 1e-3
 	num_workers    = 0

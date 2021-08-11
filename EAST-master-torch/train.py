@@ -21,6 +21,7 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 	#device = torch.device("cpu")
 	print ('Picked Device')
+	print (device)
 	model = EAST()
 	#model = EASTER()
 	data_parallel = False

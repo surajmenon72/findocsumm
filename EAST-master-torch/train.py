@@ -22,6 +22,8 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	#device = torch.device("cpu")
 	print ('Picked Device')
 	print (device)
+	torch.cuda.empty_cache()
+	print ('Emptied Cache')
 	model = EAST()
 	#model = EASTER()
 	data_parallel = False
@@ -66,7 +68,8 @@ if __name__ == '__main__':
 	#train_img_path = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_img')
 	#train_gt_path  = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_gt')
 	pths_path      = './pths'
-	batch_size     = 24 
+	#batch_size     = 24
+	batch_size 	   = 8
 	lr             = 1e-3
 	num_workers    = 0
 	epoch_iter     = 600

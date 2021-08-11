@@ -69,7 +69,7 @@ if __name__ == '__main__':
 	#train_gt_path  = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_gt')
 	pths_path      = './pths'
 	#batch_size     = 24
-	batch_size 	   = 24
+	batch_size 	   = 12
 	lr             = 1e-3
 	num_workers    = 0
 	epoch_iter     = 600

@@ -702,9 +702,7 @@ date_contexts, count_contexts = find_contexts(results)
 
 #Now clean up results, remove excess headers and dates, add spellcheck
 #TODO: Tune these values
-#header_threshold = 300
 date_threshold = 150
-#count_threshold = 50
 
 #sim_headers = get_similar_headers(header_results, threshold=header_threshold)
 sim_dates = get_similar_dates(date_results, dates_parsed, threshold=date_threshold)

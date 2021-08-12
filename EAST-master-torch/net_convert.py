@@ -14,7 +14,6 @@ model_name = './pths/sm1-60.pth'
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = EAST(False).to(device)
 model.load_state_dict(torch.load(model_name, map_location=torch.device('cpu')))
-model.eval()
 
 # set the model to inference mode
 model.eval()
@@ -23,5 +22,6 @@ model.eval()
 # This is needed because the convertion forward pass the network once 
 dummy_input = torch.randn(12, 3, 512, 512, device='cpu')
 torch.onnx.export(model, dummy_input, onnx_model_path, verbose=False)
+
 print ('Done')
 

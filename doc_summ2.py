@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd #need openpyxl as well
 from matplotlib import pyplot as plt
 from cv_part2 import process_image, show_image
+from nlp_part import label_headers, bucket_headers, print_buckets
 import Levenshtein
 from dateutil.parser import *
 import datefinder
@@ -466,9 +467,11 @@ def split_results(results, im_height, im_width):
 			current_real_words = 0
 			words = text.split()
 			for word in words:
-				if (d.check(str(word))):
-					if (word not in months_dict):
-						current_real_words += 1
+				word_c = word.translate(str.maketrans({key: "".format(key) for key in string.punctuation}))
+				if (len(word_c) > 0):
+					if (d.check(str(word_c))):
+						if (word not in months_dict):
+							current_real_words += 1
 
 			if (current_real_words >= words_real_thresh):
 				header_results.append(result)
@@ -660,22 +663,30 @@ def print_results(headers, dates, dates_full, counts, date_contexts, count_conte
 #Creating argument dictionary for the default arguments needed in the code. 
 args = {"full_image":"/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png","east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
 
-filename = 'apple.csv'
+filename = 'adobe.csv'
 
-args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
-#args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full2.png" #cat
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_test6.png" #small_apple
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full1.png" #cat
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/mcds_tc_full1.png" #mcds
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/gme_tc_full1.png" #gme
-#args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full1.png" #adobe
+args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full2.png" #adobe
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
 #args['min_confidence'] = 1e-3 #TODO: tune this
 args['min_confidence'] = .99
-args['width'] = 5120 #TODO: verify these
-args['height'] = 5120
+# args['width'] = 2560 #TODO: verify these
+# args['height'] = 2560
+args['width'] = 2560 #TODO: verify these
+args['height'] = 2560
 
 
-process_date_x = 25
+#process_date_x = 25
+#process_date_y = 5
+
+#TEST
+process_date_x = 15
 process_date_y = 5
+
 image_to_process = args['full_image']
 r_image, results = process_image(True, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y)
 
@@ -720,7 +731,6 @@ trim_date_contexts = connect_date_contexts(trim_dates_r, trim_dates, date_contex
 trim_counts = delete_false_counts(count_results)
 	
 #do spellcheck, embedding check
-
 #Now find all the crosshairs and save in an array
 final_results = crosshair_results(trim_headers, trim_dates_r, trim_counts)
 
@@ -728,6 +738,15 @@ final_results = crosshair_results(trim_headers, trim_dates_r, trim_counts)
 clean_final_results = clean_results(final_results)
 
 #print results
-printed_results = print_results(trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, filename)
+#print_results(trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, filename)
+
+#headers for bucketing results
+header_labels = label_headers(trim_headers, clean_final_results)
+
+#bucket results
+bucketed_headers = bucket_headers(trim_headers, header_labels)
+
+#print buckets w/ data structure as defined by nlp file
+print_buckets(bucketed_headers, header_labels, trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, filename)
 
 print ('Done!')

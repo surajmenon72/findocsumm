@@ -101,91 +101,6 @@ def connect_horizontal_boxes(boxes, x_threshold=30, y_threshold=30):
 
 	return box_it
 
-
-# def remove_nearby_boxes(boxes, threshold=10):
-
-# 	boxes_copy = boxes.copy()
-
-# 	#remove boxes that are close in the y-direction
-# 	index_1 = 0
-# 	index_remove = []
-# 	for (startX, startY, endX, endY) in boxes_copy:
-# 		if (index_1 not in index_remove):
-# 			index_2 = 0
-# 			for (startX_c, startY_c, endX_c, endY_c) in boxes_copy:
-# 				#TODO: Consider something smarter here
-# 				if ((startX != startX_c) and (endX != endX_c)):
-# 					diff_start = np.abs(startY_c - startY)
-# 					diff_end = np.abs(endY_c - endY)
-
-# 					if ((diff_start+diff_end) < threshold):
-# 						if (index_2 not in index_remove):
-# 							index_remove.append(index_2)
-# 				index_2 += 1
-# 		index_1 += 1
-
-# 	#remove index from copy
-# 	removed = 0
-# 	index_remove.sort()
-# 	for i in index_remove:
-# 		i_remove = i - removed
-# 		boxes_copy = np.delete(boxes_copy, i_remove, axis=0)
-# 		removed += 1
-
-# 	return boxes_copy
-
-######** MAIN **#########
-
-#takes in a full page image and returns a split image according to specifications
-# def split_image(input_image, horiz_slices=2, horiz_buffer=5, vert_slices=2, vert_buffer=5):
-
-# 	image = cv2.imread(input_image)
-
-# 	orig = image.copy()
-# 	(origH, origW) = image.shape[:2]
-
-# 	#lets assume for now these divisions don't need to exactly divide it due to our buffer
-# 	slice_width = int(origW/horiz_slices)
-# 	slice_height = int(origH/vert_slices)
-
-# 	output_images = []
-
-# 	for i in range(vert_slices):
-# 		for j in range(horiz_slices):
-# 			if (i == 0):
-# 				start_v_index = 0
-# 				end_v_index = slice_height+(vert_buffer*2)
-# 			elif (i == (vert_slices-1)):
-# 				start_v_index = (i*slice_height)-(vert_buffer*2)
-# 				#end_v_index = origH
-# 				end_v_index = start_v_index + slice_height + (vert_buffer*2)
-# 			else:
-# 				start_v_index = (i*slice_height)-vert_buffer
-# 				end_v_index = ((i+1)*slice_height)+vert_buffer
-
-# 			if (j == 0):
-# 				start_h_index = 0
-# 				end_h_index = slice_width+(horiz_buffer*2)
-# 			elif (j == (horiz_slices-1)):
-# 				start_h_index = (j*slice_width)-(horiz_buffer*2)
-# 				#end_h_index = origW
-# 				end_h_index = start_h_index + slice_width + (horiz_buffer*2)
-# 			else:
-# 				start_h_index = (j*slice_width)-horiz_buffer
-# 				end_h_index = ((j+1)*slice_width)+horiz_buffer
-
-# 			# start_v_index = (0 if (i==0) else (i*slice_height)-vert_buffer)
-# 			# end_v_index = (origH if (i == (vert_slices-1)) else (((i+1)*slice_height)+vert_buffer))
-
-# 			# start_h_index = (0 if (j==0) else (j*slice_width)-horiz_buffer)
-# 			# end_h_index = (origW if (j == (horiz_slices-1)) else (((j+1)*slice_width)+horiz_buffer))
-
-# 			sliced_image = image[start_v_index:end_v_index, start_h_index:end_h_index, :]
-
-# 			output_images.append(sliced_image)
-
-# 	return output_images
-
 def process_image(image_read, image_real, east, min_confidence, width, height, hyst_X=0, hyst_Y=0, offset_X=0, offset_Y=0, remove_boxes=False):
 
 	#unnecessary default
@@ -247,13 +162,6 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 
 	(boxes, confidence_val) = predictions(scores, geometry, args['min_confidence'])
 	boxes = non_max_suppression(np.array(boxes), probs=confidence_val)
-	
-	#connect nearby boxes in the x-direction
-	#boxes = connect_horizontal_boxes(boxes, x_threshold=10, y_threshold=10)
-
-	#extra box removal
-	# if (remove_boxes==True):
-	# 	boxes = remove_nearby_boxes(boxes, threshold=10)
 
 	##Text Detection and Recognition 
 
@@ -264,8 +172,7 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 
 	extra_distance = 1
 
-	#x_start_buffer = 20 #TODO: FIX, hack since the vision tends to underestimate the start, so shift it 5
-	#TEST
+	#for now, say we don't want any X-shifting
 	x_start_buffer = 0
 
 	boxes = connect_horizontal_boxes(boxes, x_threshold=50, y_threshold=20) 
@@ -311,15 +218,6 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 		except:
 			print ('Some bounding box out of order')
 			text = 'GHAJEFKJEKAFJEKFAJEFKEJKFAEK'
-
-
-		#shift the coordinates before returning
-		# startX += (offset_X*extra_distance)
-		# startY += (offset_Y*extra_distance)
-		# endX += (offset_X*extra_distance)
-		# endY += (offset_Y*extra_distance)
-
-		#print (((startX, startY, endX, endY), text))
 
 		# append bbox coordinate and associated text to the list of results 
 		results.append(((startX, startY, endX, endY), text))

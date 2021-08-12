@@ -679,11 +679,6 @@ args['min_confidence'] = .99
 args['width'] = 2560 #TODO: verify these
 args['height'] = 2560
 
-
-#process_date_x = 25
-#process_date_y = 5
-
-#TEST
 process_date_x = 15
 process_date_y = 5
 

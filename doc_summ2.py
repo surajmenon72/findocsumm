@@ -125,7 +125,7 @@ def match_years_dates(years, dates):
 	return final_dates, final_dates_full
 
 def find_contexts(results):
-	date_contexts = ['Months Ended', 'Months ended', 'months ended', 'Weeks Ended', 'Weeks ended', 'weeks ended']
+	date_contexts = ['Months Ended', 'Months ended', 'months ended', 'Weeks Ended', 'Weeks ended', 'weeks ended', 'Quarters ended', 'quarters ended', 'Quarters Ended']
 	count_contexts = ['in millions', 'In Millions', 'In millions', 'in billions', 'In Billions', 'In billions']
 
 	new_date_contexts = []
@@ -663,14 +663,14 @@ def print_results(headers, dates, dates_full, counts, date_contexts, count_conte
 #Creating argument dictionary for the default arguments needed in the code. 
 args = {"full_image":"/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png","east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
 
-filename = 'adobe.csv'
+filename = 'apple.csv'
 
-#args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
+args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_test6.png" #small_apple
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/cat_tc_full1.png" #cat
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/mcds_tc_full1.png" #mcds
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/gme_tc_full1.png" #gme
-args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full2.png" #adobe
+#args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full2.png" #adobe
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
 args['min_confidence'] = .99
 args['width'] = 2560 #TODO: verify these

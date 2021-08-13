@@ -171,7 +171,7 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 	#for now, say we don't want any X-shifting
 	x_start_buffer = 0
 
-	boxes = connect_horizontal_boxes(boxes, x_threshold=50, y_threshold=20) 
+	boxes = connect_horizontal_boxes(boxes, x_threshold=45, y_threshold=20) 
 	adjusted_boxes = []
 
 	# loop over the bounding boxes to find the coordinate of bounding boxes

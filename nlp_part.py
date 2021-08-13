@@ -313,6 +313,11 @@ def fit_hierarchy(pot_headers, headers, header_labels):
 						if (h not in possible_sub_matches):
 							suggest.insert(0, (match[0])) #for now just clear matches and add to suggest
 							match = []
+					if (len(suggest) > 0):
+						h, conf, text = suggest[0]
+						if (h not in possible_sub_matches):
+							#suggest = []
+							match = []
 
 				layer_match.append((match, suggest, sub_match))
 			tree_match.append(layer_match)
@@ -381,6 +386,7 @@ def print_buckets(bucketed_headers, header_labels, headers, dates, dates_full, c
 						header_text = 'SUBLEVEL-SUGGEST-- ' + text 
 						header_order.append(s)
 						headers_text.append(header_text)
+
 
 	df = pd.DataFrame({'Headers': headers_text})
 

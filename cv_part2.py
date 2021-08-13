@@ -121,6 +121,7 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 	#print (image.shape)
 	print ('.')
 
+
 	#Saving a original image and shape
 	orig = image.copy()
 	(origH, origW) = image.shape[:2]
@@ -146,7 +147,6 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 	blob = cv2.dnn.blobFromImage(image, 1.0, (W, H),
 		(123.68, 116.78, 103.94), swapRB=True, crop=False)
 
-
 	net = cv2.dnn.readNet(args["east"])
 
 	# We would like to get two outputs from the EAST model. 
@@ -167,11 +167,7 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 
 	# initialize the list of results
 	results = []
-
-	count = 0
-
-	extra_distance = 1
-
+	
 	#for now, say we don't want any X-shifting
 	x_start_buffer = 0
 
@@ -221,7 +217,6 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 
 		# append bbox coordinate and associated text to the list of results 
 		results.append(((startX, startY, endX, endY), text))
-		count += 1
 
 	return orig, results
 	#return orig, results_m
@@ -247,3 +242,5 @@ def show_image(image, results):
 	plt.imshow(orig_image)
 	plt.title('Output')
 	plt.show()
+
+

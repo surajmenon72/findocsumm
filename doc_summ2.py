@@ -672,10 +672,7 @@ filename = 'adobe.csv'
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/gme_tc_full1.png" #gme
 args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full2.png" #adobe
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
-#args['min_confidence'] = 1e-3 #TODO: tune this
 args['min_confidence'] = .99
-# args['width'] = 2560 #TODO: verify these
-# args['height'] = 2560
 args['width'] = 2560 #TODO: verify these
 args['height'] = 2560
 

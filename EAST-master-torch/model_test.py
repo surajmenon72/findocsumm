@@ -10,6 +10,7 @@ from dataset import custom_dataset
 from imutils.object_detection import non_max_suppression
 import sys
 import os
+import copy
 from model import EAST
 from matplotlib import pyplot as plt
 
@@ -152,6 +153,9 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 
 	net = args["east"]
 
+	blob = cv2.dnn.blobFromImage(image, 1.0, (W, H),
+	(123.68, 116.78, 103.94), swapRB=True, crop=False)
+
 	# construct a blob from the image to forward pass it to EAST model
 	# blob = cv2.dnn.blobFromImage(image, 1.0, (W, H),
 	# 	(123.68, 116.78, 103.94), swapRB=True, crop=False)
@@ -169,17 +173,22 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 	# net.setInput(blob)
 	#(scores, geometry) = net.forward(layerNames)
 
-	print (image.shape)
-	image_r = image.reshape(1, 3, H, W)
-	print (image_r.shape)
-	image_r_pt = torch.from_numpy(image_r)
+	print (blob.shape)
+	#image_r = image.reshape(1, 3, H, W)
+	print (blob.dtype)
+	print (blob.shape)
+	image_r_pt = torch.from_numpy(blob)
 	print (image_r_pt.shape)
+	print (image_r_pt.dtype)
+	image_r_pt = image_r_pt.type(torch.FloatTensor)
 	(scores, geometry) = net(image_r_pt)
 	print (scores.shape)
 	print (geometry.shape)
-	exit()
 
-	(boxes, confidence_val) = predictions(scores, geometry, args['min_confidence'])
+	scores_n = scores.detach().cpu().numpy()
+	geometry_n = geometry.detach().cpu().numpy()
+
+	(boxes, confidence_val) = predictions(scores_n, geometry_n, args['min_confidence'])
 	boxes = non_max_suppression(np.array(boxes), probs=confidence_val)
 
 	##Text Detection and Recognition 
@@ -190,7 +199,7 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 	#for now, say we don't want any X-shifting
 	x_start_buffer = 0
 
-	boxes = connect_horizontal_boxes(boxes, x_threshold=50, y_threshold=20) 
+	#boxes = connect_horizontal_boxes(boxes, x_threshold=50, y_threshold=20) 
 	adjusted_boxes = []
 
 	# loop over the bounding boxes to find the coordinate of bounding boxes
@@ -271,8 +280,8 @@ model.eval()
 
 img_path = "/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png"
 min_confidence = .99
-height = 512
-width = 512
+height = 2560
+width = 2560
 
 process_date_x = 15
 process_date_y = 5

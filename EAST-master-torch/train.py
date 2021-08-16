@@ -43,6 +43,9 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 		for i, (img, gt_score, gt_geo, ignored_map) in enumerate(train_loader):
 			start_time = time.time()
 			img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
+			print (img.shape)
+			print (img.dtype)
+			exit()
 			pred_score, pred_geo = model(img)
 			loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
 			
@@ -63,13 +66,13 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 
 
 if __name__ == '__main__':
-	train_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_img')
-	train_gt_path  = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_gt')
-	#train_img_path = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_img')
-	#train_gt_path  = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_gt')
+	#train_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_img')
+	#train_gt_path  = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_gt')
+	train_img_path = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_img')
+	train_gt_path  = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_gt')
 	pths_path      = './pths'
 	#batch_size     = 24
-	batch_size 	   = 12
+	batch_size 	   = 16
 	lr             = 1e-3
 	num_workers    = 0
 	epoch_iter     = 600

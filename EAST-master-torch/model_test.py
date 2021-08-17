@@ -270,7 +270,8 @@ def show_image(image, results):
 	plt.title('Output')
 	plt.show()
 
-model_name = './pths/sm1-60.pth'
+model_name = './pths/east_vgg16.pth'
+#model_name = './pths/sm2-300.pth'
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = EAST(False).to(device)
 model.load_state_dict(torch.load(model_name, map_location=torch.device('cpu')))
@@ -278,10 +279,11 @@ model.load_state_dict(torch.load(model_name, map_location=torch.device('cpu')))
 # set the model to inference mode
 model.eval()
 
-img_path = "/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png"
+#img_path = "/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png"
+img_path = "/Users/surajmenon/Desktop/findocDocs/test_image1.jpg"
 min_confidence = .99
-height = 2560
-width = 2560
+height = 512
+width = 512
 
 process_date_x = 15
 process_date_y = 5

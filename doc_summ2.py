@@ -672,6 +672,7 @@ args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #ap
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/gme_tc_full1.png" #gme
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/adobe_tc_full2.png" #adobe
 args['east']="/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb"
+#args['east']="/Users/surajmenon/Desktop/findocDocs/test_model1.pb"
 args['min_confidence'] = .99
 args['width'] = 2560 #TODO: verify these
 args['height'] = 2560

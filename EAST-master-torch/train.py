@@ -25,6 +25,9 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	torch.cuda.empty_cache()
 	print ('Emptied Cache')
 	model = EAST()
+	model_name = './pths/sm2-300.pth'
+	model.load_state_dict(torch.load(model_name))
+	epoch_start = 300
 	#model = EASTER()
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
@@ -35,7 +38,7 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=0.1)
 
 	print ('Starting Training')
-	for epoch in range(epoch_iter):	
+	for epoch in range(epoch_start, epoch_iter):	
 		model.train()
 		scheduler.step()
 		epoch_loss = 0

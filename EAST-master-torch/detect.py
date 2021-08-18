@@ -186,7 +186,7 @@ if __name__ == '__main__':
 	#img_path    = '../data/ICDAR_2015/test_img/img_2.jpg'
 	#model_path  = './pths/east_vgg16.pth'
 	model_path  = './pths/sm1-60.pth'
-	res_img     = './adobe.bmp'
+	res_img     = './apple.bmp'
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 	model = EAST(False).to(device)
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))

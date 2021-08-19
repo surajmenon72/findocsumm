@@ -37,6 +37,11 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=0.1)
 
+	print ('Catching up Scheduler')
+	for epoch in range(epoch_start):
+		model.train()
+		scheduler.step()
+
 	print ('Starting Training')
 	for epoch in range(epoch_start, epoch_iter):	
 		model.train()

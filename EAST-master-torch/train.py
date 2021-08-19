@@ -28,6 +28,7 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	# model_name = './pths/sm2-300.pth'
 	# model.load_state_dict(torch.load(model_name))
 	# epoch_start = 300
+	epoch_start = 0
 	model = EASTER()
 	data_parallel = False
 	if torch.cuda.device_count() > 1:

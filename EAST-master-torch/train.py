@@ -13,7 +13,7 @@ import numpy as np
 
 def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers, epoch_iter, interval):
 	file_num = len(os.listdir(train_img_path))
-	trainset = custom_dataset(train_img_path, train_gt_path)
+	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5)
 	train_loader = data.DataLoader(trainset, batch_size=batch_size, \
                                    shuffle=True, num_workers=num_workers, drop_last=True)
 	
@@ -24,12 +24,11 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	print (device)
 	torch.cuda.empty_cache()
 	print ('Emptied Cache')
-	# model = EAST()
+	model = EASTER()
 	# model_name = './pths/sm2-300.pth'
 	# model.load_state_dict(torch.load(model_name))
 	# epoch_start = 300
 	epoch_start = 0
-	model = EASTER()
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
@@ -72,10 +71,10 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 
 
 if __name__ == '__main__':
-	train_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_img')
-	train_gt_path  = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_gt')
-	#train_img_path = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_img')
-	#train_gt_path  = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_gt')
+	#train_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_img')
+	#train_gt_path  = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_gt')
+	train_img_path = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_img')
+	train_gt_path  = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_gt')
 	pths_path      = './pths'
 	#batch_size     = 24
 	batch_size 	   = 16

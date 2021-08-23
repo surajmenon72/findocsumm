@@ -2,6 +2,7 @@ import torch
 from torchvision import transforms
 from PIL import Image, ImageDraw
 from model import EAST
+from model2 import EASTER
 import os
 from dataset import get_rotate_mat
 import numpy as np

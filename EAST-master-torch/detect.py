@@ -202,6 +202,8 @@ if __name__ == '__main__':
 		res_img = './' + company + '.bmp'
 
 		do_detection(img_path, model_path, res_img)
+		print ('Done with:')
+		print (t)
 
 	print ('Done')
 

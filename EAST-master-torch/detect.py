@@ -180,14 +180,7 @@ def detect_dataset(model, device, test_img_path, submit_path):
 		with open(os.path.join(submit_path, 'res_' + os.path.basename(img_file).replace('.jpg','.txt')), 'w') as f:
 			f.writelines(seq)
 
-
-if __name__ == '__main__':
-	#img_path 	= 'test_img/apple_tc_full1.jpg'
-	img_path 	= 'test_img/adobe_tc_full2.jpg'
-	#img_path    = '../data/ICDAR_2015/test_img/img_2.jpg'
-	#model_path  = './pths/east_vgg16.pth'
-	model_path  = './pths/sm4-165.pth'
-	res_img     = './adobe.bmp'
+def do_detection():
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 	model = EASTER(False).to(device)
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
@@ -197,6 +190,19 @@ if __name__ == '__main__':
 	boxes = detect(img, model, device)
 	plot_img = plot_boxes(img, boxes)	
 	plot_img.save(res_img)
+
+test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2']
+
+if __name__ == '__main__':
+	model_path  = './pths/sm4-375.pth'
+	for t in test_images:
+		img_path = 'test_img/' + t + '.jpg'
+		segs = t.split('_')
+		company = segs[0]
+		res_img = './' + company + '.bmp'
+
+		do_detection(img_path, model_path, res_img)
+
 	print ('Done')
 
 

@@ -180,7 +180,7 @@ def detect_dataset(model, device, test_img_path, submit_path):
 		with open(os.path.join(submit_path, 'res_' + os.path.basename(img_file).replace('.jpg','.txt')), 'w') as f:
 			f.writelines(seq)
 
-def do_detection():
+def do_detection(img_path, model_path, res_img):
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 	model = EASTER(False).to(device)
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))

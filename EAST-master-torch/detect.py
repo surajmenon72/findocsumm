@@ -200,8 +200,8 @@ def do_detection(img_path, model_path, res_img):
 test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2']
 
 if __name__ == '__main__':
-	#model_path = './pths/east_vgg16.pth'
-	model_path  = './pths/sm3-450.pth'
+	model_path = './pths/east_vgg16.pth'
+	#model_path  = './pths/sm3-450.pth'
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'
 		segs = t.split('_')

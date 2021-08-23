@@ -25,9 +25,9 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	torch.cuda.empty_cache()
 	print ('Emptied Cache')
 	model = EASTER()
-	model_name = './pths/sm4-35.pth'
+	model_name = './pths/sm4-165.pth'
 	model.load_state_dict(torch.load(model_name))
-	epoch_start = 35
+	epoch_start = 165
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)

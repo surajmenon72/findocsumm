@@ -13,8 +13,13 @@ def resize_img(img):
 	'''resize image to be divisible by 32
 	'''
 	w, h = img.size
-	resize_w = w
-	resize_h = h
+
+	#rescale factor
+	w_scale = 2
+	h_scale = 2
+
+	resize_w = w * w_scale
+	resize_h = h * h_scale
 
 	resize_h = resize_h if resize_h % 32 == 0 else int(resize_h / 32) * 32
 	resize_w = resize_w if resize_w % 32 == 0 else int(resize_w / 32) * 32
@@ -195,6 +200,7 @@ def do_detection(img_path, model_path, res_img):
 test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2']
 
 if __name__ == '__main__':
+	#model_path = './pths/east_vgg16.pth'
 	model_path  = './pths/sm3-450.pth'
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'

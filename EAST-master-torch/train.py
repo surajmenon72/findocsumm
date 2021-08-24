@@ -24,10 +24,11 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	print (device)
 	torch.cuda.empty_cache()
 	print ('Emptied Cache')
-	model = EASTER()
-	model_name = './pths/sm4-165.pth'
-	model.load_state_dict(torch.load(model_name))
-	epoch_start = 165
+	model = EAST()
+	# model = EASTER()
+	# model_name = './pths/sm4-165.pth'
+	# model.load_state_dict(torch.load(model_name))
+	epoch_start = 0
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
@@ -38,6 +39,7 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 
 	print ('Catching up Scheduler')
 	for epoch in range(epoch_start):
+		print (epoch)
 		model.train()
 		scheduler.step()
 

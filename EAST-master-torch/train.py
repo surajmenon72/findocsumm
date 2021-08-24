@@ -13,7 +13,8 @@ import numpy as np
 
 def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers, epoch_iter, interval):
 	file_num = len(os.listdir(train_img_path))
-	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5)
+	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.25)
+	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5)
 	train_loader = data.DataLoader(trainset, batch_size=batch_size, \
                                    shuffle=True, num_workers=num_workers, drop_last=True)
 	

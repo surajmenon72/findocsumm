@@ -3,6 +3,7 @@ from torchvision import transforms
 from PIL import Image, ImageDraw
 from model import EAST
 from model2 import EASTER
+from model3 import EAST_STRETCH
 import os
 from dataset import get_rotate_mat
 import numpy as np
@@ -190,6 +191,7 @@ def detect_dataset(model, device, test_img_path, submit_path):
 
 def do_detection(img_path, model_path, res_img):
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+	#model = EAST_STRETCH(False).to(device)
 	#model = EASTER(False).to(device)
 	model = EAST(False).to(device)
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))

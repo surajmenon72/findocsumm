@@ -5,6 +5,7 @@ from torch.optim import lr_scheduler
 from dataset import custom_dataset
 from model import EAST
 from model2 import EASTER
+from model3 import EAST_STRETCH
 from loss import Loss
 import os
 import time
@@ -13,8 +14,8 @@ import numpy as np
 
 def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers, epoch_iter, interval):
 	file_num = len(os.listdir(train_img_path))
-	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.25)
-	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5)
+	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.25)
+	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5)
 	train_loader = data.DataLoader(trainset, batch_size=batch_size, \
                                    shuffle=True, num_workers=num_workers, drop_last=True)
 	
@@ -25,8 +26,9 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	print (device)
 	torch.cuda.empty_cache()
 	print ('Emptied Cache')
-	model = EAST()
-	# model = EASTER()
+	#model = EAST()
+	#model = EASTER()
+	model = EAST_STRETCH()
 	# model_name = './pths/sm4-165.pth'
 	# model.load_state_dict(torch.load(model_name))
 	epoch_start = 0
@@ -38,16 +40,20 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=0.1)
 
-	print ('Catching up Scheduler')
-	for epoch in range(epoch_start):
-		print (epoch)
-		model.train()
-		scheduler.step()
+	use_scheduler = False
+
+	if (use_scheduler == True):
+		print ('Catching up Scheduler')
+		for epoch in range(epoch_start):
+			print (epoch)
+			model.train()
+			scheduler.step()
 
 	print ('Starting Training')
 	for epoch in range(epoch_start, epoch_iter):	
 		model.train()
-		scheduler.step()
+		if (use_scheduler == True):
+			scheduler.step()
 		epoch_loss = 0
 		epoch_time = time.time()
 		for i, (img, gt_score, gt_geo, ignored_map) in enumerate(train_loader):

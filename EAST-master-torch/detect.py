@@ -206,7 +206,7 @@ test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2']
 
 if __name__ == '__main__':
 	#model_path = './pths/east_vgg16.pth'
-	model_path  = './pths/EAST_STRETCH-sm1-35.pth'
+	model_path  = './pths/EAST_STRETCH-sm1-250.pth'
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'
 		segs = t.split('_')

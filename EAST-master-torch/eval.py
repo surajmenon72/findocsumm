@@ -13,7 +13,7 @@ def eval_model(model_path, test_img_path, submit_path, save_flag=True):
 		shutil.rmtree(submit_path) 
 	os.mkdir(submit_path)
 
-	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 	model = EAST(False).to(device)
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 	model.eval()

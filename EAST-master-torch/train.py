@@ -29,9 +29,9 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	#model = EAST()
 	#model = EASTER()
 	model = EAST_STRETCH()
-	# model_name = './pths/sm4-165.pth'
-	# model.load_state_dict(torch.load(model_name))
-	epoch_start = 0
+	model_name = './pths/EAST_STRETCH-sm1-35.pth'
+	model.load_state_dict(torch.load(model_name))
+	epoch_start = 35
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)

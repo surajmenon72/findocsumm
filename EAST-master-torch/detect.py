@@ -114,7 +114,7 @@ def get_boxes(score, geo, score_thresh=0.9, nms_thresh=0.2):
 	xy_text = xy_text[np.argsort(xy_text[:, 0])]
 	valid_pos = xy_text[:, ::-1].copy() # n x 2, [x, y]
 	valid_geo = geo[:, xy_text[:, 0], xy_text[:, 1]] # 5 x n
-	polys_restored, index = restore_polys(valid_pos, valid_geo, score.shape) 
+	polys_restored, index = restore_polys(valid_pos, valid_geo, score.shape, scale=2) 
 	if polys_restored.size == 0:
 		return None
 
@@ -123,7 +123,6 @@ def get_boxes(score, geo, score_thresh=0.9, nms_thresh=0.2):
 	boxes[:, 8] = score[xy_text[index, 0], xy_text[index, 1]]
 	boxes = lanms.merge_quadrangle_n9(boxes.astype('float32'), nms_thresh)
 	return boxes
-
 
 def adjust_ratio(boxes, ratio_w, ratio_h):
 	'''refine boxes

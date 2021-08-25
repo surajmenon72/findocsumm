@@ -96,7 +96,7 @@ def restore_polys(valid_pos, valid_geo, score_shape, scale=4):
 	return np.array(polys), index
 
 
-def get_boxes(score, geo, score_thresh=0.9, nms_thresh=0.2):
+def get_boxes(score, geo, score_thresh=0.9, nms_thresh=0.2, scale=4):
 	'''get boxes from feature map
 	Input:
 		score       : score map from model <numpy.ndarray, (1,row,col)>
@@ -114,7 +114,7 @@ def get_boxes(score, geo, score_thresh=0.9, nms_thresh=0.2):
 	xy_text = xy_text[np.argsort(xy_text[:, 0])]
 	valid_pos = xy_text[:, ::-1].copy() # n x 2, [x, y]
 	valid_geo = geo[:, xy_text[:, 0], xy_text[:, 1]] # 5 x n
-	polys_restored, index = restore_polys(valid_pos, valid_geo, score.shape, scale=2) 
+	polys_restored, index = restore_polys(valid_pos, valid_geo, score.shape, scale=scale) 
 	if polys_restored.size == 0:
 		return None
 
@@ -140,7 +140,7 @@ def adjust_ratio(boxes, ratio_w, ratio_h):
 	return np.around(boxes)
 	
 	
-def detect(img, model, device):
+def detect(img, model, device, scale=4):
 	'''detect text regions of img using model
 	Input:
 		img   : PIL Image
@@ -152,7 +152,7 @@ def detect(img, model, device):
 	img, ratio_h, ratio_w = resize_img(img)
 	with torch.no_grad():
 		score, geo = model(load_pil(img).to(device))
-	boxes = get_boxes(score.squeeze(0).cpu().numpy(), geo.squeeze(0).cpu().numpy())
+	boxes = get_boxes(score.squeeze(0).cpu().numpy(), geo.squeeze(0).cpu().numpy(), scale=scale)
 	return adjust_ratio(boxes, ratio_w, ratio_h)
 
 
@@ -188,7 +188,7 @@ def detect_dataset(model, device, test_img_path, submit_path):
 		with open(os.path.join(submit_path, 'res_' + os.path.basename(img_file).replace('.jpg','.txt')), 'w') as f:
 			f.writelines(seq)
 
-def do_detection(img_path, model_path, res_img):
+def do_detection(img_path, model_path, res_img, scale=4):
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 	#model = EAST_STRETCH(False).to(device)
 	model = EASTER(False).to(device)
@@ -197,7 +197,7 @@ def do_detection(img_path, model_path, res_img):
 	model.eval()
 	img = Image.open(img_path)
 	
-	boxes = detect(img, model, device)
+	boxes = detect(img, model, device, scale=scale)
 	plot_img = plot_boxes(img, boxes)	
 	plot_img.save(res_img)
 
@@ -206,13 +206,14 @@ test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2']
 if __name__ == '__main__':
 	#model_path = './pths/east_vgg16.pth'
 	model_path  = './pths/EASTER-sm1-375.pth'
+	scale = 2
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'
 		segs = t.split('_')
 		company = segs[0]
 		res_img = './' + company + '.bmp'
 
-		do_detection(img_path, model_path, res_img)
+		do_detection(img_path, model_path, res_img, scale=2)
 		print ('Done with:')
 		print (t)
 

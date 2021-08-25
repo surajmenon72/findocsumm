@@ -190,8 +190,8 @@ def detect_dataset(model, device, test_img_path, submit_path):
 
 def do_detection(img_path, model_path, res_img):
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-	model = EAST_STRETCH(False).to(device)
-	#model = EASTER(False).to(device)
+	#model = EAST_STRETCH(False).to(device)
+	model = EASTER(False).to(device)
 	#model = EAST(False).to(device)
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 	model.eval()
@@ -205,7 +205,7 @@ test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2']
 
 if __name__ == '__main__':
 	#model_path = './pths/east_vgg16.pth'
-	model_path  = './pths/EAST_STRETCH-sm1-250.pth'
+	model_path  = './pths/EASTER-sm1-375.pth'
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'
 		segs = t.split('_')

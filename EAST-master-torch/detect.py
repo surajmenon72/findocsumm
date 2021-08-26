@@ -124,6 +124,16 @@ def get_boxes(score, geo, score_thresh=0.9, nms_thresh=0.2, scale=4):
 	boxes = lanms.merge_quadrangle_n9(boxes.astype('float32'), nms_thresh)
 	return boxes
 
+# def get_boxes_from_geo(geo):
+# 	img.save("img_test_before.jpeg")
+# 	test_img = transform(img)
+# 	test_img = test_img.cpu().detach().numpy()
+# 	img_test = test_img.reshape(512, 512, 3)
+# 	img_test = img_test * 255
+# 	img_test = img_test.astype(np.uint8)
+# 	im = Image.fromarray(img_test)
+# 	im.save("img_test_after.jpeg")
+
 def adjust_ratio(boxes, ratio_w, ratio_h):
 	'''refine boxes
 	Input:

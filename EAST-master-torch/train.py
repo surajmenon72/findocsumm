@@ -49,7 +49,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=0.75)
 
 	use_scheduler = True
-	do_eval = True
+	do_eval = False
 
 	if (use_scheduler == True):
 		print ('Catching up Scheduler')
@@ -88,7 +88,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 		#EVAL code
 		if (do_eval == True):
-			if (epoch + 1) % interval == 0:
+			if (epoch + 1) % eval_interval == 0:
 				model.eval()
 				img_train, gt_s_train, gt_g_train, ignore_train = train_loader[0]
 				img_test, gt_s_test, gt_g_test, ignore_test = test_loader[0]
@@ -121,6 +121,6 @@ if __name__ == '__main__':
 	num_workers    = 0
 	epoch_iter     = 600
 	save_interval  = 5
-	eval_interval  = 5
+	eval_interval  = 1
 	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval)	
 	

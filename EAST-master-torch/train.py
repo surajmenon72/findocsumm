@@ -10,14 +10,22 @@ from loss import Loss
 import os
 import time
 import numpy as np
+from PIL import Image, ImageDraw
 
 
-def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers, epoch_iter, interval):
+def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, lr, num_workers, epoch_iter, interval, eval_interval):
 	file_num = len(os.listdir(train_img_path))
 	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.25)
 	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5)
+
+	#testset = custom_dataset(test_img_path, test_gt_path, scale=0.25)
+	testset = custom_dataset(test_img_path, test_gt_path, scale=0.5)
+
 	train_loader = data.DataLoader(trainset, batch_size=batch_size, \
                                    shuffle=True, num_workers=num_workers, drop_last=True)
+
+	test_loader = data.DataLoader(testset, batch_size=batch_size, \
+                               	   shuffle=True, num_workers=num_workers, drop_last=True)
 	
 	criterion = Loss()
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -27,20 +35,21 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 	torch.cuda.empty_cache()
 	print ('Emptied Cache')
 	#model = EAST()
-	#model = EASTER()
-	model = EAST_STRETCH()
-	model_name = './pths/EAST_STRETCH-sm1-35.pth'
-	model.load_state_dict(torch.load(model_name))
-	epoch_start = 35
+	model = EASTER()
+	#model = EAST_STRETCH()
+	model_name = './pths/EASTER-sm1-375.pth'
+	# model.load_state_dict(torch.load(model_name))
+	epoch_start = 295
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
 		data_parallel = True
 	model.to(device)
 	optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=0.1)
+	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=0.75)
 
 	use_scheduler = False
+	do_eval = True
 
 	if (use_scheduler == True):
 		print ('Catching up Scheduler')
@@ -77,12 +86,34 @@ def train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers,
 			state_dict = model.module.state_dict() if data_parallel else model.state_dict()
 			torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch+1)))
 
+		#EVAL code
+		if (do_eval == True):
+			if (epoch + 1) % interval == 0:
+				model.eval()
+				img_train, gt_s_train, gt_g_train, ignore_train = train_loader[0]
+				img_test, gt_s_test, gt_g_test, ignore_test = test_loader[0]
+
+				img_train, gt_s_train, gt_g_train, ignore_train = img_train.to(device), gt_s_train.to(device), gt_g_train.to(device), ignore_train.to(device)
+				img_test, gt_s_test, gt_g_test, ignore_test = img_test.to(device), gt_s_test.to(device), gt_g_test.to(device), ignore_test.to(device)
+
+				train_score, train_geo = model(img_train)
+				test_score, test_geo = model(img_test)
+
+				loss_train = criterion(gt_s_train, train_score, gt_g_train, train_geo, ignore_train)
+				loss_test = criterion(gt_s_test, test_score, gt_g_test, test_geo, ignore_test)
+				print ('EVAL: TRAIN LOSS: {:.8f}, TEST LOSS: {:.8f}'.format(loss_train, loss_test))
+
+
 
 if __name__ == '__main__':
 	train_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_img')
 	train_gt_path  = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_gt')
-	#train_img_path = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_img')
-	#train_gt_path  = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_gt')
+	test_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/test_img')
+	test_gt_path  = os.path.abspath('/home/surajm72/data/ICDAR_2015/test_gt')
+	# train_img_path = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_img')
+	# train_gt_path  = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/train_gt')
+	# test_img_path = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/test_img')
+	# test_gt_path  = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/test_gt')
 	pths_path      = './pths'
 	#batch_size     = 24
 	batch_size 	   = 16
@@ -90,5 +121,6 @@ if __name__ == '__main__':
 	num_workers    = 0
 	epoch_iter     = 600
 	save_interval  = 5
-	train(train_img_path, train_gt_path, pths_path, batch_size, lr, num_workers, epoch_iter, save_interval)	
+	eval_interval  = 5
+	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval)	
 	

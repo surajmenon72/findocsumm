@@ -215,7 +215,7 @@ test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2']
 
 if __name__ == '__main__':
 	#model_path = './pths/east_vgg16.pth'
-	model_path  = './pths/EASTER-sm1-350.pth'
+	model_path  = './pths/EASTER-sm1-325.pth'
 	scale = 2
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'

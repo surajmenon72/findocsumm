@@ -252,6 +252,30 @@ def rotate_all_pixels(rotate_mat, anchor_x, anchor_y, length):
 	rotated_y = rotated_coord[1, :].reshape(y.shape)
 	return rotated_x, rotated_y
 
+def scale_img(img, vertices, low=0.5, high=1.2):
+	'''adjust scale of image to aug data
+	Input:
+		img         : PIL Image
+		vertices    : vertices of text regions <numpy.ndarray, (n,8)>
+		ratio       : height/width changes in [0.5, 1.5]
+	Output:
+		img         : adjusted PIL Image
+		new_vertices: adjusted vertices
+	'''
+
+	#ratio_hw = 1 + ratio * (np.random.rand() * 2 - 1)
+	ratio_hw = np.random.uniform(low=low, high=high)
+	old_h = img.height
+	old_w = img.width
+	new_h = int(np.around(old_h * ratio_hw))
+	new_w = int(np.around(old_w * ratio_hw))
+	img = img.resize((new_w, new_h), Image.BILINEAR)
+
+	new_vertices = vertices.copy()
+	if (vertices.size) > 0:
+		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (new_h / old_h)
+		new_vertices[:,[0,2,4,6]] = vertices[:,[0,2,4,6]] * (new_w / old_w)
+	return img, new_vertices
 
 def adjust_height(img, vertices, ratio=0.2):
 	'''adjust height of image to aug data
@@ -267,7 +291,6 @@ def adjust_height(img, vertices, ratio=0.2):
 	old_h = img.height
 	new_h = int(np.around(old_h * ratio_h))
 	img = img.resize((img.width, new_h), Image.BILINEAR)
-	
 	new_vertices = vertices.copy()
 	if vertices.size > 0:
 		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (new_h / old_h)
@@ -385,6 +408,7 @@ class custom_dataset(data.Dataset):
 		
 		img = Image.open(self.img_files[index])
 		img, vertices = adjust_height(img, vertices) 
+		#img, vertices = scale_img(img, vertices)
 		img, vertices = rotate_img(img, vertices)
 		img, vertices = crop_img(img, vertices, labels, self.length)
 		transform = transforms.Compose([transforms.ColorJitter(0.5, 0.5, 0.5, 0.25), \

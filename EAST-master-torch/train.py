@@ -46,7 +46,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 		data_parallel = True
 	model.to(device)
 	optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=0.75)
+	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//3], gamma=0.75)
 
 	use_scheduler = True
 	do_eval = False
@@ -119,7 +119,7 @@ if __name__ == '__main__':
 	batch_size 	   = 16
 	lr             = 1e-3
 	num_workers    = 0
-	epoch_iter     = 600
+	epoch_iter     = 900
 	save_interval  = 5
 	eval_interval  = 1
 	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval)	

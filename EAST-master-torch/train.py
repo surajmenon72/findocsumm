@@ -16,10 +16,10 @@ from PIL import Image, ImageDraw
 def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, lr, num_workers, epoch_iter, interval, eval_interval):
 	file_num = len(os.listdir(train_img_path))
 	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.25)
-	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5)
+	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=False)
 
 	#testset = custom_dataset(test_img_path, test_gt_path, scale=0.25)
-	testset = custom_dataset(test_img_path, test_gt_path, scale=0.5)
+	testset = custom_dataset(test_img_path, test_gt_path, scale=0.5, scale_aug=False)
 
 	train_loader = data.DataLoader(trainset, batch_size=batch_size, \
                                    shuffle=True, num_workers=num_workers, drop_last=True)
@@ -27,6 +27,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	test_loader = data.DataLoader(testset, batch_size=batch_size, \
                                	   shuffle=True, num_workers=num_workers, drop_last=True)
 	
+
 	criterion = Loss()
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 	#device = torch.device("cpu")
@@ -37,9 +38,9 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	#model = EAST()
 	model = EASTER()
 	#model = EAST_STRETCH()
-	#model_name = './pths/EASTER-sm1-400.pth'
-	#model.load_state_dict(torch.load(model_name))
-	epoch_start = 0
+	model_name = './pths/EASTER-sm2-125.pth'
+	model.load_state_dict(torch.load(model_name))
+	epoch_start = 125
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
@@ -49,7 +50,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//3], gamma=.1)
 
 	use_scheduler = True
-	do_eval = False
+	do_eval = True
 
 	if (use_scheduler == True):
 		print ('Catching up Scheduler')
@@ -59,7 +60,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			scheduler.step()
 
 	print ('Starting Training')
-	for epoch in range(epoch_start, epoch_iter):	
+	for epoch in range(epoch_start, epoch_iter):
 		model.train()
 		if (use_scheduler == True):
 			scheduler.step()
@@ -89,19 +90,24 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 		#EVAL code
 		if (do_eval == True):
 			if (epoch + 1) % eval_interval == 0:
+				print ('Doing Eval')
 				model.eval()
-				img_train, gt_s_train, gt_g_train, ignore_train = train_loader[0]
-				img_test, gt_s_test, gt_g_test, ignore_test = test_loader[0]
+				train_loss = 0
+				test_loss = 0
+				#for now just test on a random epoch
+				for k, (img, gt_score, gt_geo, ignored_map) in enumerate(train_loader):
+					img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
+					pred_score, pred_geo = model(img)
+					train_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
+					break
 
-				img_train, gt_s_train, gt_g_train, ignore_train = img_train.to(device), gt_s_train.to(device), gt_g_train.to(device), ignore_train.to(device)
-				img_test, gt_s_test, gt_g_test, ignore_test = img_test.to(device), gt_s_test.to(device), gt_g_test.to(device), ignore_test.to(device)
+				for k, (img, gt_score, gt_geo, ignored_map) in enumerate(test_loader):
+					img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
+					pred_score, pred_geo = model(img)
+					test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
+					break
 
-				train_score, train_geo = model(img_train)
-				test_score, test_geo = model(img_test)
-
-				loss_train = criterion(gt_s_train, train_score, gt_g_train, train_geo, ignore_train)
-				loss_test = criterion(gt_s_test, test_score, gt_g_test, test_geo, ignore_test)
-				print ('EVAL: TRAIN LOSS: {:.8f}, TEST LOSS: {:.8f}'.format(loss_train, loss_test))
+				print ('EVAL: TRAIN LOSS: {:.8f}, TEST LOSS: {:.8f}'.format(train_loss, test_loss))	
 
 
 

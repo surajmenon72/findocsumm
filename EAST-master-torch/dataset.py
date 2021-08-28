@@ -252,7 +252,36 @@ def rotate_all_pixels(rotate_mat, anchor_x, anchor_y, length):
 	rotated_y = rotated_coord[1, :].reshape(y.shape)
 	return rotated_x, rotated_y
 
-def scale_img(img, vertices, low=0.5, high=1.2):
+def resize_with_pad(im, target_width, target_height):
+    '''
+    Resize PIL image keeping ratio and using white background.
+    '''
+    # target_ratio = target_height / target_width
+    # im_ratio = im.height / im.width
+    # if target_ratio > im_ratio:
+    #     # It must be fixed by width
+    #     resize_width = target_width
+    #     resize_height = round(resize_width * im_ratio)
+    # else:
+    #     # Fixed by height
+    #     resize_height = target_height
+    #     resize_width = round(resize_height / im_ratio)
+
+    resize_width = im.width
+    resize_height = im.height
+
+    #image_resize = im.resize((resize_width, resize_height), Image.ANTIALIAS)
+    image_resize = im
+
+    background = Image.new('RGBA', (target_width, target_height), (255, 255, 255, 255))
+    x_offset = round((target_width - resize_width) / 2)
+    y_offset = round((target_height - resize_height) / 2)
+
+    offset = (x_offset, y_offset)
+    background.paste(image_resize, offset)
+    return background.convert('RGB'), (x_offset, y_offset)
+
+def scale_img(img, vertices, low=0.2, high=1):
 	'''adjust scale of image to aug data
 	Input:
 		img         : PIL Image
@@ -271,11 +300,20 @@ def scale_img(img, vertices, low=0.5, high=1.2):
 	new_w = int(np.around(old_w * ratio_hw))
 	img = img.resize((new_w, new_h), Image.BILINEAR)
 
+	img.save('pre_image.jpeg')
 	new_vertices = vertices.copy()
 	if (vertices.size) > 0:
 		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (new_h / old_h)
 		new_vertices[:,[0,2,4,6]] = vertices[:,[0,2,4,6]] * (new_w / old_w)
-	return img, new_vertices
+
+	scaled_image, offsets = resize_with_pad(img, 512, 512)
+	scaled_image.save('post_image.jpeg')
+
+	if (vertices.size) > 0:
+		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] + offsets[1]
+		new_vertices[:,[0,2,4,6]] = vertices[:,[0,2,4,6]] + offsets[0]
+
+	return scaled_img, new_vertices
 
 def adjust_height(img, vertices, ratio=0.2):
 	'''adjust height of image to aug data
@@ -391,12 +429,13 @@ def extract_vertices(lines):
 
 	
 class custom_dataset(data.Dataset):
-	def __init__(self, img_path, gt_path, scale=0.25, length=512):
+	def __init__(self, img_path, gt_path, scale=0.25, length=512, scale_aug=False):
 		super(custom_dataset, self).__init__()
 		self.img_files = [os.path.join(img_path, img_file) for img_file in sorted(os.listdir(img_path))]
 		self.gt_files  = [os.path.join(gt_path, gt_file) for gt_file in sorted(os.listdir(gt_path))]
 		self.scale = scale
 		self.length = length
+		self.scale_aug = scale_aug
 
 	def __len__(self):
 		return len(self.img_files)
@@ -407,8 +446,10 @@ class custom_dataset(data.Dataset):
 		vertices, labels = extract_vertices(lines)
 		
 		img = Image.open(self.img_files[index])
-		img, vertices = adjust_height(img, vertices) 
-		#img, vertices = scale_img(img, vertices)
+		if (self.scale_aug == True):
+			img, vertices = scale_img(img, vertices)
+		else:
+			img, vertices = adjust_height(img, vertices) 
 		img, vertices = rotate_img(img, vertices)
 		img, vertices = crop_img(img, vertices, labels, self.length)
 		transform = transforms.Compose([transforms.ColorJitter(0.5, 0.5, 0.5, 0.25), \

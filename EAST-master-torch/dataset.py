@@ -300,20 +300,18 @@ def scale_img(img, vertices, low=0.2, high=1):
 	new_w = int(np.around(old_w * ratio_hw))
 	img = img.resize((new_w, new_h), Image.BILINEAR)
 
-	img.save('pre_image.jpeg')
 	new_vertices = vertices.copy()
 	if (vertices.size) > 0:
 		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (new_h / old_h)
 		new_vertices[:,[0,2,4,6]] = vertices[:,[0,2,4,6]] * (new_w / old_w)
 
 	scaled_image, offsets = resize_with_pad(img, 512, 512)
-	scaled_image.save('post_image.jpeg')
 
 	if (vertices.size) > 0:
 		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] + offsets[1]
 		new_vertices[:,[0,2,4,6]] = vertices[:,[0,2,4,6]] + offsets[0]
 
-	return scaled_img, new_vertices
+	return scaled_image, new_vertices
 
 def adjust_height(img, vertices, ratio=0.2):
 	'''adjust height of image to aug data

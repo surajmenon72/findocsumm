@@ -114,6 +114,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 					pred_score, pred_geo = model(img)
 					test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
 					full_test_loss += test_loss
+					break
 
 				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))	
 

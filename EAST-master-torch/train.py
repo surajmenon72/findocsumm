@@ -50,7 +50,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//3], gamma=.1)
 
 	use_scheduler = True
-	do_eval = True
+	do_eval = False
 
 	if (use_scheduler == True):
 		print ('Catching up Scheduler')
@@ -60,22 +60,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			scheduler.step()
 
 	print ('Starting Training')
-	for epoch in range(epoch_start, epoch_iter):
-		if (do_eval == True):
-			if (epoch + 1) % eval_interval == 0:
-				print ('Doing Eval')
-				model.eval()
-				full_test_loss = 0
-
-				for k, (img, gt_score, gt_geo, ignored_map) in enumerate(test_loader):
-					img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
-					pred_score, pred_geo = model(img)
-					test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
-					full_test_loss += test_loss
-					torch.cuda.empty_cache()
-
-				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))
-				
+	for epoch in range(epoch_start, epoch_iter):				
 		model.train()
 		if (use_scheduler == True):
 			scheduler.step()

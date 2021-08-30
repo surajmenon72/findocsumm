@@ -38,16 +38,16 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	#model = EAST()
 	model = EASTER()
 	#model = EAST_STRETCH()
-	model_name = './pths/EASTER-sm2-150.pth'
+	model_name = './pths/EASTER-sm2-290.pth'
 	model.load_state_dict(torch.load(model_name))
-	epoch_start = 150
+	epoch_start = 290
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
 		data_parallel = True
 	model.to(device)
 	optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//3], gamma=.1)
+	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=.1)
 
 	use_scheduler = True
 	do_eval = False

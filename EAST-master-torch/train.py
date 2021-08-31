@@ -107,7 +107,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			if (epoch + 1) % eval_interval == 0:
 				print ('Doing Eval')
 				model.eval()
-				full_test_loss = 0
+				full_test_loss = 0.0
 
 				torch.cuda.empty_cache()
 				for k, (img, gt_score, gt_geo, ignored_map) in enumerate(test_loader):

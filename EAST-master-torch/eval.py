@@ -14,12 +14,14 @@ def eval_model(model_path, test_img_path, submit_path, save_flag=True):
 	os.mkdir(submit_path)
 
 	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-	model = EAST(False).to(device)
-	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+	#model = EAST(False).to(device)
+	model = EASTER(False).to(device)
+	scale = 2
+	model.load_state_dict(torch.load(model_path, map_location=device))
 	model.eval()
 	
 	start_time = time.time()
-	detect_dataset(model, device, test_img_path, submit_path)
+	detect_dataset(model, device, test_img_path, submit_path, scale=scale)
 	os.chdir(submit_path)
 	res = subprocess.getoutput('zip -q submit.zip *.txt')
 	res = subprocess.getoutput('mv submit.zip ../')
@@ -34,7 +36,8 @@ def eval_model(model_path, test_img_path, submit_path, save_flag=True):
 
 
 if __name__ == '__main__': 
-	model_name = './pths/east_vgg16.pth'
+	#model_name = './pths/east_vgg16.pth'
+	model_path  = './pths/EASTER-sm2-415.pth'
 	test_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/test_img')
 	submit_path = './submit'
 	eval_model(model_name, test_img_path, submit_path)

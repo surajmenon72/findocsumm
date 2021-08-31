@@ -49,7 +49,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=.1)
 
-	use_scheduler = False
+	use_scheduler = True
 	do_eval = False
 
 	if (use_scheduler == True):
@@ -117,7 +117,7 @@ if __name__ == '__main__':
 	pths_path      = './pths'
 	#batch_size     = 24
 	batch_size 	   = 16
-	lr             = 1e-4
+	lr             = 1e-3
 	num_workers    = 0
 	epoch_iter     = 900
 	save_interval  = 5

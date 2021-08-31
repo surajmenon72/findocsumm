@@ -194,7 +194,7 @@ def detect_dataset(model, device, test_img_path, submit_path, scale=4):
 	
 	for i, img_file in enumerate(img_files):
 		print('evaluating {} image'.format(i), end='\r')
-		boxes = detect(Image.open(img_file), model, device)
+		boxes = detect(Image.open(img_file), model, device, scale=scale)
 		seq = []
 		if boxes is not None:
 			seq.extend([','.join([str(int(b)) for b in box[:-1]]) + '\n' for box in boxes])

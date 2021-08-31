@@ -219,14 +219,14 @@ test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2']
 if __name__ == '__main__':
 	model_path = './pths/east_vgg16.pth'
 	#model_path  = './pths/EASTER-sm2-460.pth'
-	scale = 2
+	scale = 4
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'
 		segs = t.split('_')
 		company = segs[0]
 		res_img = './' + company + '.bmp'
 
-		do_detection(img_path, model_path, res_img, scale=2)
+		do_detection(img_path, model_path, res_img, scale=scale)
 		print ('Done with:')
 		print (t)
 

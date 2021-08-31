@@ -19,11 +19,11 @@ def resize_img(img):
 	#w_scale = 2.75
 	#h_scale = 2.75
 
-	#w_scale = 1.875
-	#h_scale = 1.875
+	w_scale = 1.875
+	h_scale = 1.875
 
-	w_scale = 1
-	h_scale = 1
+	# w_scale = 1
+	# h_scale = 1
 
 	resize_w = int(w * w_scale)
 	resize_h = int(h * h_scale)
@@ -99,7 +99,7 @@ def restore_polys(valid_pos, valid_geo, score_shape, scale=4):
 	return np.array(polys), index
 
 
-def get_boxes(score, geo, score_thresh=0.001, nms_thresh=0.2, scale=4):
+def get_boxes(score, geo, score_thresh=0.9, nms_thresh=0.2, scale=4):
 	'''get boxes from feature map
 	Input:
 		score       : score map from model <numpy.ndarray, (1,row,col)>
@@ -218,7 +218,7 @@ test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2']
 
 if __name__ == '__main__':
 	#model_path = './pths/east_vgg16.pth'
-	model_path  = './pths/EASTER-sm2-500.pth'
+	model_path  = './pths/EASTER-sm2-415.pth'
 	scale = 2
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'

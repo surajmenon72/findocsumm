@@ -3,6 +3,7 @@ import torch
 import subprocess
 import os
 from model import EAST
+from model2 import EASTER
 from detect import detect_dataset
 import numpy as np
 import shutil

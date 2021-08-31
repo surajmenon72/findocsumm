@@ -109,12 +109,13 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				model.eval()
 				full_test_loss = 0
 
+				torch.cuda.empty_cache()
 				for k, (img, gt_score, gt_geo, ignored_map) in enumerate(test_loader):
 					img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
 					with torch.no_grad():
 						pred_score, pred_geo = model(img)
 						test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
-						full_test_loss += test_loss
+						full_test_loss += test_loss.item()
 					torch.cuda.empty_cache()
 
 				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))	

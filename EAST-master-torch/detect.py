@@ -16,11 +16,11 @@ def resize_img(img):
 	w, h = img.size
 
 	#rescale factor
-	w_scale = 2.75
-	h_scale = 2.75
+	#w_scale = 2.75
+	#h_scale = 2.75
 
-	#w_scale = 1.875
-	#h_scale = 1.875
+	w_scale = 1.875
+	h_scale = 1.875
 
 	#w_scale = 1
 	#h_scale = 1
@@ -99,7 +99,7 @@ def restore_polys(valid_pos, valid_geo, score_shape, scale=4):
 	return np.array(polys), index
 
 
-def get_boxes(score, geo, score_thresh=0.001, nms_thresh=0.2, scale=4):
+def get_boxes(score, geo, score_thresh=0.1, nms_thresh=0.2, scale=4):
 	'''get boxes from feature map
 	Input:
 		score       : score map from model <numpy.ndarray, (1,row,col)>
@@ -204,8 +204,8 @@ def detect_dataset(model, device, test_img_path, submit_path):
 def do_detection(img_path, model_path, res_img, scale=4):
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 	#model = EAST_STRETCH(False).to(device)
-	#model = EASTER(False).to(device)
-	model = EAST(False).to(device)
+	model = EASTER(False).to(device)
+	#model = EAST(False).to(device)
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 	model.eval()
 	img = Image.open(img_path)
@@ -217,9 +217,9 @@ def do_detection(img_path, model_path, res_img, scale=4):
 test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2']
 
 if __name__ == '__main__':
-	model_path = './pths/east_vgg16.pth'
-	#model_path  = './pths/EASTER-sm2-460.pth'
-	scale = 4
+	#model_path = './pths/east_vgg16.pth'
+	model_path  = './pths/EASTER-sm2-500.pth'
+	scale = 2
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'
 		segs = t.split('_')

@@ -133,7 +133,7 @@ if __name__ == '__main__':
 	pths_path      = './pths'
 	#batch_size     = 24
 	train_batch_size = 16
-	test_batch_size = 1
+	test_batch_size = 16
 	lr             = 1e-3
 	num_workers    = 0
 	epoch_iter     = 900

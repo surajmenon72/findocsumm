@@ -13,7 +13,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 
-def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, lr, num_workers, epoch_iter, interval, eval_interval):
+def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, test_batch_size, lr, num_workers, epoch_iter, interval, eval_interval):
 	file_num = len(os.listdir(train_img_path))
 	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.25)
 	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
@@ -24,7 +24,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	train_loader = data.DataLoader(trainset, batch_size=batch_size, \
                                    shuffle=True, num_workers=num_workers, drop_last=True)
 
-	test_loader = data.DataLoader(testset, batch_size=batch_size, \
+	test_loader = data.DataLoader(testset, batch_size=test_batch_size, \
                                	   shuffle=True, num_workers=num_workers, drop_last=True)
 	
 
@@ -50,7 +50,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=.1)
 
 	use_scheduler = True
-	do_eval = False
+	do_eval = True
 
 	if (use_scheduler == True):
 		print ('Catching up Scheduler')
@@ -60,7 +60,22 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			scheduler.step()
 
 	print ('Starting Training')
-	for epoch in range(epoch_start, epoch_iter):				
+	for epoch in range(epoch_start, epoch_iter):	
+		if (do_eval == True):
+			if (epoch + 1) % eval_interval == 0:
+				print ('Doing Eval')
+				model.eval()
+				full_test_loss = 0
+
+				for k, (img, gt_score, gt_geo, ignored_map) in enumerate(test_loader):
+					torch.cuda.empty_cache()
+					img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
+					pred_score, pred_geo = model(img)
+					test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
+					full_test_loss += test_loss
+
+				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))
+		exit()			
 		model.train()
 		if (use_scheduler == True):
 			scheduler.step()
@@ -116,11 +131,12 @@ if __name__ == '__main__':
 	# test_gt_path  = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/test_gt')
 	pths_path      = './pths'
 	#batch_size     = 24
-	batch_size 	   = 16
+	train_batch_size = 16
+	test_batch_size = 1
 	lr             = 1e-3
 	num_workers    = 0
 	epoch_iter     = 900
 	save_interval  = 5
 	eval_interval  = 1
-	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval)	
+	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval)	
 	

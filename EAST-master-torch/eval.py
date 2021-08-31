@@ -20,7 +20,7 @@ def eval_model(model_path, test_img_path, submit_path, save_flag=True):
 	#model = EAST(False).to(device)
 	model = EASTER(False).to(device)
 	scale = 2
-	model.load_state_dict(torch.load(model_path, map_location='cpu'))
+	model.load_state_dict(torch.load(model_path, map_location=device))
 	model.eval()
 	
 	start_time = time.time()

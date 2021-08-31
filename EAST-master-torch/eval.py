@@ -15,6 +15,8 @@ def eval_model(model_path, test_img_path, submit_path, save_flag=True):
 	os.mkdir(submit_path)
 
 	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+	print ('Picked Device')
+	print (device)
 	#model = EAST(False).to(device)
 	model = EASTER(False).to(device)
 	scale = 2

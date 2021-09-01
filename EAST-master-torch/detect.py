@@ -195,7 +195,11 @@ def detect_dataset(model, device, test_img_path, submit_path, scale=4):
 	img_files = os.listdir(test_img_path)
 	img_files = sorted([os.path.join(test_img_path, img_file) for img_file in img_files])
 	
+	images_to_check = 100
+
 	for i, img_file in enumerate(img_files):
+		if (i == images_to_check):
+			break
 		print('evaluating {} image'.format(i), end='\r')
 		boxes = detect(Image.open(img_file), model, device, scale=scale)
 		seq = []

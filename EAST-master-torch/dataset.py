@@ -315,7 +315,7 @@ def scale_img(img, vertices, low=0.3, high=.6, scale_prob=0.2):
 	do_scale = False
 
 	num =  np.random.uniform(low=0, high=1)
-	if (num > scale_prob):
+	if (num < scale_prob):
 		do_scale = True
 	else:
 		do_scale = False

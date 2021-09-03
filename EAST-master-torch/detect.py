@@ -8,6 +8,7 @@ import os
 from dataset import get_rotate_mat
 import numpy as np
 import lanms
+from loss import Loss
 
 
 def resize_img(img):
@@ -221,8 +222,8 @@ def do_detection(img_path, model_path, res_img, scale=4):
 	plot_img = plot_boxes(img, boxes)	
 	plot_img.save(res_img)
 
-#test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2', 'mcds_tc_full1', 'cat_tc_full2']
-test_images = ['mcds_tc_full1']
+test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2', 'mcds_tc_full1', 'cat_tc_full2']
+#test_images = ['mcds_tc_full1']
 
 if __name__ == '__main__':
 	#model_path = './pths/east_vgg16.pth'

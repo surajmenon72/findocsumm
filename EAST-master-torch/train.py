@@ -15,11 +15,11 @@ from PIL import Image, ImageDraw
 
 def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, test_batch_size, lr, num_workers, epoch_iter, interval, eval_interval):
 	file_num = len(os.listdir(train_img_path))
-	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.25, scale_aug=True)
-	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
+	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.25, scale_aug=True)
+	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
 
-	testset = custom_dataset(test_img_path, test_gt_path, scale=0.25, scale_aug=True)
-	#testset = custom_dataset(test_img_path, test_gt_path, scale=0.5, scale_aug=True)
+	#testset = custom_dataset(test_img_path, test_gt_path, scale=0.25, scale_aug=True)
+	testset = custom_dataset(test_img_path, test_gt_path, scale=0.5, scale_aug=True)
 
 	train_loader = data.DataLoader(trainset, batch_size=batch_size, \
                                    shuffle=True, num_workers=num_workers, drop_last=True)
@@ -35,13 +35,13 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	print (device)
 	torch.cuda.empty_cache()
 	print ('Emptied Cache')
-	model = EAST()
-	#model = EASTER()
+	#model = EAST()
+	model = EASTER()
 	#model = EAST_STRETCH()
-	model_name = './pths/east_vgg16.pth'
-	#model_name = './pths/EASTER-sm2-415.pth'
+	#model_name = './pths/east_vgg16.pth'
+	model_name = './pths/EASTER-sm2-150.pth'
 	model.load_state_dict(torch.load(model_name))
-	epoch_start = 0
+	epoch_start = 150
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
@@ -50,7 +50,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=.1)
 
-	use_scheduler = False
+	use_scheduler = True
 	do_eval = False
 
 	if (use_scheduler == True):
@@ -121,7 +121,7 @@ if __name__ == '__main__':
 	#batch_size     = 24
 	train_batch_size = 16
 	test_batch_size = 16
-	lr             = 1e-4
+	lr             = 1e-3
 	num_workers    = 0
 	epoch_iter     = 900
 	save_interval  = 5

@@ -281,38 +281,6 @@ def resize_with_pad(im, target_width, target_height):
     background.paste(image_resize, offset)
     return background.convert('RGB'), (x_offset, y_offset)
 
-def scale_img(img, vertices, low=0.2, high=1):
-	'''adjust scale of image to aug data
-	Input:
-		img         : PIL Image
-		vertices    : vertices of text regions <numpy.ndarray, (n,8)>
-		ratio       : height/width changes in [0.5, 1.5]
-	Output:
-		img         : adjusted PIL Image
-		new_vertices: adjusted vertices
-	'''
-
-	#ratio_hw = 1 + ratio * (np.random.rand() * 2 - 1)
-	ratio_hw = np.random.uniform(low=low, high=high)
-	old_h = img.height
-	old_w = img.width
-	new_h = int(np.around(old_h * ratio_hw))
-	new_w = int(np.around(old_w * ratio_hw))
-	img = img.resize((new_w, new_h), Image.BILINEAR)
-
-	new_vertices = vertices.copy()
-	if (vertices.size) > 0:
-		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (new_h / old_h)
-		new_vertices[:,[0,2,4,6]] = vertices[:,[0,2,4,6]] * (new_w / old_w)
-
-	scaled_image, offsets = resize_with_pad(img, 512, 512)
-
-	if (vertices.size) > 0:
-		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] + offsets[1]
-		new_vertices[:,[0,2,4,6]] = vertices[:,[0,2,4,6]] + offsets[0]
-
-	return scaled_image, new_vertices
-
 def adjust_height(img, vertices, ratio=0.2):
 	'''adjust height of image to aug data
 	Input:
@@ -332,6 +300,48 @@ def adjust_height(img, vertices, ratio=0.2):
 		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (new_h / old_h)
 	return img, new_vertices
 
+def scale_img(img, vertices, low=0.3, high=.6, scale_prob=0.2):
+	'''adjust scale of image to aug data
+	Input:
+		img         : PIL Image
+		vertices    : vertices of text regions <numpy.ndarray, (n,8)>
+		ratio       : height/width changes in [0.5, 1.5]
+	Output:
+		img         : adjusted PIL Image
+		new_vertices: adjusted vertices
+	'''
+
+	#ratio_hw = 1 + ratio * (np.random.rand() * 2 - 1)
+	do_scale = False
+
+	num =  np.random.uniform(low=0, high=1)
+	if (num > scale_prob):
+		do_scale = True
+	else:
+		do_scale = False
+
+	if (do_scale == True):
+		ratio_hw = np.random.uniform(low=low, high=high)
+		old_h = img.height
+		old_w = img.width
+		new_h = int(np.around(old_h * ratio_hw))
+		new_w = int(np.around(old_w * ratio_hw))
+		img = img.resize((new_w, new_h), Image.BILINEAR)
+
+		new_vertices = vertices.copy()
+		if (vertices.size) > 0:
+			new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (new_h / old_h)
+			new_vertices[:,[0,2,4,6]] = vertices[:,[0,2,4,6]] * (new_w / old_w)
+
+		scaled_image, offsets = resize_with_pad(img, 512, 512)
+
+		if (vertices.size) > 0:
+			new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] + offsets[1]
+			new_vertices[:,[0,2,4,6]] = vertices[:,[0,2,4,6]] + offsets[0]
+	else:
+		scaled_image, new_vertices = adjust_height(img, vertices)
+
+	return scaled_image, new_vertices
 
 def rotate_img(img, vertices, angle_range=10):
 	'''rotate image [-10, 10] degree to aug data

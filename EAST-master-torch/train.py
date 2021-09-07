@@ -20,7 +20,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
 
 	#testset = custom_dataset(test_img_path, test_gt_path, scale=0.25, scale_aug=True)
-	testset = custom_dataset(test_img_path, test_gt_path, scale=0.5, scale_aug=True)
+	testset = custom_dataset(test_img_path, test_gt_path, scale=0.5, scale_aug=False)
 
 	train_loader = data.DataLoader(trainset, batch_size=batch_size, \
                                    shuffle=True, num_workers=num_workers, drop_last=True)

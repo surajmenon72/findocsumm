@@ -54,6 +54,9 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	use_scheduler = True
 	do_eval = True
 
+	eval_epochs = []
+	eval_losses = []
+
 	if (use_scheduler == True):
 		print ('Catching up Scheduler')
 		for epoch in range(epoch_start):
@@ -79,8 +82,11 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 						full_test_loss += test_loss.item()
 					torch.cuda.empty_cache()
 
-				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))
-		exit()				
+				eval_epochs.append(epoch)
+				eval_losses.append(full_test_loss)
+
+				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))	
+		#TRAIN code	
 		model.train()
 		if (use_scheduler == True):
 			scheduler.step()
@@ -107,23 +113,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			state_dict = model.module.state_dict() if data_parallel else model.state_dict()
 			torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch+1)))
 
-		#EVAL code
-		if (do_eval == True):
-			if (epoch + 1) % eval_interval == 0:
-				print ('Doing Eval')
-				model.eval()
-				full_test_loss = 0.0
 
-				torch.cuda.empty_cache()
-				for k, (img, gt_score, gt_geo, ignored_map) in enumerate(test_loader):
-					#img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
-					with torch.no_grad():
-						pred_score, pred_geo = model(img)
-						test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
-						full_test_loss += test_loss.item()
-					torch.cuda.empty_cache()
-
-				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))	
 
 
 

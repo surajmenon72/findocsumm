@@ -35,13 +35,13 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	print (device)
 	torch.cuda.empty_cache()
 	print ('Emptied Cache')
-	model = EAST()
-	#model = EASTER()
+	#model = EAST()
+	model = EASTER()
 	#model = EAST_STRETCH()
-	model_name = './pths/east_vgg16.pth'
-	#model_name = './pths/EASTER-sm2-150.pth'
+	#model_name = './pths/east_vgg16.pth'
+	model_name = './pths/EASTER-sm2-150.pth'
 	model.load_state_dict(torch.load(model_name))
-	epoch_start = 0
+	epoch_start = 150
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
@@ -51,7 +51,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=.1)
 
 	use_scheduler = True
-	do_eval = False
+	do_eval = True
 
 	if (use_scheduler == True):
 		print ('Catching up Scheduler')
@@ -61,7 +61,25 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			scheduler.step()
 
 	print ('Starting Training')
-	for epoch in range(epoch_start, epoch_iter):			
+	for epoch in range(epoch_start, epoch_iter):
+		#EVAL code
+		if (do_eval == True):
+			if (epoch + 1) % eval_interval == 0:
+				print ('Doing Eval')
+				model.eval()
+				full_test_loss = 0.0
+
+				torch.cuda.empty_cache()
+				for k, (img, gt_score, gt_geo, ignored_map) in enumerate(test_loader):
+					#img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
+					with torch.no_grad():
+						pred_score, pred_geo = model(img)
+						test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
+						full_test_loss += test_loss.item()
+					torch.cuda.empty_cache()
+
+				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))
+		exit()				
 		model.train()
 		if (use_scheduler == True):
 			scheduler.step()
@@ -97,7 +115,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 				torch.cuda.empty_cache()
 				for k, (img, gt_score, gt_geo, ignored_map) in enumerate(test_loader):
-					img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
+					#img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
 					with torch.no_grad():
 						pred_score, pred_geo = model(img)
 						test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
@@ -121,7 +139,7 @@ if __name__ == '__main__':
 	#batch_size     = 24
 	train_batch_size = 16
 	test_batch_size = 16
-	lr             = 1e-4
+	lr             = 1e-3
 	num_workers    = 0
 	epoch_iter     = 900
 	save_interval  = 5

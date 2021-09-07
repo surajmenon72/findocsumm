@@ -15,11 +15,12 @@ from PIL import Image, ImageDraw
 
 def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, test_batch_size, lr, num_workers, epoch_iter, interval, eval_interval):
 	file_num = len(os.listdir(train_img_path))
-	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.25, scale_aug=True)
-	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
+	
+	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.25, scale_aug=True)
+	trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
 
-	testset = custom_dataset(test_img_path, test_gt_path, scale=0.25, scale_aug=True)
-	#testset = custom_dataset(test_img_path, test_gt_path, scale=0.5, scale_aug=True)
+	#testset = custom_dataset(test_img_path, test_gt_path, scale=0.25, scale_aug=True)
+	testset = custom_dataset(test_img_path, test_gt_path, scale=0.5, scale_aug=True)
 
 	train_loader = data.DataLoader(trainset, batch_size=batch_size, \
                                    shuffle=True, num_workers=num_workers, drop_last=True)

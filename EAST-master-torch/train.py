@@ -104,7 +104,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 		for i, (img, gt_score, gt_geo, ignored_map) in enumerate(train_loader):
 			start_time = time.time()
 			img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
-			pred_score, pred_geo = model(img)
+			pred_score, pred_geo, _ = model(img)
 			loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
 			
 			epoch_loss += loss.item()

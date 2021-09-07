@@ -17,9 +17,9 @@ def eval_model(model_path, test_img_path, submit_path, save_flag=True):
 	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 	print ('Picked Device')
 	print (device)
-	model = EAST(False).to(device)
-	#model = EASTER(False).to(device)
-	scale = 4
+	#model = EAST(False).to(device)
+	model = EASTER(False).to(device)
+	scale = 2
 	model.load_state_dict(torch.load(model_path, map_location=device))
 	model.eval()
 	
@@ -40,7 +40,7 @@ def eval_model(model_path, test_img_path, submit_path, save_flag=True):
 
 if __name__ == '__main__': 
 	#model_name = './pths/east_vgg16.pth'
-	model_name  = './pths/EAST-sm3-ft-10.pth'
+	model_name  = './pths/EASTER-sm2-150.pth'
 	test_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/test_img')
 	submit_path = './submit'
 	eval_model(model_name, test_img_path, submit_path)

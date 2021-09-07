@@ -42,7 +42,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	#model_name = './pths/east_vgg16.pth'
 	model_name = './pths/EASTER-sm2-150.pth'
 	model.load_state_dict(torch.load(model_name))
-	epoch_start = 150
+	epoch_start = 0
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
@@ -56,6 +56,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 	eval_epochs = []
 	eval_losses = []
+	eval_vars = []
 
 	if (use_scheduler == True):
 		print ('Catching up Scheduler')
@@ -72,20 +73,28 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				print ('Doing Eval')
 				model.eval()
 				full_test_loss = 0.0
+				full_test_var = 0.0
 
 				torch.cuda.empty_cache()
 				for k, (img, gt_score, gt_geo, ignored_map) in enumerate(test_loader):
 					img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
 					with torch.no_grad():
-						pred_score, pred_geo = model(img)
+						#pred_score, pred_geo = model(img)
+						pred_score, pred_geo, feat_var = model(img)
 						test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
 						full_test_loss += test_loss.item()
+						full_test_var += feat_var
 					torch.cuda.empty_cache()
+					avg_test_var = full_test_var/(k+1)
+
 
 				eval_epochs.append(epoch)
 				eval_losses.append(full_test_loss)
+				eval_vars.append(avg_test_var)
 
-				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))	
+				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))
+				print ('EVAL: TEST VAR: {:.8f}'.format(avg_test_var))
+		exit()	
 		#TRAIN code	
 		model.train()
 		if (use_scheduler == True):
@@ -112,9 +121,6 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 		if (epoch + 1) % interval == 0:
 			state_dict = model.module.state_dict() if data_parallel else model.state_dict()
 			torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch+1)))
-
-
-
 
 
 if __name__ == '__main__':

@@ -7,6 +7,7 @@ from model import EAST
 from model2 import EASTER
 from model3 import EAST_STRETCH
 from loss import Loss
+from eval import eval_model
 import os
 import time
 import numpy as np
@@ -40,7 +41,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	model = EASTER()
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/EASTER-sm2-430.pth'
+	model_name = './pths/EASTER-sm2-150.pth'
 	model.load_state_dict(torch.load(model_name))
 	epoch_start = 150
 	data_parallel = False
@@ -58,6 +59,8 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	eval_losses = []
 	eval_vars = []
 
+	last_saved_epoch = epoch_start
+
 	if (use_scheduler == True):
 		print ('Catching up Scheduler')
 		for epoch in range(epoch_start):
@@ -72,7 +75,6 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			if (epoch + 1) % eval_interval == 0:
 				print ('Doing Eval')
 				model.eval()
-				full_class_loss = 0.0
 				full_test_loss = 0.0
 				full_test_var = 0.0
 
@@ -82,22 +84,24 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 					with torch.no_grad():
 						#pred_score, pred_geo = model(img)
 						pred_score, pred_geo, feat_var = model(img)
-						class_loss = criterion.class_loss(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
 						test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
-						full_class_loss += class_loss.item()
 						full_test_loss += test_loss.item()
 						full_test_var += feat_var
 					torch.cuda.empty_cache()
 					avg_test_var = full_test_var/(k+1)
 
-
 				eval_epochs.append(epoch)
 				eval_losses.append(full_test_loss)
 				eval_vars.append(avg_test_var)
 
-				print ('EVAL: CLASS LOSS: {:.8f}'.format(full_class_loss))
 				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))
 				print ('EVAL: TEST VAR: {:.8f}'.format(avg_test_var))
+
+				#testing
+				if (last_saved_epoch > 0):
+					model_path = './pths/model_epoch_' + str(last_saved_epoch)
+					res = eval_model(model_path, test_img_path)
+					print (res)
 
 			if (eval_interval == 1):
 				exit()
@@ -125,6 +129,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 		print(time.asctime(time.localtime(time.time())))
 		print('='*50)
 		if (epoch + 1) % interval == 0:
+			last_saved_epoch = (epoch+1)
 			state_dict = model.module.state_dict() if data_parallel else model.state_dict()
 			torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch+1)))
 

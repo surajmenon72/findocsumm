@@ -9,7 +9,7 @@ import numpy as np
 import shutil
 
 
-def eval_model(model_path, test_img_path, submit_path, save_flag=True):
+def eval_model(model_path, test_img_path, submit_path='./submit', save_flag=True):
 	if os.path.exists(submit_path):
 		shutil.rmtree(submit_path) 
 	os.mkdir(submit_path)
@@ -36,6 +36,8 @@ def eval_model(model_path, test_img_path, submit_path, save_flag=True):
 
 	if not save_flag:
 		shutil.rmtree(submit_path)
+
+	return res
 
 
 if __name__ == '__main__': 

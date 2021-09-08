@@ -181,12 +181,12 @@ class EASTER(nn.Module):
 		merge_output = self.merge(self.extractor(x))
 		score, geo = self.output(merge_output)
 
-		var_full = torch.var(merge_output, dim=1, unbiased=True)
-		var_avg = torch.mean(torch.mean(var_full, dim=2), dim=1)
-		var_full_avg = torch.mean(var_avg)
+		smooshed_output = torch.reshape(merge_output, (16, 32, 65536))
+		var_full = torch.var(smooshed_output, dim=2, unbiased=True)
+		var_avg = torch.mean(torch.mean(var_full, dim=1), dim=0)
 		
 		#return self.output(self.merge(self.extractor(x)))
-		return score, geo, var_full_avg
+		return score, geo, var_avg
 		
 
 if __name__ == '__main__':

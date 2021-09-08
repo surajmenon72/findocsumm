@@ -72,6 +72,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			if (epoch + 1) % eval_interval == 0:
 				print ('Doing Eval')
 				model.eval()
+				full_class_loss = 0.0
 				full_test_loss = 0.0
 				full_test_var = 0.0
 
@@ -81,7 +82,9 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 					with torch.no_grad():
 						#pred_score, pred_geo = model(img)
 						pred_score, pred_geo, feat_var = model(img)
+						class_loss = criterion.class_loss(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
 						test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
+						full_class_loss += class_loss.item()
 						full_test_loss += test_loss.item()
 						full_test_var += feat_var
 					torch.cuda.empty_cache()
@@ -92,9 +95,12 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				eval_losses.append(full_test_loss)
 				eval_vars.append(avg_test_var)
 
+				print ('EVAL: CLASS LOSS: {:.8f}'.format(full_class_loss))
 				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))
 				print ('EVAL: TEST VAR: {:.8f}'.format(avg_test_var))
 
+			if (eval_interval == 1):
+				exit()
 		#TRAIN code	
 		model.train()
 		if (use_scheduler == True):
@@ -140,6 +146,6 @@ if __name__ == '__main__':
 	num_workers    = 0
 	epoch_iter     = 900
 	save_interval  = 5
-	eval_interval  = 5
+	eval_interval  = 1
 	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval)	
 	

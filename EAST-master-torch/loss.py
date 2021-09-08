@@ -27,6 +27,10 @@ class Loss(nn.Module):
 		super(Loss, self).__init__()
 		self.weight_angle = weight_angle
 
+	def class_loss(self, gt_score, pred_score, gt_geo, pred_geo, ignored_map):
+		classify_loss = get_dice_loss(gt_score, pred_score*(1-ignored_map))
+		return classify_loss
+
 	def forward(self, gt_score, pred_score, gt_geo, pred_geo, ignored_map):
 		if torch.sum(gt_score) < 1:
 			return torch.sum(pred_score + pred_geo) * 0

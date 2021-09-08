@@ -302,7 +302,6 @@ def evaluate_method(gtFilePath, submFilePath, evaluationParams):
 
     resDict = {'calculated':True,'Message':'','method': methodMetrics,'per_sample': perSampleMetrics}
     
-    
     return resDict;
 
 

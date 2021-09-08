@@ -337,8 +337,14 @@ def main_evaluation(p,default_evaluation_params_fn,validate_data_fn,evaluate_met
         outZip.close()
 
     if show_result:
-        sys.stdout.write("Calculated!")
-        sys.stdout.write(json.dumps(resDict['method']))
+        sys.stdout.write("Calculated!_")
+        method = resDict['method']
+        precision = method['precision']
+        recall = method['recall']
+
+        #sys.stdout.write(json.dumps(resDict['method']))
+        sys.stdout.write(str(precision))
+        sys.stdout.write(str(recall))
     
     return resDict
 

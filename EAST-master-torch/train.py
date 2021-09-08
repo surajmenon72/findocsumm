@@ -57,6 +57,8 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 	eval_epochs = []
 	eval_losses = []
+	eval_precisions = []
+	eval_recalls = []
 	eval_vars = []
 
 	last_saved_epoch = epoch_start
@@ -101,6 +103,17 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				if (last_saved_epoch > 0):
 					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'
 					res = eval_model(model_path, test_img_path)
+					words = res.split('_')
+					precision = float(words[1])
+					recall = float(words[2])
+
+					print (precision)
+					print (recall)
+					
+					eval_precisions.append(precision)
+					eval_recalls.append(recall)
+
+
 
 			if (eval_interval == 1):
 				exit()

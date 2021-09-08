@@ -63,6 +63,11 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 	last_saved_epoch = epoch_start
 
+	#for eval
+	if (epoch_start > 0):
+		state_dict = model.module.state_dict() if data_parallel else model.state_dict()
+		torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch_start)))
+
 	if (use_scheduler == True):
 		print ('Catching up Scheduler')
 		for epoch in range(epoch_start):
@@ -107,13 +112,11 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 					precision = float(words[1])
 					recall = float(words[2])
 
-					print (precision)
-					print (recall)
-					
 					eval_precisions.append(precision)
 					eval_recalls.append(recall)
 
-
+					print ('EVAL: TEST PRECISION: {:.8f}'.format(precision))
+					print ('EVAL: TEST RECALL: {:.8f}'.format(recall))
 
 			if (eval_interval == 1):
 				exit()

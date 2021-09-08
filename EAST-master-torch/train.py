@@ -76,7 +76,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				print ('Doing Eval')
 				model.eval()
 				full_test_loss = 0.0
-				full_test_var = 0.0
+				#full_test_var = 0.0
 
 				torch.cuda.empty_cache()
 				for k, (img, gt_score, gt_geo, ignored_map) in enumerate(test_loader):
@@ -88,14 +88,14 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 						full_test_loss += test_loss.item()
 						full_test_var += feat_var
 					torch.cuda.empty_cache()
-					avg_test_var = full_test_var/(k+1)
+					#avg_test_var = full_test_var/(k+1)
 
 				eval_epochs.append(epoch)
 				eval_losses.append(full_test_loss)
-				eval_vars.append(avg_test_var)
+				#eval_vars.append(avg_test_var)
 
 				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))
-				print ('EVAL: TEST VAR: {:.8f}'.format(avg_test_var))
+				#print ('EVAL: TEST VAR: {:.8f}'.format(avg_test_var))
 
 				#testing
 				if (last_saved_epoch > 0):

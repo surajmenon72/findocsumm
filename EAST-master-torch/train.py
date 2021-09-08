@@ -101,8 +101,6 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				if (last_saved_epoch > 0):
 					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'
 					res = eval_model(model_path, test_img_path)
-					print (res["precision"])
-					print (res["recall"])
 
 			if (eval_interval == 1):
 				exit()

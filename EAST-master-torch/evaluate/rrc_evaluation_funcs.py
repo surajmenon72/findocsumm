@@ -343,8 +343,8 @@ def main_evaluation(p,default_evaluation_params_fn,validate_data_fn,evaluate_met
         recall = method['recall']
 
         #sys.stdout.write(json.dumps(resDict['method']))
-        sys.stdout.write(str(precision))
-        sys.stdout.write(str(recall))
+        outstr = str(precision) + '_' + str(recall) 
+        sys.stdout.write(outstr)
     
     return resDict
 

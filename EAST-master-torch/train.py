@@ -41,7 +41,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	model = EASTER(True, True)
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/EASTER-sm2-500.pth'
+	model_name = './pths/EASTER-sm2-150.pth'
 	model.load_state_dict(torch.load(model_name))
 	epoch_start = 150
 	data_parallel = False

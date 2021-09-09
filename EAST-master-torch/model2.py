@@ -179,6 +179,7 @@ class EASTER(nn.Module):
 		self.retVar = retVar
 	
 	def forward(self, x, calcVar=False):
+		device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 		merge_output = self.merge(self.extractor(x))
 		score, geo = self.output(merge_output)
 

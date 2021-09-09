@@ -42,7 +42,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	model = EASTER(True, True)
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/EASTER-sm2-150.pth'
+	model_name = './pths/EASTER-sm2-415.pth'
 	model.load_state_dict(torch.load(model_name))
 	epoch_start = 0
 	data_parallel = False
@@ -106,10 +106,12 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))
 				print ('EVAL: TEST VAR: {:.8f}'.format(avg_test_var))
 
+				exit()
+
 				#testing
 				if (last_saved_epoch > -1):
 					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'
-					res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EAST')
+					res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EASTER')
 					words = res.split('_')
 					precision = float(words[1])
 					recall = float(words[2])

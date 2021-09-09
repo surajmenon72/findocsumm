@@ -185,8 +185,12 @@ class EASTER(nn.Module):
 		if (self.retVar):
 			smooshed_output = torch.reshape(merge_output, (16, 32, 65536))
 			smooshed_mean = torch.mean(merge_output, axis=1)
+			print (smooshed_mean.shape)
 			var_full = torch.var(smooshed_mean, dim=1, unbiased=True)
+			print (var_full.shape)
 			var_avg = torch.mean(var_full, axis=0)
+			print (var_avg.shape)
+			exit()
 
 			return score, geo, var_avg
 		else:

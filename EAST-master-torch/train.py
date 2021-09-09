@@ -18,7 +18,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	file_num = len(os.listdir(train_img_path))
 	
 	inv_ds = (1/data_scale)
-	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=True)
+	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=False)
 	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
 
 	testset = custom_dataset(test_img_path, test_gt_path, scale=inv_ds, scale_aug=False)
@@ -42,9 +42,9 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	model = EASTER(True, True)
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/EASTER-sm2-500.pth'
+	model_name = './pths/EASTER-sm2-150.pth'
 	model.load_state_dict(torch.load(model_name))
-	epoch_start = 0
+	epoch_start = 150
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
@@ -106,8 +106,6 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))
 				print ('EVAL: TEST VAR: {:.8f}'.format(avg_test_var))
 
-				exit()
-
 				#testing
 				if (last_saved_epoch > -1):
 					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'
@@ -153,6 +151,17 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			state_dict = model.module.state_dict() if data_parallel else model.state_dict()
 			torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch+1)))
 
+			eval_metrics = []
+			eval_metrics.append(eval_epochs)
+			eval_metrics.append(eval_losses)
+			eval_metrics.append(eval_precisions)
+			eval_metrics.append(eval_recalls)
+			eval_metrics.append(eval_vars)
+
+			save_str = 'eval_metrics.npy'
+			eval_metrics_np = np.array(eval_metrics)
+			np.save(save_str, eval_metrics_np)
+
 
 if __name__ == '__main__':
 	train_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/train_img')
@@ -171,7 +180,7 @@ if __name__ == '__main__':
 	num_workers    = 0
 	epoch_iter     = 900
 	save_interval  = 5
-	eval_interval  = 1
+	eval_interval  = 5
 	data_scale = 2
 	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval, data_scale)	
 	

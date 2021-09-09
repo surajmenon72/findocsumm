@@ -109,7 +109,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				#testing
 				if (last_saved_epoch > -1):
 					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'
-					res = eval_model(model_path, test_img_path, set_scale=data_scale)
+					res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EAST')
 					words = res.split('_')
 					precision = float(words[1])
 					recall = float(words[2])

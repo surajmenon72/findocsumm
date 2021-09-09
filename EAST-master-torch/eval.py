@@ -9,7 +9,7 @@ import numpy as np
 import shutil
 
 
-def eval_model(model_path, test_img_path, submit_path='./submit', save_flag=True, set_scale=4):
+def eval_model(model_path, test_img_path, submit_path='./submit', save_flag=True, set_scale=4, model='EAST'):
 	if os.path.exists(submit_path):
 		shutil.rmtree(submit_path) 
 	os.mkdir(submit_path)
@@ -17,8 +17,10 @@ def eval_model(model_path, test_img_path, submit_path='./submit', save_flag=True
 	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 	print ('Picked Device')
 	print (device)
-	#model = EAST(False).to(device)
-	model = EASTER(False).to(device)
+	if (model == 'EAST'):
+		model = EAST(False).to(device)
+	else:
+		model = EASTER(False).to(device)
 	scale = set_scale
 	model.load_state_dict(torch.load(model_path, map_location=device))
 	model.eval()
@@ -46,4 +48,5 @@ if __name__ == '__main__':
 	test_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/test_img')
 	submit_path = './submit'
 	scale = 2
-	eval_model(model_name, test_img_path, submit_path, set_scale=scale)
+	model = 'EAST'
+	eval_model(model_name, test_img_path, submit_path, set_scale=scale, model=model)

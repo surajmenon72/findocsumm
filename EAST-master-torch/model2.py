@@ -191,13 +191,11 @@ class EASTER(nn.Module):
 				#Calculating some sort of avg spread
 				for i in range(num_dim):
 					val = smooshed_output[:, i, :]
-					new_diff = torch.zeros((16, 1, 65536))
+					new_diff = torch.zeros((16, 65536))
 					for j in range(num_dim):
 						new_val = smooshed_output[:, j, :]
 						diff = val - new_val
 						diff = torch.square(diff)
-						print (diff.shape)
-						exit()
 						new_diff += diff
 
 					total_diff[:, i, :] = new_diff

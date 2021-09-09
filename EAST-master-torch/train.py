@@ -92,14 +92,11 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 					with torch.no_grad():
 						#pred_score, pred_geo = model(img)
 						pred_score, pred_geo, feat_var = model(img)
-						print (feat_var)
 						test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
 						full_test_loss += test_loss.item()
 						full_test_var += feat_var
 					torch.cuda.empty_cache()
 					avg_test_var = full_test_var/(k+1)
-
-				print (avg_test_var)
 
 				eval_epochs.append(epoch)
 				eval_losses.append(full_test_loss)

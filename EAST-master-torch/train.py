@@ -107,7 +107,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				print ('EVAL: TEST VAR: {:.8f}'.format(avg_test_var))
 
 				#testing
-				if (last_saved_epoch > 0):
+				if (last_saved_epoch > -1):
 					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'
 					res = eval_model(model_path, test_img_path, set_scale=data_scale)
 					words = res.split('_')

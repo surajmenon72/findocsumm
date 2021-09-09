@@ -184,7 +184,7 @@ class EASTER(nn.Module):
 
 		if (self.retVar):
 			smooshed_output = torch.reshape(merge_output, (16, 32, 65536))
-			smooshed_mean = torch.mean(merge_output, axis=1)
+			smooshed_mean = torch.mean(smooshed_output, axis=1)
 			print (smooshed_mean.shape)
 			var_full = torch.var(smooshed_mean, dim=1, unbiased=True)
 			print (var_full.shape)

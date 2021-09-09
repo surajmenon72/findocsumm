@@ -171,23 +171,26 @@ class output(nn.Module):
 		
 	
 class EASTER(nn.Module):
-	def __init__(self, pretrained=True):
+	def __init__(self, pretrained=True, retVar=False):
 		super(EASTER, self).__init__()
 		self.extractor = extractor(pretrained)
 		self.merge     = merge()
 		self.output    = output()
+		self.retVar = retVar
 	
 	def forward(self, x):
 		merge_output = self.merge(self.extractor(x))
 		score, geo = self.output(merge_output)
 
-		#smooshed_output = torch.reshape(merge_output, (16, 32, 65536))
-		#var_full = torch.var(smooshed_output, dim=2, unbiased=True)
-		#var_avg = torch.mean(torch.mean(var_full, dim=1), dim=0)
-		
-		#return self.output(self.merge(self.extractor(x)))
-		return score, geo
-		#return score, geo, var_avg
+		if (self.retVar):
+			smooshed_output = torch.reshape(merge_output, (16, 32, 65536))
+			smooshed_mean = torch.mean(merge_output, axis=1)
+			var_full = torch.var(smooshed_mean, dim=1, unbiased=True)
+			var_avg = torch.mean(var_full, axis=0)
+
+			return score, geo, var_avg
+		else:
+			return score, geo
 		
 
 if __name__ == '__main__':

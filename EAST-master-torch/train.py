@@ -105,6 +105,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))
 				print ('EVAL: TEST VAR: {:.8f}'.format(avg_test_var))
 
+				exit()
 				#testing
 				if (last_saved_epoch > 0):
 					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'

@@ -38,11 +38,11 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	print (device)
 	torch.cuda.empty_cache()
 	print ('Emptied Cache')
-	model = EAST(True, True)
-	#model = EASTER(True, True)
+	#model = EAST(True, True)
+	model = EASTER(True, True)
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/EAST-sm4-50.pth'
+	model_name = './pths/EASTER-sm2-150.pth'
 	model.load_state_dict(torch.load(model_name))
 	epoch_start = 0
 	data_parallel = False
@@ -92,7 +92,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 					img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
 					with torch.no_grad():
 						#pred_score, pred_geo = model(img)
-						pred_score, pred_geo, feat_var = model(img)
+						pred_score, pred_geo, feat_var = model(img, True)
 						test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
 						full_test_loss += test_loss.item()
 						full_test_var += feat_var
@@ -170,6 +170,6 @@ if __name__ == '__main__':
 	epoch_iter     = 900
 	save_interval  = 5
 	eval_interval  = 1
-	data_scale = 4
+	data_scale = 2
 	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval, data_scale)	
 	

@@ -165,17 +165,21 @@ class EAST(nn.Module):
 		self.output    = output()
 		self.retVar = retVar
 	
-	def forward(self, x):
+	def forward(self, x, calcVar=False):
 		merge_output = self.merge(self.extractor(x))
 		score, geo = self.output(merge_output)
 
 		if (self.retVar):
-			smooshed_output = torch.reshape(merge_output, (16, 32, 16384))
-			smooshed_var = torch.var(smooshed_output, axis=1, unbiased=True)
-			var_full = torch.mean(smooshed_var, dim=1)
-			var_avg = torch.mean(var_full, axis=0)
+			if (calcVar == True):
+				smooshed_output = torch.reshape(merge_output, (16, 32, 16384))
+				smooshed_var = torch.var(smooshed_output, axis=1, unbiased=True)
+				var_full = torch.mean(smooshed_var, dim=1)
+				var_avg = torch.mean(var_full, axis=0)
 
-			return score, geo, var_avg
+				return score, geo, var_avg
+			else:
+				var_avg = 0
+				return score, geo, var_avg
 		else:
 			return score, geo
 		

@@ -178,17 +178,41 @@ class EASTER(nn.Module):
 		self.output    = output()
 		self.retVar = retVar
 	
-	def forward(self, x):
+	def forward(self, x, calcVar=False):
 		merge_output = self.merge(self.extractor(x))
 		score, geo = self.output(merge_output)
 
 		if (self.retVar):
-			smooshed_output = torch.reshape(merge_output, (16, 32, 65536))
-			smooshed_var = torch.var(smooshed_output, axis=1, unbiased=True)
-			var_full = torch.mean(smooshed_var, dim=1)
-			var_avg = torch.mean(var_full, axis=0)
+			if (calcVar == True):
+				smooshed_output = torch.reshape(merge_output, (16, 32, 65536))
+				num_dim = smoothed_output.shape[1]
+				total_diff = torch.zeros((16, 32, 65536))
 
-			return score, geo, var_avg
+				#Calculating some sort of avg spread
+				for i in range(num_dim):
+					val = smooshed_output[:, i, :]
+					new_diff = torch.zeros((16, 1, 65536))
+					for j in range(num_dim):
+						new_val = smooshed_output[:, j, :]
+						diff = val - new_val
+						diff = torch.square(diff)
+						new_diff += diff
+
+					total_diff[:, i, :] = new_diff
+
+				diff_mean = torch.mean(total_diff, axis=1)
+				diff_mean_pix = torch.mean(diff_mean, axis=1)
+				diff_mean_batch = torch.mean(diff_mean_pix, axis=0)
+
+				# smooshed_var = torch.var(smooshed_output, axis=1, unbiased=True)
+				# var_full = torch.mean(smooshed_var, dim=1)
+				# var_avg = torch.mean(var_full, axis=0)
+
+				#return score, geo, var_avg
+				return score, geo, diff_mean_batch
+			else:
+				var_avg = 0
+				return score, geo, var_avg
 		else:
 			return score, geo
 		

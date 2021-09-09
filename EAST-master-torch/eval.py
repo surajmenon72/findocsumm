@@ -9,7 +9,7 @@ import numpy as np
 import shutil
 
 
-def eval_model(model_path, test_img_path, submit_path='./submit', save_flag=True):
+def eval_model(model_path, test_img_path, submit_path='./submit', save_flag=True, set_scale=4):
 	if os.path.exists(submit_path):
 		shutil.rmtree(submit_path) 
 	os.mkdir(submit_path)
@@ -19,7 +19,7 @@ def eval_model(model_path, test_img_path, submit_path='./submit', save_flag=True
 	print (device)
 	#model = EAST(False).to(device)
 	model = EASTER(False).to(device)
-	scale = 2
+	scale = set_scale
 	model.load_state_dict(torch.load(model_path, map_location=device))
 	model.eval()
 	
@@ -45,4 +45,5 @@ if __name__ == '__main__':
 	model_name  = './pths/EASTER-sm2-150.pth'
 	test_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/test_img')
 	submit_path = './submit'
-	eval_model(model_name, test_img_path, submit_path)
+	scale = 2
+	eval_model(model_name, test_img_path, submit_path, set_scale=scale)

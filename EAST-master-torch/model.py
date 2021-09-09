@@ -158,14 +158,26 @@ class output(nn.Module):
 		
 	
 class EAST(nn.Module):
-	def __init__(self, pretrained=True):
+	def __init__(self, pretrained=True, retVar=False):
 		super(EAST, self).__init__()
 		self.extractor = extractor(pretrained)
 		self.merge     = merge()
 		self.output    = output()
+		self.retVar = retVar
 	
 	def forward(self, x):
-		return self.output(self.merge(self.extractor(x)))
+		merge_output = self.merge(self.extractor(x))
+		score, geo = self.output(merge_output)
+
+		if (self.retVar):
+			smooshed_output = torch.reshape(merge_output, (16, 32, 16384))
+			smooshed_var = torch.var(smooshed_output, axis=1, unbiased=True)
+			var_full = torch.mean(smooshed_var, dim=1)
+			var_avg = torch.mean(var_full, axis=0)
+
+			return score, geo, var_avg
+		else:
+			return score, geo
 		
 
 if __name__ == '__main__':

@@ -196,6 +196,8 @@ class EASTER(nn.Module):
 						new_val = smooshed_output[:, j, :]
 						diff = val - new_val
 						diff = torch.square(diff)
+						print (diff.shape)
+						exit()
 						new_diff += diff
 
 					total_diff[:, i, :] = new_diff

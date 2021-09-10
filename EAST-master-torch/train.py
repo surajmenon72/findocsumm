@@ -42,9 +42,9 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	model = EASTER(True, True)
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/EASTER-sm3-250.pth'
+	model_name = './pths/EASTER-sm3-aug-270.pth'
 	model.load_state_dict(torch.load(model_name))
-	epoch_start = 250
+	epoch_start = 270
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
@@ -109,6 +109,10 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 				#testing
 				if (last_saved_epoch > -1):
+					last_saved_epoch = (epoch+1)
+					state_dict = model.module.state_dict() if data_parallel else model.state_dict()
+					torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch+1)))
+
 					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'
 					res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EASTER')
 					words = res.split('_')

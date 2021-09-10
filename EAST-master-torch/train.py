@@ -42,7 +42,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	model = EASTER(True, True)
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/EASTER-sm2-150.pth'
+	model_name = './pths/EASTER-sm3-215.pth'
 	model.load_state_dict(torch.load(model_name))
 	epoch_start = 150
 	data_parallel = False
@@ -57,6 +57,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	do_eval = True
 
 	eval_epochs = []
+	eval_train_losses = []
 	eval_losses = []
 	eval_precisions = []
 	eval_recalls = []
@@ -99,7 +100,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 					torch.cuda.empty_cache()
 					avg_test_var = full_test_var/(k+1)
 
-				eval_epochs.append(epoch)
+				eval_epochs.append(epoch+1)
 				eval_losses.append(full_test_loss)
 				eval_vars.append(avg_test_var)
 
@@ -151,8 +152,11 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			state_dict = model.module.state_dict() if data_parallel else model.state_dict()
 			torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch+1)))
 
+			eval_train_losses.append(epoch_loss)
+
 			eval_metrics = []
 			eval_metrics.append(eval_epochs)
+			eval_metrics.append(eval_train_losses)
 			eval_metrics.append(eval_losses)
 			eval_metrics.append(eval_precisions)
 			eval_metrics.append(eval_recalls)

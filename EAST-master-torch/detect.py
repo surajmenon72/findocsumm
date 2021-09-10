@@ -17,8 +17,8 @@ def resize_img(img):
 	w, h = img.size
 
 	#rescale factor
-	w_scale = 2.75
-	h_scale = 2.75
+	#w_scale = 2.75
+	#h_scale = 2.75
 
 	#w_scale = 2.5
 	#h_scale = 2.5
@@ -26,8 +26,8 @@ def resize_img(img):
 	#w_scale = 1.875
 	#h_scale = 1.875
 
-	#w_scale = 1
-	#h_scale = 1
+	w_scale = 1
+	h_scale = 1
 
 	resize_w = int(w * w_scale)
 	resize_h = int(h * h_scale)
@@ -228,8 +228,8 @@ test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2', 'mcds_tc_full1',
 
 if __name__ == '__main__':
 	#model_path = './pths/east_vgg16.pth'
-	model_path  = './pths/EAST-sm4-ft-25.pth'
-	scale = 4
+	model_path  = './pths/EASTER-sm3-aug-305.pth'
+	scale = 2
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'
 		segs = t.split('_')

@@ -1,11 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-file = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-255-full.npy'
+file = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug250-150--315.npy'
 
 vec = np.load(file)
 
-#off by 1 for EASTER-sm3-215, first one, no training loss
 epoch_index = 0
 train_loss_index = 1
 test_loss_index = 2
@@ -21,5 +20,5 @@ recalls = vec[recall_index, :]
 variances = vec[variance_index, :]
 
 plt.figure(1)
-plt.plot(epochs, variances)
+plt.plot(epochs, recalls)
 plt.show()

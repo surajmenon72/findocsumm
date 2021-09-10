@@ -18,7 +18,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	file_num = len(os.listdir(train_img_path))
 	
 	inv_ds = (1/data_scale)
-	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=False)
+	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=True)
 	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
 
 	testset = custom_dataset(test_img_path, test_gt_path, scale=inv_ds, scale_aug=False)
@@ -68,7 +68,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	#for eval
 	if (epoch_start > -1):
 		state_dict = model.module.state_dict() if data_parallel else model.state_dict()
-		torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch_start)))
+		torch.save(state_dict, os.path.join(pths_path, 'model_aug_epoch_{}.pth'.format(epoch_start)))
 
 	if (use_scheduler == True):
 		print ('Catching up Scheduler')
@@ -109,7 +109,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 				#testing
 				if (last_saved_epoch > -1):
-					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'
+					model_path = './pths/model_aug_epoch_' + str(last_saved_epoch) + '.pth'
 					res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EASTER')
 					words = res.split('_')
 					precision = float(words[1])
@@ -150,7 +150,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 		if (epoch + 1) % interval == 0:
 			last_saved_epoch = (epoch+1)
 			state_dict = model.module.state_dict() if data_parallel else model.state_dict()
-			torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch+1)))
+			torch.save(state_dict, os.path.join(pths_path, 'model_aug_epoch_{}.pth'.format(epoch+1)))
 
 			eval_train_losses.append(epoch_loss)
 
@@ -162,7 +162,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			eval_metrics.append(eval_recalls)
 			eval_metrics.append(eval_vars)
 
-			save_str = 'eval_metrics.npy'
+			save_str = 'eval_aug_metrics.npy'
 			eval_metrics_np = np.array(eval_metrics)
 			np.save(save_str, eval_metrics_np)
 

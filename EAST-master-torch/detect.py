@@ -213,8 +213,8 @@ def detect_dataset(model, device, test_img_path, submit_path, scale=4):
 def do_detection(img_path, model_path, res_img, scale=4):
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 	#model = EAST_STRETCH(False).to(device)
-	#model = EASTER(False).to(device)
-	model = EAST(False).to(device)
+	model = EASTER(False).to(device)
+	#model = EAST(False).to(device)
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 	model.eval()
 	img = Image.open(img_path)

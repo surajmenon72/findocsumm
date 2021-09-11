@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-file = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug250-150--315.npy'
+file = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug2250-425.npy'
 
 vec = np.load(file)
 
@@ -20,5 +20,5 @@ recalls = vec[recall_index, :]
 variances = vec[variance_index, :]
 
 plt.figure(1)
-plt.plot(epochs, train_losses)
+plt.plot(epochs, recalls)
 plt.show()

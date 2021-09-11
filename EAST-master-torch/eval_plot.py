@@ -20,5 +20,5 @@ recalls = vec[recall_index, :]
 variances = vec[variance_index, :]
 
 plt.figure(1)
-plt.plot(epochs, recalls)
+plt.plot(epochs, train_losses)
 plt.show()

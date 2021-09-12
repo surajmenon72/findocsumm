@@ -315,6 +315,7 @@ def scale_img(img, vertices, low=0.2, high=1, scale_prob=1):
 	do_scale = False
 
 	num =  np.random.uniform(low=0, high=1)
+	print (num)
 	if (num < scale_prob):
 		do_scale = True
 	else:
@@ -322,6 +323,7 @@ def scale_img(img, vertices, low=0.2, high=1, scale_prob=1):
 
 	if (do_scale == True):
 		ratio_hw = np.random.uniform(low=low, high=high)
+		print (ratio_hw)
 		old_h = img.height
 		old_w = img.width
 		new_h = int(np.around(old_h * ratio_hw))
@@ -341,6 +343,7 @@ def scale_img(img, vertices, low=0.2, high=1, scale_prob=1):
 	else:
 		scaled_image, new_vertices = adjust_height(img, vertices)
 
+	exit()
 	return scaled_image, new_vertices
 
 def rotate_img(img, vertices, angle_range=10):

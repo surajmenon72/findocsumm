@@ -228,7 +228,7 @@ test_images = ['test_img2', 'mcds_tc_full1']
 
 if __name__ == '__main__':
 	#model_path = './pths/east_vgg16.pth'
-	model_path  = './pths/EAST-sm3-ft-100.pth'
+	model_path  = './pths/EAST-sm3-ft-125.pth'
 	scale = 4
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'

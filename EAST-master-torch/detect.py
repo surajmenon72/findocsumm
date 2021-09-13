@@ -17,14 +17,14 @@ def resize_img(img):
 	w, h = img.size
 
 	#rescale factor
-	w_scale = 2.75
-	h_scale = 2.75
+	#w_scale = 2.75
+	#h_scale = 2.75
 
 	#w_scale = 2.15
 	#h_scale = 2.15
 
-	#w_scale = 1.875
-	#h_scale = 1.875
+	w_scale = 1.875
+	h_scale = 1.875
 
 	#w_scale = 1
 	#h_scale = 1
@@ -223,13 +223,13 @@ def do_detection(img_path, model_path, res_img, scale=4):
 	plot_img = plot_boxes(img, boxes)	
 	plot_img.save(res_img)
 
-test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2', 'mcds_tc_full1', 'cat_tc_full2']
-#test_images = ['test_img2', 'mcds_tc_full1']
+#test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2', 'mcds_tc_full1', 'cat_tc_full2']
+test_images = ['test_img2', 'mcds_tc_full1']
 #test_images = ['mcds_tc_full1']
 
 if __name__ == '__main__':
 	#model_path = './pths/east_vgg16.pth'
-	model_path  = './pths/EASTER-sm3-aug-400.pth'
+	model_path  = './pths/EASTER-sm3-aug-300.pth'
 	scale = 2
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'

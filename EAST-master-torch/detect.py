@@ -213,8 +213,8 @@ def detect_dataset(model, device, test_img_path, submit_path, scale=4):
 def do_detection(img_path, model_path, res_img, scale=4):
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 	#model = EAST_STRETCH(False).to(device)
-	#model = EASTER(False).to(device)
-	model = EAST(False).to(device)
+	model = EASTER(False).to(device)
+	#model = EAST(False).to(device)
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 	model.eval()
 	img = Image.open(img_path)
@@ -223,13 +223,13 @@ def do_detection(img_path, model_path, res_img, scale=4):
 	plot_img = plot_boxes(img, boxes)	
 	plot_img.save(res_img)
 
-#test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2', 'mcds_tc_full1', 'cat_tc_full2']
-test_images = ['test_img2', 'mcds_tc_full1']
+test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2', 'mcds_tc_full1', 'cat_tc_full2']
+#test_images = ['test_img2', 'mcds_tc_full1']
 
 if __name__ == '__main__':
 	#model_path = './pths/east_vgg16.pth'
-	model_path  = './pths/EAST-sm3-ft-125.pth'
-	scale = 4
+	model_path  = './pths/EASTER-sm2-420.pth'
+	scale = 2
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'
 		segs = t.split('_')

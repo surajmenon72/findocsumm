@@ -43,8 +43,8 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
 	#model_name = './pths/EASTER-sm3-aug3-410.pth'
-	model_name = './pths/test2/model_epoch_120.pth'
-	model.load_state_dict(torch.load(model_name))
+	#model_name = './pths/test2/model_epoch_120.pth'
+	#model.load_state_dict(torch.load(model_name))
 	epoch_start = 0
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
@@ -107,6 +107,8 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 				print ('EVAL: TEST LOSS: {:.8f}'.format(full_test_loss))
 				print ('EVAL: TEST VAR: {:.8f}'.format(avg_test_var))
+
+				exit()
 
 				#testing
 				if (last_saved_epoch > -1):

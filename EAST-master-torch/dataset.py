@@ -513,12 +513,12 @@ class custom_dataset(data.Dataset):
 
 		print (score_map.shape)
 		print (geo_map.shape)
-		exit()
-		boxes = get_boxes(score_map.squeeze(0).cpu().numpy(), geo_map.squeeze(0).cpu().numpy(), scale=self.scale)
-		res_img = plot_boxes(img, boxes)
-		res_img.save('./scale_test.bmp')
-		print ('Pre and Post Images Saved')
-		exit()
+		# exit()
+		# boxes = get_boxes(score_map.squeeze(0).cpu().numpy(), geo_map.squeeze(0).cpu().numpy(), scale=self.scale)
+		# res_img = plot_boxes(img, boxes)
+		# res_img.save('./scale_test.bmp')
+		# print ('Pre and Post Images Saved')
+		# exit()
 
 		return transform(img), score_map, geo_map, ignored_map
 

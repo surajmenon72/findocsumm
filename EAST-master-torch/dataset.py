@@ -13,7 +13,7 @@ def get_rotate_mat(theta):
 	'''positive theta value means rotate clockwise'''
 	return np.array([[math.cos(theta), -math.sin(theta)], [math.sin(theta), math.cos(theta)]])
 
-#TODO: These two functions should be moved to some more abstract file
+#TODO: These two functions should be moved to some more abstract file, they generally belong in detect.py
 def plot_boxes(img, boxes):
 	'''plot boxes on image
 	'''
@@ -37,6 +37,10 @@ def restore_polys(valid_pos, valid_geo, score_shape, scale=4):
 	'''
 	polys = []
 	index = []
+	print ('Type Testing')
+	print (valid_pos.dtype)
+	print(scale.dtype)
+	exit()
 	valid_pos *= scale
 	d = valid_geo[:4, :] # 4 x N
 	angle = valid_geo[4, :] # N,

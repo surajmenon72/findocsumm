@@ -480,10 +480,9 @@ class custom_dataset(data.Dataset):
 		
 		score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length)
 
-		print (transform(img).shape)
-		print (vertices.shape)
 		res_img = plot_boxes(img, vertices)
 		res_img.save('./scale_test.bmp')
+		print ('Pre and Post Images Saved')
 		exit()
 
 		return transform(img), score_map, geo_map, ignored_map

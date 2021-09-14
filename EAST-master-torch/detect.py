@@ -220,6 +220,9 @@ def do_detection(img_path, model_path, res_img, scale=4):
 	img = Image.open(img_path)
 	
 	boxes = detect(img, model, device, scale=scale)
+	print ('Boxes shape')
+	print (boxes.shape)
+	exit()
 	plot_img = plot_boxes(img, boxes)	
 	plot_img.save(res_img)
 

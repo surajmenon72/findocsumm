@@ -78,7 +78,7 @@ def restore_polys(valid_pos, valid_geo, score_shape, scale=4):
 			polys.append([res[0,0], res[1,0], res[0,1], res[1,1], res[0,2], res[1,2],res[0,3], res[1,3]])
 	return np.array(polys), index
 
-def get_boxes(score, geo, score_thresh=0.89, nms_thresh=0.2, scale=4):
+def get_boxes(score, geo, score_thresh=0, nms_thresh=0.2, scale=4):
 	'''get boxes from feature map
 	Input:
 		score       : score map from model <numpy.ndarray, (1,row,col)>

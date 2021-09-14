@@ -167,6 +167,7 @@ def detect(img, model, device, scale=4):
 		detected polys
 	'''
 	img, ratio_h, ratio_w = resize_img(img)
+	print (img.shape)
 	with torch.no_grad():
 		score, geo = model(load_pil(img).to(device))
 		print (score.shape)

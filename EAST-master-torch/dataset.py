@@ -461,14 +461,15 @@ class custom_dataset(data.Dataset):
 		img, vertices = rotate_img(img, vertices)
 		img, vertices = crop_img(img, vertices, labels, self.length)
 
-		print (img.shape)
-		print (vertices.shape)
-		exit()
 		transform = transforms.Compose([transforms.ColorJitter(0.5, 0.5, 0.5, 0.25), \
                                         transforms.ToTensor(), \
                                         transforms.Normalize(mean=(0.5,0.5,0.5),std=(0.5,0.5,0.5))])
 		
 		score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length)
+
+		print (transform(img).shape)
+		print (vertices.shape)
+		exit()
 
 		return transform(img), score_map, geo_map, ignored_map
 

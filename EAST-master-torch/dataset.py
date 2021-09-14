@@ -7,6 +7,7 @@ import os
 import torch
 import torchvision.transforms as transforms
 from torch.utils import data
+from detect import plot_boxes
 
 
 def cal_distance(x1, y1, x2, y2):

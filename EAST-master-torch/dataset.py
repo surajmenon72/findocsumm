@@ -464,6 +464,9 @@ class custom_dataset(data.Dataset):
 		vertices, labels = extract_vertices(lines)
 		
 		img = Image.open(self.img_files[index])
+
+		res_img = plot_boxes(img, vertices)
+		res_img.save('./pre_test.bmp')
 		if (self.scale_aug == True):
 			img, vertices = scale_img(img, vertices)
 		else:
@@ -481,7 +484,6 @@ class custom_dataset(data.Dataset):
 		print (vertices.shape)
 		res_img = plot_boxes(img, vertices)
 		res_img.save('./scale_test.bmp')
-		print ('Image saved')
 		exit()
 
 		return transform(img), score_map, geo_map, ignored_map

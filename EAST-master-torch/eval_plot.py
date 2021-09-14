@@ -33,7 +33,7 @@ plt.show()
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
-mv_avg_n = 5
+mv_avg_n = 1
 begin_epoch = epochs[0]
 end_epoch = epochs[num_samples-1]
 

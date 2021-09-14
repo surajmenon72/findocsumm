@@ -13,7 +13,7 @@ def get_rotate_mat(theta):
 	'''positive theta value means rotate clockwise'''
 	return np.array([[math.cos(theta), -math.sin(theta)], [math.sin(theta), math.cos(theta)]])
 
-#TODO: These two functions should be moved to some more abstract file, they generally belong in detect.py
+#TODO: These three functions should be moved to some more abstract file, they generally belong in detect.py
 def plot_boxes(img, boxes):
 	'''plot boxes on image
 	'''
@@ -24,6 +24,22 @@ def plot_boxes(img, boxes):
 	for box in boxes:
 		draw.polygon([box[0], box[1], box[2], box[3], box[4], box[5], box[6], box[7]], outline=(0,255,0))
 	return img
+
+def is_valid_poly(res, score_shape, scale):
+	'''check if the poly in image scope
+	Input:
+		res        : restored poly in original image
+		score_shape: score map shape
+		scale      : feature map -> image
+	Output:
+		True if valid
+	'''
+	cnt = 0
+	for i in range(res.shape[1]):
+		if res[0,i] < 0 or res[0,i] >= score_shape[1] * scale or \
+           res[1,i] < 0 or res[1,i] >= score_shape[0] * scale:
+			cnt += 1
+	return True if cnt <= 1 else False
 
 def restore_polys(valid_pos, valid_geo, score_shape, scale=4):
 	'''restore polys from feature maps in given positions

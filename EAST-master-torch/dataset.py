@@ -574,6 +574,7 @@ class custom_dataset(data.Dataset):
 		res_img = plot_boxes(img, boxes)
 		res_img.save('./scale_test.bmp')
 		print ('Pre and Post Images Saved')
+		print (vertices)
 		print (boxes)
 		exit()
 

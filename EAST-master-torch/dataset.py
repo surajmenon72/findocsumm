@@ -1,7 +1,7 @@
 from shapely.geometry import Polygon
 import numpy as np
 import cv2
-from PIL import Image
+from PIL import Image, ImageDraw
 import math
 import os
 import torch

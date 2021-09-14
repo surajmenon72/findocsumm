@@ -77,6 +77,10 @@ def restore_polys(valid_pos, valid_geo, score_shape, scale=4):
 	'''
 	polys = []
 	index = []
+	print ('Type Testing')
+	print (valid_pos.dtype)
+	print(scale.dtype)
+	exit()
 	valid_pos *= scale
 	d = valid_geo[:4, :] # 4 x N
 	angle = valid_geo[4, :] # N,

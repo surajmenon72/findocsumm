@@ -484,7 +484,7 @@ class custom_dataset(data.Dataset):
 		self.scale = scale
 		self.length = length
 		self.scale_aug = scale_aug
-		self.scale_len = int(self.length/self.scale)
+		self.scale_len = int(self.length*self.scale)
 
 	def __len__(self):
 		return len(self.img_files)

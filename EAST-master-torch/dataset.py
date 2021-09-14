@@ -7,8 +7,17 @@ import os
 import torch
 import torchvision.transforms as transforms
 from torch.utils import data
-from detect import plot_boxes
 
+def plot_boxes(img, boxes):
+	'''plot boxes on image
+	'''
+	if boxes is None:
+		return img
+	
+	draw = ImageDraw.Draw(img)
+	for box in boxes:
+		draw.polygon([box[0], box[1], box[2], box[3], box[4], box[5], box[6], box[7]], outline=(0,255,0))
+	return img
 
 def cal_distance(x1, y1, x2, y2):
 	'''calculate the Euclidean distance'''

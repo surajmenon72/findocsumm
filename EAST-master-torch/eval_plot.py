@@ -25,15 +25,15 @@ precisions = vec[precision_index, :]
 recalls = vec[recall_index, :]
 variances = vec[variance_index, :]
 
-plt.figure(1)
+# plt.figure(1)
 results = variances
-plt.plot(epochs, results)
-plt.show()
+# plt.plot(epochs, results)
+# plt.show()
 
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
-mv_avg_n = 1
+mv_avg_n = 3
 begin_epoch = epochs[0]
 end_epoch = epochs[num_samples-1]
 

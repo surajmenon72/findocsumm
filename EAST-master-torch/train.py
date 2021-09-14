@@ -141,11 +141,6 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			img, gt_score, gt_geo, ignored_map = img.to(device), gt_score.to(device), gt_geo.to(device), ignored_map.to(device)
 			#pred_score, pred_geo = model(img)
 			pred_score, pred_geo, _ = model(img)
-			print (pred_score.shape)
-			print (pred_geo.shape)
-			print (gt_score.shape)
-			print (gt_geo.shape)
-			exit()
 			loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
 			
 			epoch_loss += loss.item()

@@ -484,6 +484,7 @@ class custom_dataset(data.Dataset):
 		self.scale = scale
 		self.length = length
 		self.scale_aug = scale_aug
+		self.scale_len = int(self.length/self.scale)
 
 	def __len__(self):
 		return len(self.img_files)
@@ -511,14 +512,17 @@ class custom_dataset(data.Dataset):
 		
 		score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length)
 
-		#print (score_map.shape)
-		#print (geo_map.shape)
-		# exit()
-		# boxes = get_boxes(score_map.squeeze(0).cpu().numpy(), geo_map.squeeze(0).cpu().numpy(), scale=self.scale)
-		# res_img = plot_boxes(img, boxes)
-		# res_img.save('./scale_test.bmp')
-		# print ('Pre and Post Images Saved')
-		# exit()
+		score_map_r = score_map.reshape(score_map, (1, 1, self.scale_len, self.scale_len))
+		geo_map_r = geo_map.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
+
+		print (score_map_r.shape)
+		print (geo_map_r.shape)
+
+		boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=self.scale)
+		res_img = plot_boxes(img, boxes)
+		res_img.save('./scale_test.bmp')
+		print ('Pre and Post Images Saved')
+		exit()
 
 		return transform(img), score_map, geo_map, ignored_map
 

@@ -480,7 +480,7 @@ class custom_dataset(data.Dataset):
 		print (transform(img).shape)
 		print (vertices.shape)
 		res_img = plot_boxes(img, vertices)
-		res_img.save('./test.bmp')
+		res_img.save('./scale_test.bmp')
 		print ('Image saved')
 		exit()
 

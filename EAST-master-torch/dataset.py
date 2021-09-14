@@ -9,6 +9,11 @@ import torchvision.transforms as transforms
 from torch.utils import data
 import lanms
 
+def get_rotate_mat(theta):
+	'''positive theta value means rotate clockwise'''
+	return np.array([[math.cos(theta), -math.sin(theta)], [math.sin(theta), math.cos(theta)]])
+
+#TODO: These two functions should be moved to some more abstract file
 def plot_boxes(img, boxes):
 	'''plot boxes on image
 	'''
@@ -19,6 +24,43 @@ def plot_boxes(img, boxes):
 	for box in boxes:
 		draw.polygon([box[0], box[1], box[2], box[3], box[4], box[5], box[6], box[7]], outline=(0,255,0))
 	return img
+
+def restore_polys(valid_pos, valid_geo, score_shape, scale=4):
+	'''restore polys from feature maps in given positions
+	Input:
+		valid_pos  : potential text positions <numpy.ndarray, (n,2)>
+		valid_geo  : geometry in valid_pos <numpy.ndarray, (5,n)>
+		score_shape: shape of score map
+		scale      : image / feature map
+	Output:
+		restored polys <numpy.ndarray, (n,8)>, index
+	'''
+	polys = []
+	index = []
+	valid_pos *= scale
+	d = valid_geo[:4, :] # 4 x N
+	angle = valid_geo[4, :] # N,
+
+	for i in range(valid_pos.shape[0]):
+		x = valid_pos[i, 0]
+		y = valid_pos[i, 1]
+		y_min = y - d[0, i]
+		y_max = y + d[1, i]
+		x_min = x - d[2, i]
+		x_max = x + d[3, i]
+		rotate_mat = get_rotate_mat(-angle[i])
+		
+		temp_x = np.array([[x_min, x_max, x_max, x_min]]) - x
+		temp_y = np.array([[y_min, y_min, y_max, y_max]]) - y
+		coordidates = np.concatenate((temp_x, temp_y), axis=0)
+		res = np.dot(rotate_mat, coordidates)
+		res[0,:] += x
+		res[1,:] += y
+		
+		if is_valid_poly(res, score_shape, scale):
+			index.append(i)
+			polys.append([res[0,0], res[1,0], res[0,1], res[1,1], res[0,2], res[1,2],res[0,3], res[1,3]])
+	return np.array(polys), index
 
 def get_boxes(score, geo, score_thresh=0.89, nms_thresh=0.2, scale=4):
 	'''get boxes from feature map
@@ -114,11 +156,6 @@ def shrink_poly(vertices, coef=0.3):
 	v = move_points(v, 1 + offset, 2 + offset, r, coef)
 	v = move_points(v, 3 + offset, 4 + offset, r, coef)
 	return v
-
-
-def get_rotate_mat(theta):
-	'''positive theta value means rotate clockwise'''
-	return np.array([[math.cos(theta), -math.sin(theta)], [math.sin(theta), math.cos(theta)]])
 
 
 def rotate_vertices(vertices, theta, anchor=None):

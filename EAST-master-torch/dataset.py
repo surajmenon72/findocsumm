@@ -7,6 +7,7 @@ import os
 import torch
 import torchvision.transforms as transforms
 from torch.utils import data
+import lanms
 
 def plot_boxes(img, boxes):
 	'''plot boxes on image
@@ -18,6 +19,34 @@ def plot_boxes(img, boxes):
 	for box in boxes:
 		draw.polygon([box[0], box[1], box[2], box[3], box[4], box[5], box[6], box[7]], outline=(0,255,0))
 	return img
+
+def get_boxes(score, geo, score_thresh=0.89, nms_thresh=0.2, scale=4):
+	'''get boxes from feature map
+	Input:
+		score       : score map from model <numpy.ndarray, (1,row,col)>
+		geo         : geo map from model <numpy.ndarray, (5,row,col)>
+		score_thresh: threshold to segment score map
+		nms_thresh  : threshold in nms
+	Output:
+		boxes       : final polys <numpy.ndarray, (n,9)>
+	'''
+	score = score[0,:,:]
+	xy_text = np.argwhere(score > score_thresh) # n x 2, format is [r, c]
+	if xy_text.size == 0:
+		return None
+
+	xy_text = xy_text[np.argsort(xy_text[:, 0])]
+	valid_pos = xy_text[:, ::-1].copy() # n x 2, [x, y]
+	valid_geo = geo[:, xy_text[:, 0], xy_text[:, 1]] # 5 x n
+	polys_restored, index = restore_polys(valid_pos, valid_geo, score.shape, scale=scale) 
+	if polys_restored.size == 0:
+		return None
+
+	boxes = np.zeros((polys_restored.shape[0], 9), dtype=np.float32)
+	boxes[:, :8] = polys_restored
+	boxes[:, 8] = score[xy_text[index, 0], xy_text[index, 1]]
+	boxes = lanms.merge_quadrangle_n9(boxes.astype('float32'), nms_thresh)
+	return boxes
 
 def cal_distance(x1, y1, x2, y2):
 	'''calculate the Euclidean distance'''
@@ -465,12 +494,13 @@ class custom_dataset(data.Dataset):
 		
 		img = Image.open(self.img_files[index])
 
-		res_img = plot_boxes(img, vertices)
-		res_img.save('./pre_test.bmp')
+		#res_img = plot_boxes(img, vertices)
+		#res_img.save('./pre_test.bmp')
 		if (self.scale_aug == True):
 			img, vertices = scale_img(img, vertices)
 		else:
 			img, vertices = adjust_height(img, vertices) 
+
 		img, vertices = rotate_img(img, vertices)
 		img, vertices = crop_img(img, vertices, labels, self.length)
 
@@ -480,7 +510,8 @@ class custom_dataset(data.Dataset):
 		
 		score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length)
 
-		res_img = plot_boxes(img, vertices)
+		boxes = get_boxes(score_map, geo_map, scale=scale)
+		res_img = plot_boxes(img, boxes)
 		res_img.save('./scale_test.bmp')
 		print ('Pre and Post Images Saved')
 		exit()

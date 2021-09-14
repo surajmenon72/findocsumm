@@ -460,6 +460,10 @@ class custom_dataset(data.Dataset):
 			img, vertices = adjust_height(img, vertices) 
 		img, vertices = rotate_img(img, vertices)
 		img, vertices = crop_img(img, vertices, labels, self.length)
+
+		print (img.shape)
+		print (vertices.shape)
+		exit()
 		transform = transforms.Compose([transforms.ColorJitter(0.5, 0.5, 0.5, 0.25), \
                                         transforms.ToTensor(), \
                                         transforms.Normalize(mean=(0.5,0.5,0.5),std=(0.5,0.5,0.5))])

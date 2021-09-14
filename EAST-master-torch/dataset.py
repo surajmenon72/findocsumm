@@ -512,12 +512,8 @@ class custom_dataset(data.Dataset):
 		
 		score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length)
 
-		print (score_map.shape)
-		print (score_map)
-		exit()
-
-		score_map_r = score_map.reshape(score_map, (1, 1, self.scale_len, self.scale_len))
-		geo_map_r = geo_map.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
+		score_map_r = torch.reshape(score_map, (1, 1, self.scale_len, self.scale_len))
+		geo_map_r = torch.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
 
 		print (score_map_r.shape)
 		print (geo_map_r.shape)

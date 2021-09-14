@@ -37,10 +37,6 @@ def restore_polys(valid_pos, valid_geo, score_shape, scale=4):
 	'''
 	polys = []
 	index = []
-	print ('Type Testing')
-	print (valid_pos.dtype)
-	print(scale.dtype)
-	exit()
 	valid_pos *= scale
 	d = valid_geo[:4, :] # 4 x N
 	angle = valid_geo[4, :] # N,
@@ -558,7 +554,7 @@ class custom_dataset(data.Dataset):
 		print (score_map_r.shape)
 		print (geo_map_r.shape)
 
-		boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=self.scale)
+		boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=int(1/self.scale))
 		res_img = plot_boxes(img, boxes)
 		res_img.save('./scale_test.bmp')
 		print ('Pre and Post Images Saved')

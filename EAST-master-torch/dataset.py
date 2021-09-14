@@ -511,8 +511,8 @@ class custom_dataset(data.Dataset):
 		
 		score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length)
 
-		print (score_map.shape)
-		print (geo_map.shape)
+		#print (score_map.shape)
+		#print (geo_map.shape)
 		# exit()
 		# boxes = get_boxes(score_map.squeeze(0).cpu().numpy(), geo_map.squeeze(0).cpu().numpy(), scale=self.scale)
 		# res_img = plot_boxes(img, boxes)

@@ -97,6 +97,8 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 						pred_score, pred_geo, feat_var = model(img, True)
 						print (pred_score)
 						print (pred_geo)
+						print (gt_score)
+						print (gt_geo)
 						exit()
 						test_loss = criterion(gt_score, pred_score, gt_geo, pred_geo, ignored_map)
 						full_test_loss += test_loss.item()

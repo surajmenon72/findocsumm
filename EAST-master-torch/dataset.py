@@ -35,15 +35,9 @@ def get_boxes(score, geo, score_thresh=0.89, nms_thresh=0.2, scale=4):
 	if xy_text.size == 0:
 		return None
 
-	print (xy_text.shape)
-	print (xy_text)
-
 	xy_text = xy_text[np.argsort(xy_text[:, 0])]
-
-	print (xy_text.shape)
-	print (xy_text)
-	
 	valid_pos = xy_text[:, ::-1].copy() # n x 2, [x, y]
+	valid_pos = torch.flip()
 	valid_geo = geo[:, xy_text[:, 0], xy_text[:, 1]] # 5 x n
 	polys_restored, index = restore_polys(valid_pos, valid_geo, score.shape, scale=scale) 
 	if polys_restored.size == 0:
@@ -517,7 +511,7 @@ class custom_dataset(data.Dataset):
 		
 		score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length)
 
-		boxes = get_boxes(score_map, geo_map, scale=self.scale)
+		boxes = get_boxes(score_map.squeeze(0).cpu().numpy(), geo_map.squeeze(0).cpu().numpy(), scale=self.scale)
 		res_img = plot_boxes(img, boxes)
 		res_img.save('./scale_test.bmp')
 		print ('Pre and Post Images Saved')

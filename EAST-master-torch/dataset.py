@@ -595,8 +595,8 @@ class custom_dataset(data.Dataset):
 		if (img_num != gt_num):
 			print ('ERROR: IMG AND GT NOT MATCHING!!')
 
-		res_img = plot_boxes_labels(img, vertices, labels)
-		res_img.save('./pre_test.bmp')
+		#res_img = plot_boxes_labels(img, vertices, labels)
+		#res_img.save('./pre_test.bmp')
 
 		if (self.scale_aug == True):
 			img, vertices = scale_img(img, vertices)
@@ -621,6 +621,7 @@ class custom_dataset(data.Dataset):
 		geo_map_r = torch.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
 
 		boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=int(1/self.scale))
+		
 		res_img2 = plot_boxes(img, boxes)
 		res_img2.save('./scale_test.bmp')
 		print ('Pre and Post Images Saved')

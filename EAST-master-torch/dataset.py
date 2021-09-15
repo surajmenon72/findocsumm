@@ -94,6 +94,7 @@ def get_boxes(score, geo, score_thresh=0, nms_thresh=0.2, scale=4):
 		return None
 
 	xy_text = xy_text[np.argsort(xy_text[:, 0])]
+	print (xy_text.shape)
 	valid_pos = xy_text[:, ::-1].copy() # n x 2, [x, y]
 	valid_geo = geo[:, xy_text[:, 0], xy_text[:, 1]] # 5 x n
 	print ('Mid-shapes')

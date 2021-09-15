@@ -101,6 +101,7 @@ def get_boxes(score, geo, score_thresh=0, nms_thresh=0.2, scale=4):
 	print (valid_pos.shape)
 	print (valid_geo.shape)
 	polys_restored, index = restore_polys(valid_pos, valid_geo, score.shape, scale=scale) 
+	print (polys_restored.shape)
 	if polys_restored.size == 0:
 		return None
 

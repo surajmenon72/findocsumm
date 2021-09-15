@@ -568,18 +568,6 @@ class custom_dataset(data.Dataset):
 		
 		img = Image.open(self.img_files[index])
 
-		print ('Image Index')
-		print (index)
-		print (len(self.img_files))
-		print (len(self.gt_files))
-		print (self.img_files[index])
-		print (self.gt_files[index])
-
-		print ('Img details')
-		print (img.size)
-		print (vertices)
-		print (labels)
-
 		#check that things match
 		img_addr = self.img_files[index]
 		gt_addr = self.gt_files[index]
@@ -615,24 +603,18 @@ class custom_dataset(data.Dataset):
 		
 		score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length)
 
-		r_score_map = torch.reshape(score_map, (256, 256))
-		score_sum = torch.sum(torch.sum(score_map, axis=1))
-		print ('Score sum')
-		print (score_sum)
+		# r_score_map = torch.reshape(score_map, (256, 256))
+		# score_sum = torch.sum(torch.sum(score_map, axis=1))
+		# print ('Score sum')
+		# print (score_sum)
 
-		score_map_r = torch.reshape(score_map, (1, 1, self.scale_len, self.scale_len))
-		geo_map_r = torch.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
+		# score_map_r = torch.reshape(score_map, (1, 1, self.scale_len, self.scale_len))
+		# geo_map_r = torch.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
 
-		boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=int(1/self.scale))
+		# boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=int(1/self.scale))
 	
-		res_img = plot_boxes(img, boxes)
-		res_img.save('./scale_test.bmp')
-		print ('Pre and Post Images Saved')
-		print ('Vertices')
-		print (vertices)
-		print ('Boxes')
-		print (boxes)
-		exit()
+		# res_img = plot_boxes(img, boxes)
+		# res_img.save('./scale_test.bmp')
 
 		return transform(img), score_map, geo_map, ignored_map
 

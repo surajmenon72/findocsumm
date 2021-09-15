@@ -55,7 +55,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=.1)
 
 	use_scheduler = True
-	do_eval = False
+	do_eval = True
 
 	eval_epochs = []
 	eval_train_losses = []

@@ -581,6 +581,7 @@ class custom_dataset(data.Dataset):
 			else:
 				print (i)
 				print ('Bad')
+				exit()
 		exit()
 		print ('Image Index')
 		print (index)

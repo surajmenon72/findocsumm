@@ -450,7 +450,7 @@ def scale_img(img, vertices, low=0.2, high=1, scale_prob=1):
 			new_vertices[:,[0,2,4,6]] = new_vertices[:,[0,2,4,6]] + offsets[0]
 
 		print ('Image been resized girl')
-		res_img = plot_boxes(scaled_img, new_vertices)
+		res_img = plot_boxes(scaled_image, new_vertices)
 		res_img.save('./pre_test.bmp')
 		exit()
 	else:

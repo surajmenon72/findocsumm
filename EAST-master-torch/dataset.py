@@ -569,6 +569,9 @@ class custom_dataset(data.Dataset):
 		vertices, labels = extract_vertices(lines)
 		
 		img = Image.open(self.img_files[index])
+		print ('Image Index')
+		print (index)
+		print ('Img details')
 		print (img.size)
 		print (vertices)
 		print (labels)

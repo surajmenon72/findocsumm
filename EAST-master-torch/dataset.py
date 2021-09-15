@@ -589,11 +589,11 @@ class custom_dataset(data.Dataset):
 		gt_addr = self.gt_files[index]
 
 		img_split = img_addr.split('_')
-		img_split2 = img_split.split('.')
+		img_split2 = img_split[-1].split('.')
 		img_num = img_split2[0]
 
 		gt_split = gt_addr.split('_')
-		gt_split2 = gt_split.split('.')
+		gt_split2 = gt_split[-1].split('.')
 		gt_num = gt_split2[0]
 
 		print (img_num)

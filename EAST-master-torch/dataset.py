@@ -569,11 +569,11 @@ class custom_dataset(data.Dataset):
 		
 		score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length)
 
+		print (score_map.shape)
+		exit()
+
 		score_map_r = torch.reshape(score_map, (1, 1, self.scale_len, self.scale_len))
 		geo_map_r = torch.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
-
-		print (score_map_r.shape)
-		print (geo_map_r.shape)
 
 		boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=int(1/self.scale))
 		res_img = plot_boxes(img, boxes)

@@ -596,9 +596,8 @@ class custom_dataset(data.Dataset):
 		gt_split2 = gt_split[-1].split('.')
 		gt_num = gt_split2[0]
 
-		print (img_num)
-		print (gt_num)
-		exit()
+		if (img_num != gt_num):
+			print ('ERROR: IMG AND GT NOT MATCHING!!')
 
 		res_img = plot_boxes_labels(img, vertices, labels)
 		res_img.save('./pre_test.bmp')

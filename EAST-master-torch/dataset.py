@@ -25,6 +25,18 @@ def plot_boxes(img, boxes):
 		draw.polygon([box[0], box[1], box[2], box[3], box[4], box[5], box[6], box[7]], outline=(0,255,0))
 	return img
 
+def plot_boxes_labels(img, boxes, labels):
+
+	if boxes is None:
+		return img
+
+	draw = ImageDraw.Draw(img)
+
+	for i, box in enumerate(boxes):
+		if (labels[i] == 1):
+			draw.polygon([box[0], box[1], box[2], box[3], box[4], box[5], box[6], box[7]], outline=(0,255,0))
+
+	return img
 def is_valid_poly(res, score_shape, scale):
 	'''check if the poly in image scope
 	Input:
@@ -556,7 +568,7 @@ class custom_dataset(data.Dataset):
 		print (vertices)
 		print (labels)
 
-		res_img = plot_boxes(img, vertices)
+		res_img = plot_boxes_labels(img, vertices, labels)
 		res_img.save('./pre_test.bmp')
 		exit()
 		if (self.scale_aug == True):

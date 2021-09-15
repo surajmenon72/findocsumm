@@ -96,6 +96,9 @@ def get_boxes(score, geo, score_thresh=0, nms_thresh=0.2, scale=4):
 	xy_text = xy_text[np.argsort(xy_text[:, 0])]
 	valid_pos = xy_text[:, ::-1].copy() # n x 2, [x, y]
 	valid_geo = geo[:, xy_text[:, 0], xy_text[:, 1]] # 5 x n
+	print ('Mid-shapes')
+	print (valid_pos.shape)
+	print (valid_geo.shape)
 	polys_restored, index = restore_polys(valid_pos, valid_geo, score.shape, scale=scale) 
 	if polys_restored.size == 0:
 		return None

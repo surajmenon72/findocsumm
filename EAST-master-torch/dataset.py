@@ -608,14 +608,13 @@ class custom_dataset(data.Dataset):
 		# print ('Score sum')
 		# print (score_sum)
 
-		score_map_r = torch.reshape(score_map, (1, 1, self.scale_len, self.scale_len))
-		geo_map_r = torch.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
+		# score_map_r = torch.reshape(score_map, (1, 1, self.scale_len, self.scale_len))
+		# geo_map_r = torch.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
 
-		boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=int(1/self.scale))
+		# boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=int(1/self.scale))
 	
-		res_img = plot_boxes(img, boxes)
-		res_img.save('./scale_test.bmp')
-		exit()
+		# res_img = plot_boxes(img, boxes)
+		# res_img.save('./scale_test.bmp')
 
 		return transform(img), score_map, geo_map, ignored_map
 

@@ -573,6 +573,8 @@ class custom_dataset(data.Dataset):
 		img = Image.open(self.img_files[index])
 		print ('Image Index')
 		print (index)
+		print (len(self.img_files))
+		print (len(self.gt_files))
 		print (self.img_files[index])
 		print (self.gt_files[index])
 		exit()

@@ -18,7 +18,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	file_num = len(os.listdir(train_img_path))
 	
 	inv_ds = (1/data_scale)
-	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=False)
+	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=True)
 	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
 
 	testset = custom_dataset(test_img_path, test_gt_path, scale=inv_ds, scale_aug=False)
@@ -38,14 +38,14 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	print (device)
 	torch.cuda.empty_cache()
 	print ('Emptied Cache')
-	#model = EAST(True, True)
-	model = EASTER(True, True)
+	model = EAST(True, True)
+	#model = EASTER(True, True)
 	#model = EAST_STRETCH()
-	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/EASTER-sm3-aug3-410.pth'
+	model_name = './pths/east_vgg16.pth'
+	#model_name = './pths/EASTER-sm3-aug3-410.pth'
 	#model_name = './pths/test2/model_epoch_120.pth'
-	model.load_state_dict(torch.load(model_name))
-	epoch_start = 410
+	#model.load_state_dict(torch.load(model_name))
+	epoch_start = 0
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
@@ -117,7 +117,8 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 					torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch+1)))
 
 					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'
-					res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EASTER')
+					res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EAST')
+					#res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EASTER')
 					words = res.split('_')
 					precision = float(words[1])
 					recall = float(words[2])
@@ -191,7 +192,7 @@ if __name__ == '__main__':
 	num_workers    = 0
 	epoch_iter     = 900
 	save_interval  = 5
-	eval_interval  = 1
-	data_scale = 2
+	eval_interval  = 5
+	data_scale = 4
 	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval, data_scale)	
 	

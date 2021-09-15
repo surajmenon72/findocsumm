@@ -432,6 +432,7 @@ def scale_img(img, vertices, low=0.2, high=1, scale_prob=1):
 
 	if (do_scale == True):
 		ratio_hw = np.random.uniform(low=low, high=high)
+		ratio_hw = .3
 		old_h = img.height
 		old_w = img.width
 		new_h = int(np.around(old_h * ratio_hw))

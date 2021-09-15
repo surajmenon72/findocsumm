@@ -33,7 +33,8 @@ def plot_boxes_labels(img, boxes, labels):
 	draw = ImageDraw.Draw(img)
 
 	for i, box in enumerate(boxes):
-		if (labels[i] == 1):
+		#if (labels[i] == 1):
+		if 1:
 			draw.polygon([box[0], box[1], box[2], box[3], box[4], box[5], box[6], box[7]], outline=(0,255,0))
 
 	return img

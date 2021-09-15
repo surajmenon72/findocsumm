@@ -557,7 +557,7 @@ class custom_dataset(data.Dataset):
 		print (labels)
 
 		res_img = plot_boxes(img, vertices)
-		res_img.save('./pre_test.jpg')
+		res_img.save('./pre_test.bmp')
 		exit()
 		if (self.scale_aug == True):
 			img, vertices = scale_img(img, vertices)

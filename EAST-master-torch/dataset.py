@@ -33,8 +33,8 @@ def plot_boxes_labels(img, boxes, labels):
 	draw = ImageDraw.Draw(img)
 
 	for i, box in enumerate(boxes):
-		#if (labels[i] == 1):
-		if 1:
+		if (labels[i] == 0):
+		#if 1:
 			draw.polygon([box[0], box[1], box[2], box[3], box[4], box[5], box[6], box[7]], outline=(0,255,0))
 
 	return img
@@ -583,8 +583,9 @@ class custom_dataset(data.Dataset):
 		if (img_num != gt_num):
 			print ('ERROR: IMG AND GT NOT MATCHING!!')
 
-		#res_img = plot_boxes_labels(img, vertices, labels)
-		#res_img.save('./pre_test.bmp')
+		res_img = plot_boxes_labels(img, vertices, labels)
+		res_img.save('./pre_test.bmp')
+		exit()
 
 		if (self.scale_aug == True):
 			img, vertices = scale_img(img, vertices)

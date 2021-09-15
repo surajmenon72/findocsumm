@@ -78,7 +78,7 @@ def restore_polys(valid_pos, valid_geo, score_shape, scale=4):
 			polys.append([res[0,0], res[1,0], res[0,1], res[1,1], res[0,2], res[1,2],res[0,3], res[1,3]])
 	return np.array(polys), index
 
-def get_boxes(score, geo, score_thresh=0, nms_thresh=0.2, scale=4):
+def get_boxes(score, geo, score_thresh=-1000000, nms_thresh=0.2, scale=4):
 	'''get boxes from feature map
 	Input:
 		score       : score map from model <numpy.ndarray, (1,row,col)>
@@ -108,7 +108,7 @@ def get_boxes(score, geo, score_thresh=0, nms_thresh=0.2, scale=4):
 	boxes = np.zeros((polys_restored.shape[0], 9), dtype=np.float32)
 	boxes[:, :8] = polys_restored
 	boxes[:, 8] = score[xy_text[index, 0], xy_text[index, 1]]
-	#boxes = lanms.merge_quadrangle_n9(boxes.astype('float32'), nms_thresh)
+	boxes = lanms.merge_quadrangle_n9(boxes.astype('float32'), nms_thresh)
 	return boxes
 
 def cal_distance(x1, y1, x2, y2):

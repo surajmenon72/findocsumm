@@ -103,7 +103,7 @@ def get_boxes(score, geo, score_thresh=0, nms_thresh=0.2, scale=4):
 	boxes = np.zeros((polys_restored.shape[0], 9), dtype=np.float32)
 	boxes[:, :8] = polys_restored
 	boxes[:, 8] = score[xy_text[index, 0], xy_text[index, 1]]
-	boxes = lanms.merge_quadrangle_n9(boxes.astype('float32'), nms_thresh)
+	#boxes = lanms.merge_quadrangle_n9(boxes.astype('float32'), nms_thresh)
 	return boxes
 
 def cal_distance(x1, y1, x2, y2):

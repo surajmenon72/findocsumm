@@ -32,11 +32,14 @@ def plot_boxes_labels(img, boxes, labels):
 
 	draw = ImageDraw.Draw(img)
 
+	height = img.height
+	width = img.width
+
 	for i, box in enumerate(boxes):
 		if (labels[i] == 1):
 			print (box)
 			draw.polygon([box[0], box[1], box[2], box[3], box[4], box[5], box[6], box[7]], outline=(0,255,0))
-			#draw.polygon([1, 1, 100, 1, 100, 100, 1, 100], outline=(0, 255, 0))
+			draw.polygon([1, 1, width-10, 1, width-10, height-10, 1, height-10], outline=(0, 255, 0))
 
 	return img
 def is_valid_poly(res, score_shape, scale):

@@ -606,6 +606,10 @@ class custom_dataset(data.Dataset):
 		img, vertices = rotate_img(img, vertices)
 		img, vertices = crop_img(img, vertices, labels, self.length)
 
+		res_img = plot_boxes(img, vertices)
+		res_img.save('./pre_test.bmp')
+		exit()
+
 		transform = transforms.Compose([transforms.ColorJitter(0.5, 0.5, 0.5, 0.25), \
                                         transforms.ToTensor(), \
                                         transforms.Normalize(mean=(0.5,0.5,0.5),std=(0.5,0.5,0.5))])

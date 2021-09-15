@@ -606,9 +606,8 @@ class custom_dataset(data.Dataset):
 		img, vertices = rotate_img(img, vertices)
 		img, vertices = crop_img(img, vertices, labels, self.length)
 
-		res_img = plot_boxes(img, vertices)
-		res_img.save('./pre_test.bmp')
-		exit()
+		# res_img = plot_boxes(img, vertices)
+		# res_img.save('./pre_test2.bmp')
 
 		transform = transforms.Compose([transforms.ColorJitter(0.5, 0.5, 0.5, 0.25), \
                                         transforms.ToTensor(), \
@@ -625,9 +624,9 @@ class custom_dataset(data.Dataset):
 		geo_map_r = torch.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
 
 		boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=int(1/self.scale))
-		
-		res_img2 = plot_boxes(img, boxes)
-		res_img2.save('./scale_test.bmp')
+	
+		res_img = plot_boxes(img, boxes)
+		res_img.save('./scale_test.bmp')
 		print ('Pre and Post Images Saved')
 		print ('Vertices')
 		print (vertices)

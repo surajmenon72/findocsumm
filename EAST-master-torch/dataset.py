@@ -555,10 +555,10 @@ class custom_dataset(data.Dataset):
 		print (img.size)
 		print (vertices)
 		print (labels)
-		exit()
 
 		res_img = plot_boxes(img, vertices)
 		res_img.save('./pre_test.bmp')
+		exit()
 		if (self.scale_aug == True):
 			img, vertices = scale_img(img, vertices)
 		else:

@@ -568,6 +568,8 @@ class custom_dataset(data.Dataset):
 			lines = f.readlines()
 		vertices, labels = extract_vertices(lines)
 		
+		print (self.img_files)
+		exit()
 		img = Image.open(self.img_files[index])
 		print ('Image Index')
 		print (index)

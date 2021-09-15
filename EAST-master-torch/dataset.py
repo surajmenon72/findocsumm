@@ -443,6 +443,10 @@ def scale_img(img, vertices, low=0.2, high=1, scale_prob=1):
 			new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (new_h / old_h)
 			new_vertices[:,[0,2,4,6]] = vertices[:,[0,2,4,6]] * (new_w / old_w)
 
+		res_img = plot_boxes(img, new_vertices)
+		res_img.save('./pre_test.bmp')
+		exit()
+		
 		scaled_image, offsets = resize_with_pad(img, 512, 512)
 
 		if (vertices.size) > 0:
@@ -606,7 +610,7 @@ class custom_dataset(data.Dataset):
 		res_img = plot_boxes(img, vertices)
 		res_img.save('./pre_test.bmp')
 		exit()
-		
+
 		img, vertices = rotate_img(img, vertices)
 		img, vertices = crop_img(img, vertices, labels, self.length)
 

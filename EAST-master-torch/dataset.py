@@ -584,6 +584,22 @@ class custom_dataset(data.Dataset):
 		print (vertices)
 		print (labels)
 
+		#check that things match
+		img_addr = self.img_files[index]
+		gt_addr = self.gt_files[index]
+
+		img_split = img_addr.split('_')
+		img_split2 = img_split.split(.)
+		img_num = img_split2[0]
+
+		gt_split = gt_addr.split('_')
+		gt_split2 = gt_split.split(.)
+		gt_num = gt_split2[0]
+
+		print (img_num)
+		print (gt_num)
+		exit()
+
 		res_img = plot_boxes_labels(img, vertices, labels)
 		res_img.save('./pre_test.bmp')
 		exit()

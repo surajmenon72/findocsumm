@@ -580,6 +580,11 @@ class custom_dataset(data.Dataset):
 		gt_split2 = gt_split[-1].split('.')
 		gt_num = gt_split2[0]
 
+		print (len(self.img_files))
+		print (len(self.gt_files))
+		print (img_num)
+		print (gt_num)
+		exit()
 		if (img_num != gt_num):
 			print ('ERROR: IMG AND GT NOT MATCHING!!')
 

@@ -432,7 +432,6 @@ def scale_img(img, vertices, low=0.2, high=1, scale_prob=1):
 
 	if (do_scale == True):
 		ratio_hw = np.random.uniform(low=low, high=high)
-		ratio_hw = .3
 		old_h = img.height
 		old_w = img.width
 		new_h = int(np.around(old_h * ratio_hw))
@@ -449,11 +448,6 @@ def scale_img(img, vertices, low=0.2, high=1, scale_prob=1):
 		if (vertices.size) > 0:
 			new_vertices[:,[1,3,5,7]] = new_vertices[:,[1,3,5,7]] + offsets[1]
 			new_vertices[:,[0,2,4,6]] = new_vertices[:,[0,2,4,6]] + offsets[0]
-
-		print ('Image been resized girl')
-		res_img = plot_boxes(scaled_image, new_vertices)
-		res_img.save('./pre_test.bmp')
-		exit()
 	else:
 		scaled_image, new_vertices = adjust_height(img, vertices)
 
@@ -609,12 +603,12 @@ class custom_dataset(data.Dataset):
 		else:
 			img, vertices = adjust_height(img, vertices) 
 
+		img, vertices = rotate_img(img, vertices)
+		img, vertices = crop_img(img, vertices, labels, self.length)
+
 		res_img = plot_boxes(img, vertices)
 		res_img.save('./pre_test.bmp')
 		exit()
-
-		img, vertices = rotate_img(img, vertices)
-		img, vertices = crop_img(img, vertices, labels, self.length)
 
 		transform = transforms.Compose([transforms.ColorJitter(0.5, 0.5, 0.5, 0.25), \
                                         transforms.ToTensor(), \

@@ -553,8 +553,8 @@ class custom_dataset(data.Dataset):
 		
 		img = Image.open(self.img_files[index])
 
-		#res_img = plot_boxes(img, vertices)
-		res_img = img
+		res_img = plot_boxes(img, vertices)
+		#res_img = img
 		res_img.save('./pre_test.bmp')
 		if (self.scale_aug == True):
 			img, vertices = scale_img(img, vertices)

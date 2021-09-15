@@ -185,7 +185,7 @@ class EASTER(nn.Module):
 
 		if (self.retVar):
 			if (calcVar == True):
-				# smooshed_output = torch.reshape(merge_output, (16, 32, 65536))
+				smooshed_output = torch.reshape(merge_output, (16, 32, 65536))
 				# num_dim = smooshed_output.shape[1]
 				# total_diff = torch.zeros((16, 32, 65536))
 

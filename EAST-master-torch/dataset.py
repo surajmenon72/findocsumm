@@ -578,7 +578,7 @@ class custom_dataset(data.Dataset):
 		print (len(self.gt_files))
 		print (self.img_files[index])
 		print (self.gt_files[index])
-		exit()
+
 		print ('Img details')
 		print (img.size)
 		print (vertices)

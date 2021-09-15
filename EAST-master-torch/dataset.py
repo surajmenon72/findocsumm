@@ -603,12 +603,12 @@ class custom_dataset(data.Dataset):
 		else:
 			img, vertices = adjust_height(img, vertices) 
 
-		img, vertices = rotate_img(img, vertices)
-		img, vertices = crop_img(img, vertices, labels, self.length)
-
 		res_img = plot_boxes(img, vertices)
 		res_img.save('./pre_test.bmp')
 		exit()
+		
+		img, vertices = rotate_img(img, vertices)
+		img, vertices = crop_img(img, vertices, labels, self.length)
 
 		transform = transforms.Compose([transforms.ColorJitter(0.5, 0.5, 0.5, 0.25), \
                                         transforms.ToTensor(), \

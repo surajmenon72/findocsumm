@@ -585,6 +585,7 @@ class custom_dataset(data.Dataset):
 
 		res_img = plot_boxes_labels(img, vertices, labels)
 		res_img.save('./pre_test.bmp')
+		print (index)
 		exit()
 
 		if (self.scale_aug == True):

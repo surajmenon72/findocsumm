@@ -21,14 +21,14 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=False)
 	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
 
-	#testset = custom_dataset(test_img_path, test_gt_path, scale=inv_ds, scale_aug=False)
+	testset = custom_dataset(test_img_path, test_gt_path, scale=inv_ds, scale_aug=False)
 	#testset = custom_dataset(test_img_path, test_gt_path, scale=0.5, scale_aug=False)
 
 	train_loader = data.DataLoader(trainset, batch_size=batch_size, \
                                    shuffle=True, num_workers=num_workers, drop_last=True)
 
-	# test_loader = data.DataLoader(testset, batch_size=test_batch_size, \
- 	#                               	   shuffle=True, num_workers=num_workers, drop_last=True)
+	test_loader = data.DataLoader(testset, batch_size=test_batch_size, \
+ 	                              	   shuffle=True, num_workers=num_workers, drop_last=True)
 	
 
 	criterion = Loss()

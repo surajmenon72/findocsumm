@@ -571,6 +571,17 @@ class custom_dataset(data.Dataset):
 		vertices, labels = extract_vertices(lines)
 		
 		img = Image.open(self.img_files[index])
+
+		for i in range(1, 1001):
+			print (i)
+			string = '/home/surajm72/data/ICDAR_2015/train_img/img_' + str(i) + '.jpg'
+			if (string in self.img_files):
+				print (i)
+				print ('Good')
+			else:
+				print (i)
+				print ('Bad')
+		exit()
 		print ('Image Index')
 		print (index)
 		print (len(self.img_files))

@@ -118,10 +118,14 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'
 					#res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EAST')
-					res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EASTER')
-					words = res.split('_')
-					precision = float(words[1])
-					recall = float(words[2])
+					try:
+						res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EASTER')
+						words = res.split('_')
+						precision = float(words[1])
+						recall = float(words[2])
+					except:
+						precision = 0.0
+						recall = 0.0
 
 					eval_precisions.append(precision)
 					eval_recalls.append(recall)

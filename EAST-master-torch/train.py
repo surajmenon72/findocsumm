@@ -129,31 +129,8 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 					print ('EVAL: TEST PRECISION: {:.8f}'.format(precision))
 					print ('EVAL: TEST RECALL: {:.8f}'.format(recall))
 
-			if (epoch + 1) % eval_interval == 0:
-				eval_train_losses.append(epoch_loss)
-
-				eval_metrics = []
-				eval_metrics.append(eval_epochs)
-				eval_metrics.append(eval_train_losses)
-				eval_metrics.append(eval_losses)
-				eval_metrics.append(eval_precisions)
-				eval_metrics.append(eval_recalls)
-				eval_metrics.append(eval_vars)
-
-				save_str = 'eval_metrics.npy'
-				eval_metrics_np = np.array(eval_metrics)
-				eval_metrics_np = eval_metrics_np.cpu().numpy()
-				np.save(save_str, eval_metrics_np)
-
-				print ('Metrics Saved')
-
-				vec = np.load(save_str)
-				print ('Metrics Loaded')
-				print (vec.shape)
-				exit()
-
 			if (eval_interval == 1):
-				exit()
+				#exit()
 		#TRAIN code	
 		model.train()
 		if (use_scheduler == True):
@@ -179,7 +156,30 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 		print(time.asctime(time.localtime(time.time())))
 		print('='*50)
 
-		if (do_eval == False):
+		if (do_eval == True):
+			if (epoch + 1) % eval_interval == 0:
+				eval_train_losses.append(epoch_loss)
+
+				eval_metrics = []
+				eval_metrics.append(eval_epochs)
+				eval_metrics.append(eval_train_losses)
+				eval_metrics.append(eval_losses)
+				eval_metrics.append(eval_precisions)
+				eval_metrics.append(eval_recalls)
+				eval_metrics.append(eval_vars)
+
+				save_str = 'eval_metrics.npy'
+				eval_metrics_np = np.array(eval_metrics)
+				eval_metrics_np = eval_metrics_np.cpu().numpy()
+				np.save(save_str, eval_metrics_np)
+
+				print ('Metrics Saved')
+
+				vec = np.load(save_str)
+				print ('Metrics Loaded')
+				print (vec.shape)
+				exit()
+		else:
 			if ((epoch + 1) % interval):
 				last_saved_epoch = (epoch+1)
 				state_dict = model.module.state_dict() if data_parallel else model.state_dict()

@@ -42,9 +42,9 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	model = EASTER(True, True)
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/EASTER-sm3-aug3-410.pth'
+	#model_name = './pths/EASTER-sm3-aug3-410.pth'
 	#model_name = './pths/test2/model_epoch_120.pth'
-	model.load_state_dict(torch.load(model_name))
+	#model.load_state_dict(torch.load(model_name))
 	epoch_start = 0
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
@@ -130,8 +130,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 					print ('EVAL: TEST RECALL: {:.8f}'.format(recall))
 
 			if (eval_interval == 1):
-				print ('Fun')
-				#exit()
+				exit()
 		#TRAIN code	
 		model.train()
 		if (use_scheduler == True):
@@ -173,13 +172,6 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				eval_metrics_np = np.array(eval_metrics)
 				np.save(save_str, eval_metrics_np)
 
-				print ('Loading Metrics')
-				vec = np.load(save_str)
-				print (eval_metrics_np)
-				print (vec)
-				
-				if ((epoch+1) == 3):
-					exit()
 		else:
 			if ((epoch + 1) % interval):
 				last_saved_epoch = (epoch+1)
@@ -204,7 +196,7 @@ if __name__ == '__main__':
 	num_workers    = 0
 	epoch_iter     = 900
 	save_interval  = 5
-	eval_interval  = 1
+	eval_interval  = 5
 	data_scale = 2
 	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval, data_scale)	
 	

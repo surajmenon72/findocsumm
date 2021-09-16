@@ -100,6 +100,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 						full_test_var += feat_var
 					torch.cuda.empty_cache()
 					avg_test_var = full_test_var/(k+1)
+					avg_test_var = avg_test_var.cpu().numpy()
 					if (k > 1):
 						break
 

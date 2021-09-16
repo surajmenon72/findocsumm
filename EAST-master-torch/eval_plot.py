@@ -6,7 +6,7 @@ file = 'eval_results2/eval_metrics-EAST-aug3-100.npy'
 file2 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug2250-150--425.npy'
 file3 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug3250-150--410.npy'
 
-vec = np.load(file)
+vec = np.load(file, allow_pickle=True)
 print (vec.shape)
 exit()
 vec2 = np.load(file2)

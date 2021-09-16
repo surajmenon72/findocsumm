@@ -130,6 +130,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 					print ('EVAL: TEST RECALL: {:.8f}'.format(recall))
 
 			if (eval_interval == 1):
+				print ('Fun')
 				#exit()
 		#TRAIN code	
 		model.train()

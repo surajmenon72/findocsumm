@@ -18,7 +18,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	file_num = len(os.listdir(train_img_path))
 	
 	inv_ds = (1/data_scale)
-	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=True)
+	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=False)
 	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
 
 	testset = custom_dataset(test_img_path, test_gt_path, scale=inv_ds, scale_aug=False)
@@ -42,7 +42,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	model = EASTER(True, True)
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/EASTER-sm3-aug3-410.pth'
+	#model_name = './pths/EASTER-sm3-aug3-410.pth'
 	#model_name = './pths/test2/model_epoch_120.pth'
 	model.load_state_dict(torch.load(model_name))
 	epoch_start = 0
@@ -100,9 +100,6 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 						full_test_var += feat_var.item()
 					torch.cuda.empty_cache()
 					avg_test_var = full_test_var/(k+1)
-					#avg_test_var = avg_test_var.cpu().numpy()
-					if (k > 1):
-						break
 
 				eval_epochs.append(epoch+1)
 				eval_losses.append(full_test_loss)
@@ -121,12 +118,10 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'
 					#res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EAST')
-					# res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EASTER')
-					# words = res.split('_')
-					# precision = float(words[1])
-					# recall = float(words[2])
-					precision = 1.001
-					recall = 1.002
+					res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EASTER')
+					words = res.split('_')
+					precision = float(words[1])
+					recall = float(words[2])
 
 					eval_precisions.append(precision)
 					eval_recalls.append(recall)
@@ -154,8 +149,6 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			optimizer.zero_grad()
 			loss.backward()
 			optimizer.step()
-			if (i > 1):
-				break
 
 			print('Epoch is [{}/{}], mini-batch is [{}/{}], time consumption is {:.8f}, batch_loss is {:.8f}'.format(\
               epoch+1, epoch_iter, i+1, int(file_num/batch_size), time.time()-start_time, loss.item()))
@@ -178,18 +171,15 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 				save_str = 'eval_metrics.npy'
 				eval_metrics_np = np.array(eval_metrics)
-				print (eval_metrics_np.shape)
-				print (eval_metrics)
-				#eval_metrics_np = eval_metrics_np.cpu().numpy()
 				np.save(save_str, eval_metrics_np)
 
-				print ('Metrics Saved')
-
+				print ('Loading Metrics')
 				vec = np.load(save_str)
-				print ('Metrics Loaded')
-				print (vec.shape)
+				print (eval_metrics_np)
 				print (vec)
-				exit()
+				
+				if ((epoch+1) == 3):
+					exit()
 		else:
 			if ((epoch + 1) % interval):
 				last_saved_epoch = (epoch+1)

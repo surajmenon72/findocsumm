@@ -1,9 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-file = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug250-150--400.npy'
+file = 'eval_results2/eval_metrics2_eval_metrics-EAST-aug3-100.npy'
 file2 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug2250-150--425.npy'
 file3 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug3250-150--410.npy'
+
+
+vec = torch.load(file)
+print (vec.shape)
+exit()
 
 vec = np.load(file)
 vec2 = np.load(file2)
@@ -30,7 +35,7 @@ results = variances
 plt.plot(epochs, results)
 plt.show()
 
-#exit()
+exit()
 
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w

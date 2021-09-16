@@ -6,12 +6,9 @@ file = 'eval_results2/eval_metrics-EAST-aug3-100.npy'
 file2 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug2250-150--425.npy'
 file3 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug3250-150--410.npy'
 
-
-vec = torch.load(file)
+vec = np.load(file)
 print (vec.shape)
 exit()
-
-vec = np.load(file)
 vec2 = np.load(file2)
 vec3 = np.load(file3)
 

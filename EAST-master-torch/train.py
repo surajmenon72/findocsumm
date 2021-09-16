@@ -188,6 +188,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				vec = np.load(save_str)
 				print ('Metrics Loaded')
 				print (vec.shape)
+				print (vec)
 				exit()
 		else:
 			if ((epoch + 1) % interval):

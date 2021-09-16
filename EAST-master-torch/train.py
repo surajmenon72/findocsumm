@@ -38,13 +38,13 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	print (device)
 	torch.cuda.empty_cache()
 	print ('Emptied Cache')
-	model = EAST(True, True)
-	#model = EASTER(True, True)
+	#model = EAST(True, True)
+	model = EASTER(True, True)
 	#model = EAST_STRETCH()
-	model_name = './pths/east_vgg16.pth'
+	#model_name = './pths/east_vgg16.pth'
 	#model_name = './pths/EASTER-sm3-aug3-410.pth'
 	#model_name = './pths/test2/model_epoch_120.pth'
-	model.load_state_dict(torch.load(model_name))
+	#model.load_state_dict(torch.load(model_name))
 	epoch_start = 0
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
@@ -129,6 +129,29 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 					print ('EVAL: TEST PRECISION: {:.8f}'.format(precision))
 					print ('EVAL: TEST RECALL: {:.8f}'.format(recall))
 
+			if (epoch + 1) % eval_interval == 0:
+				eval_train_losses.append(epoch_loss)
+
+				eval_metrics = []
+				eval_metrics.append(eval_epochs)
+				eval_metrics.append(eval_train_losses)
+				eval_metrics.append(eval_losses)
+				eval_metrics.append(eval_precisions)
+				eval_metrics.append(eval_recalls)
+				eval_metrics.append(eval_vars)
+
+				save_str = 'eval_metrics.npy'
+				eval_metrics_np = np.array(eval_metrics)
+				eval_metrics_np = eval_metrics_np.cpu().numpy()
+				np.save(save_str, eval_metrics_np)
+
+				print ('Metrics Saved')
+
+				vec = np.load(save_str)
+				print ('Metrics Loaded')
+				print (vec.shape)
+				exit()
+
 			if (eval_interval == 1):
 				exit()
 		#TRAIN code	
@@ -155,24 +178,12 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 		print('epoch_loss is {:.8f}, epoch_time is {:.8f}'.format(epoch_loss/int(file_num/batch_size), time.time()-epoch_time))
 		print(time.asctime(time.localtime(time.time())))
 		print('='*50)
-		if (epoch + 1) % interval == 0:
-			#last_saved_epoch = (epoch+1)
-			#state_dict = model.module.state_dict() if data_parallel else model.state_dict()
-			#torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch+1)))
 
-			eval_train_losses.append(epoch_loss)
-
-			eval_metrics = []
-			eval_metrics.append(eval_epochs)
-			eval_metrics.append(eval_train_losses)
-			eval_metrics.append(eval_losses)
-			eval_metrics.append(eval_precisions)
-			eval_metrics.append(eval_recalls)
-			eval_metrics.append(eval_vars)
-
-			save_str = 'eval_metrics.npy'
-			eval_metrics_np = np.array(eval_metrics)
-			np.save(save_str, eval_metrics_np)
+		if (do_eval == False):
+			if ((epoch + 1) % interval):
+				last_saved_epoch = (epoch+1)
+				state_dict = model.module.state_dict() if data_parallel else model.state_dict()
+				torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch+1)))
 
 
 if __name__ == '__main__':

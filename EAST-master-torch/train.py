@@ -100,6 +100,8 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 						full_test_var += feat_var
 					torch.cuda.empty_cache()
 					avg_test_var = full_test_var/(k+1)
+					if (k > 1):
+						break
 
 				eval_epochs.append(epoch+1)
 				eval_losses.append(full_test_loss)
@@ -149,6 +151,8 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 			optimizer.zero_grad()
 			loss.backward()
 			optimizer.step()
+			if (i > 1):
+				break
 
 			print('Epoch is [{}/{}], mini-batch is [{}/{}], time consumption is {:.8f}, batch_loss is {:.8f}'.format(\
               epoch+1, epoch_iter, i+1, int(file_num/batch_size), time.time()-start_time, loss.item()))
@@ -171,7 +175,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 				save_str = 'eval_metrics.npy'
 				eval_metrics_np = np.array(eval_metrics)
-				eval_metrics_np = eval_metrics_np.cpu().numpy()
+				#eval_metrics_np = eval_metrics_np.cpu().numpy()
 				np.save(save_str, eval_metrics_np)
 
 				print ('Metrics Saved')

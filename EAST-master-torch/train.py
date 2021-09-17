@@ -42,10 +42,10 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	model = EASTER(True, True)
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/model_epoch_50.pth'
+	model_name = './pths/model_epoch_100.pth'
 	#model_name = './pths/test2/model_epoch_120.pth'
 	model.load_state_dict(torch.load(model_name))
-	epoch_start = 50
+	epoch_start = 100
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
@@ -74,7 +74,6 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	if (use_scheduler == True):
 		print ('Catching up Scheduler')
 		for epoch in range(epoch_start):
-			print (epoch)
 			model.train()
 			scheduler.step()
 

@@ -210,11 +210,13 @@ def detect_dataset(model, device, test_img_path, submit_path, scale=4):
 		with open(os.path.join(submit_path, 'res_' + os.path.basename(img_file).replace('.jpg','.txt')), 'w') as f:
 			f.writelines(seq)
 
-def do_detection(img_path, model_path, res_img, scale=4):
+def do_detection(img_path, model_path, res_img, scale=4, model='EAST'):
 	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 	#model = EAST_STRETCH(False).to(device)
-	#model = EASTER(False).to(device)
-	model = EAST(False).to(device)
+	if (model == 'EAST'):
+		model = EAST(False).to(device)
+	else:
+		model = EASTER(False).to(device)
 	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
 	model.eval()
 	img = Image.open(img_path)
@@ -231,6 +233,7 @@ if __name__ == '__main__':
 	#model_path = './pths/east_vgg16.pth'
 	#model_path = './pths/EAST-aug3-100.pth'
 	model_path  = './pths2/EASTER-sm1-100.pth'
+	model = 'EASTER'
 	scale = 2
 	for t in test_images:
 		img_path = 'test_img/' + t + '.jpg'
@@ -238,7 +241,7 @@ if __name__ == '__main__':
 		company = segs[0]
 		res_img = './' + company + '.bmp'
 
-		do_detection(img_path, model_path, res_img, scale=scale)
+		do_detection(img_path, model_path, res_img, scale=scale, model=model)
 		print ('Done with:')
 		print (t)
 

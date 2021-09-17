@@ -18,7 +18,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	file_num = len(os.listdir(train_img_path))
 	
 	inv_ds = (1/data_scale)
-	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=False)
+	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=True)
 	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
 
 	testset = custom_dataset(test_img_path, test_gt_path, scale=inv_ds, scale_aug=False)
@@ -42,8 +42,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	model = EASTER(True, True)
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/model_epoch_100.pth'
-	#model_name = './pths/test2/model_epoch_120.pth'
+	model_name = './pths2/EASTER-sm1-100.pth'
 	model.load_state_dict(torch.load(model_name))
 	epoch_start = 100
 	data_parallel = False

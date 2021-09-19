@@ -410,7 +410,7 @@ def adjust_height(img, vertices, ratio=0.2):
 		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (new_h / old_h)
 	return img, new_vertices
 
-def scale_img(img, vertices, low=0.2, high=1, scale_prob=1):
+def scale_img(img, vertices, low=0.2, high=0.6, scale_prob=1):
 	'''adjust scale of image to aug data
 	Input:
 		img         : PIL Image
@@ -473,7 +473,7 @@ def rotate_img(img, vertices, angle_range=10):
 	return img, new_vertices
 
 
-def get_score_geo(img, vertices, labels, scale, length):
+def get_score_geo(img, vertices, labels, scale, length, ignore=True):
 	'''generate score gt and geometry gt
 	Input:
 		img     : PIL Image
@@ -494,9 +494,10 @@ def get_score_geo(img, vertices, labels, scale, length):
 	polys = []
 	
 	for i, vertice in enumerate(vertices):
-		if labels[i] == 0:
-			ignored_polys.append(np.around(scale * vertice.reshape((4,2))).astype(np.int32))
-			continue		
+		if (ignore == True):
+			if labels[i] == 0:
+				ignored_polys.append(np.around(scale * vertice.reshape((4,2))).astype(np.int32))
+				continue		
 		
 		poly = np.around(scale * shrink_poly(vertice).reshape((4,2))).astype(np.int32) # scaled & shrinked
 		polys.append(poly)
@@ -551,8 +552,6 @@ class custom_dataset(data.Dataset):
 		super(custom_dataset, self).__init__()
 		self.img_files = [os.path.join(img_path, img_file) for img_file in sorted(os.listdir(img_path))]
 		self.gt_files  = [os.path.join(gt_path, gt_file) for gt_file in sorted(os.listdir(gt_path))]
-		#self.img_files = [os.path.join(img_path, img_file) for img_file in os.listdir(img_path)]
-		#self.gt_files  = [os.path.join(gt_path, gt_file) for gt_file in os.listdir(gt_path)]
 		self.scale = scale
 		self.length = length
 		self.scale_aug = scale_aug
@@ -601,20 +600,22 @@ class custom_dataset(data.Dataset):
                                         transforms.ToTensor(), \
                                         transforms.Normalize(mean=(0.5,0.5,0.5),std=(0.5,0.5,0.5))])
 		
-		score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length)
+		#score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length)
+		score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length, ignore=False)
 
 		# r_score_map = torch.reshape(score_map, (256, 256))
 		# score_sum = torch.sum(torch.sum(score_map, axis=1))
 		# print ('Score sum')
 		# print (score_sum)
 
-		# score_map_r = torch.reshape(score_map, (1, 1, self.scale_len, self.scale_len))
-		# geo_map_r = torch.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
+		score_map_r = torch.reshape(score_map, (1, 1, self.scale_len, self.scale_len))
+		geo_map_r = torch.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
 
-		# boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=int(1/self.scale))
+		boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=int(1/self.scale))
 	
-		# res_img = plot_boxes(img, boxes)
-		# res_img.save('./scale_test.bmp')
+		res_img = plot_boxes(img, boxes)
+		res_img.save('./scale_test.bmp')
+		exit()
 
 		return transform(img), score_map, geo_map, ignored_map
 

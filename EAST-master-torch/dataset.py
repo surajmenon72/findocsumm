@@ -410,7 +410,7 @@ def adjust_height(img, vertices, ratio=0.2):
 		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (new_h / old_h)
 	return img, new_vertices
 
-def scale_img(img, vertices, low=0.2, high=0.6, scale_prob=1):
+def scale_img(img, vertices, low=0.2, high=1, scale_prob=1):
 	'''adjust scale of image to aug data
 	Input:
 		img         : PIL Image
@@ -608,14 +608,13 @@ class custom_dataset(data.Dataset):
 		# print ('Score sum')
 		# print (score_sum)
 
-		score_map_r = torch.reshape(score_map, (1, 1, self.scale_len, self.scale_len))
-		geo_map_r = torch.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
+		# score_map_r = torch.reshape(score_map, (1, 1, self.scale_len, self.scale_len))
+		# geo_map_r = torch.reshape(geo_map, (1, 5, self.scale_len, self.scale_len))
 
-		boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=int(1/self.scale))
+		# boxes = get_boxes(score_map_r.squeeze(0).cpu().numpy(), geo_map_r.squeeze(0).cpu().numpy(), scale=int(1/self.scale))
 	
-		res_img = plot_boxes(img, boxes)
-		res_img.save('./scale_test.bmp')
-		exit()
+		# res_img = plot_boxes(img, boxes)
+		# res_img.save('./scale_test.bmp')
 
 		return transform(img), score_map, geo_map, ignored_map
 

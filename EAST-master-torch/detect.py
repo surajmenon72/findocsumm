@@ -232,7 +232,7 @@ test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2', 'mcds_tc_full1',
 if __name__ == '__main__':
 	#model_path = './pths/east_vgg16.pth'
 	#model_path = './pths/EAST-aug3-100.pth'
-	model_path  = './pths2/EASTER-sm1-aug3-285.pth'
+	model_path  = './pths2/EASTER-sm1-aug3-280.pth'
 	model = 'EASTER'
 	scale = 2
 	for t in test_images:

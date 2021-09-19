@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 
-file = 'eval_results2/eval_metrics2_eval_metrics-EASTER-sm1-aug3-1--150.npy'
+file = 'eval_results2/eval_metrics2_eval_metrics-EASTER-sm1-aug3-1--250.npy'
 file2 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug2250-150--425.npy'
 file3 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug3250-150--410.npy'
 
@@ -27,7 +27,7 @@ recalls = vec[recall_index, :]
 variances = vec[variance_index, :]
 
 plt.figure(1)
-results = recalls
+results = variances
 plt.plot(epochs, results)
 plt.show()
 

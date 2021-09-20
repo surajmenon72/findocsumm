@@ -107,14 +107,9 @@ def get_boxes(score, geo, score_thresh=0, nms_thresh=0.2, scale=4):
 		return None
 
 	xy_text = xy_text[np.argsort(xy_text[:, 0])]
-	print (xy_text.shape)
 	valid_pos = xy_text[:, ::-1].copy() # n x 2, [x, y]
 	valid_geo = geo[:, xy_text[:, 0], xy_text[:, 1]] # 5 x n
-	print ('Mid-shapes')
-	print (valid_pos.shape)
-	print (valid_geo.shape)
 	polys_restored, index = restore_polys(valid_pos, valid_geo, score.shape, scale=scale) 
-	print (polys_restored.shape)
 	if polys_restored.size == 0:
 		return None
 
@@ -410,7 +405,7 @@ def adjust_height(img, vertices, ratio=0.2):
 		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (new_h / old_h)
 	return img, new_vertices
 
-def scale_img(img, vertices, low=0.2, high=1, scale_prob=1):
+def scale_img(img, vertices, low=0.2, high=0.6, scale_prob=1):
 	'''adjust scale of image to aug data
 	Input:
 		img         : PIL Image

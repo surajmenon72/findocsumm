@@ -46,7 +46,6 @@ plt.figure(5)
 plt.plot(epochs, variances)
 plt.savefig('variances.png')
 
-exit()
 
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
@@ -55,9 +54,16 @@ mv_avg_n = 3
 begin_epoch = epochs[0]
 end_epoch = epochs[num_samples-1]
 
+results = variances
 mv_avg_results = moving_average(results, mv_avg_n)
 mv_avg_shape = mv_avg_results.shape[0]
 x = np.linspace(begin_epoch, end_epoch, num=mv_avg_shape)
+
+plt.figure(6)
+plt.plot(x, mv_avg_results)
+plt.savefig('smooth.png')
+
+exit()
 
 results2 = vec2[variance_index, :]
 results3 = vec3[variance_index, :]

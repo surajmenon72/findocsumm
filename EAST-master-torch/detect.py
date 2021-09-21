@@ -189,7 +189,7 @@ def plot_boxes(img, boxes):
 	return img
 
 
-def detect_dataset(model, device, test_img_path, submit_path, scale=4):
+def detect_dataset(model, device, test_img_path, submit_path, scale=4, limit_images=False):
 	'''detection on whole dataset, save .txt results in submit_path
 	Input:
 		model        : detection model
@@ -203,8 +203,9 @@ def detect_dataset(model, device, test_img_path, submit_path, scale=4):
 	images_to_check = 100
 
 	for i, img_file in enumerate(img_files):
-		if (i == images_to_check):
-			break
+		if (limit_images == True):
+			if (i == images_to_check):
+				break
 		print('evaluating {} image'.format(i), end='\r')
 		boxes = detect(Image.open(img_file), model, device, scale=scale)
 		seq = []

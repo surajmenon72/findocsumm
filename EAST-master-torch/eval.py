@@ -9,7 +9,7 @@ import numpy as np
 import shutil
 
 
-def eval_model(model_path, test_img_path, submit_path='./submit', save_flag=True, set_scale=4, model='EAST'):
+def eval_model(model_path, test_img_path, submit_path='./submit', save_flag=True, set_scale=4, model='EAST', limit=False):
 	if os.path.exists(submit_path):
 		shutil.rmtree(submit_path) 
 	os.mkdir(submit_path)
@@ -26,7 +26,7 @@ def eval_model(model_path, test_img_path, submit_path='./submit', save_flag=True
 	model.eval()
 	
 	start_time = time.time()
-	detect_dataset(model, device, test_img_path, submit_path, scale=scale)
+	detect_dataset(model, device, test_img_path, submit_path, scale=scale, limit_images=limit)
 	os.chdir(submit_path)
 	res = subprocess.getoutput('zip -q submit.zip *.txt')
 	res = subprocess.getoutput('mv submit.zip ../')

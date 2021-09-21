@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 
-file = 'eval_results2/eval_metrics2_eval_metrics-EASTER-sm1-aug3-no_ignore-375.npy'
+file = 'eval_results2/eval_metrics2_eval_metrics-EASTER-sm1-aug3-no_ignore-1--375.npy'
 # file2 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug2250-150--425.npy'
 # file3 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug3250-150--410.npy'
 
@@ -75,7 +75,7 @@ plt.figure(7)
 plt.plot(epochs, f1)
 plt.savefig('f1.png')
 
-c1 = np.corrcoef(test_losses, precisions)
+c1 = np.corrcoef(test_losses, recalls)
 print (c1)
 
 # results2 = vec2[variance_index, :]

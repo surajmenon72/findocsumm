@@ -42,9 +42,9 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	model = EASTER(True, True)
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/EASTER-sm1-aug3-no_ignore-aug4-400.pth'
+	model_name = './pths/EASTER-sm1-aug3-no_ignore-375.pth'
 	model.load_state_dict(torch.load(model_name))
-	epoch_start = 400
+	epoch_start = 375
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
@@ -196,7 +196,7 @@ if __name__ == '__main__':
 	test_batch_size = 16
 	lr             = 1e-3
 	num_workers    = 0
-	epoch_iter     = 900
+	epoch_iter     = 700
 	save_interval  = 5
 	eval_interval  = 5
 	data_scale = 2

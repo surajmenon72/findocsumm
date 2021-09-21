@@ -43,10 +43,10 @@ def eval_model(model_path, test_img_path, submit_path='./submit', save_flag=True
 
 
 if __name__ == '__main__': 
-	model_name = './pths/east_vgg16.pth'
-	#model_name  = './pths/EASTER-sm2-150.pth'
+	#model_name = './pths/east_vgg16.pth'
+	model_name  = './pths/EASTER-sm1-aug3-295.pth'
 	test_img_path = os.path.abspath('/home/surajm72/data/ICDAR_2015/test_img')
 	submit_path = './submit'
-	scale = 4
-	model = 'EAST'
+	scale = 2
+	model = 'EASTER'
 	eval_model(model_name, test_img_path, submit_path, set_scale=scale, model=model)

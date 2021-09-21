@@ -196,7 +196,7 @@ if __name__ == '__main__':
 	test_batch_size = 16
 	lr             = 1e-3
 	num_workers    = 0
-	epoch_iter     = 700
+	epoch_iter     = 900
 	save_interval  = 5
 	eval_interval  = 5
 	data_scale = 2

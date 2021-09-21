@@ -2,13 +2,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 
-file = 'eval_results2/eval_metrics2_eval_metrics-EASTER-sm1-aug3-no_ignore-1--375.npy'
-file2 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug2250-150--425.npy'
-file3 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug3250-150--410.npy'
+file = 'eval_results2/eval_metrics2_eval_metrics-EASTER-sm1-aug3-no_ignore-375.npy'
+# file2 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug2250-150--425.npy'
+# file3 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug3250-150--410.npy'
 
 vec = np.load(file)
-vec2 = np.load(file2)
-vec3 = np.load(file3)
+# vec2 = np.load(file2)
+# vec3 = np.load(file3)
 
 epoch_index = 0
 train_loss_index = 1
@@ -38,6 +38,9 @@ plt.figure(3)
 plt.plot(epochs, precisions)
 plt.savefig('precisions.png')
 
+#some recalls should be scaled by 5
+recalls = recalls*5
+
 plt.figure(4)
 plt.plot(epochs, recalls)
 plt.savefig('recalls.png')
@@ -63,24 +66,34 @@ plt.figure(6)
 plt.plot(x, mv_avg_results)
 plt.savefig('smooth.png')
 
-exit()
+recalls += 1e-6
+precisions += 1e-6
 
-results2 = vec2[variance_index, :]
-results3 = vec3[variance_index, :]
+f1 = (2*recalls*precisions)/(recalls+precisions)
 
-mv_avg_results2 = moving_average(results2, mv_avg_n)
-mv_avg_results3 = moving_average(results3, mv_avg_n)
+plt.figure(7)
+plt.plot(epochs, f1)
+plt.savefig('f1.png')
 
-mv_avg_results2_f = mv_avg_results2[:mv_avg_shape]
-mv_avg_results3_f = mv_avg_results3[:mv_avg_shape]
+c1 = np.corrcoef(test_losses, precisions)
+print (c1)
 
-plt.figure(2)
-plt.plot(x, mv_avg_results, color='red')
-plt.plot(x, mv_avg_results2_f, color='blue')
-plt.plot(x, mv_avg_results3_f, color='green')
-#plt.ylim(20, 30)
-plt.xlabel('Epoch')
-plt.ylabel('Spread')
-plt.legend(['Lowest', 'Middle', 'Highest'])
-plt.title('Comparing Variances')
-plt.show()
+# results2 = vec2[variance_index, :]
+# results3 = vec3[variance_index, :]
+
+# mv_avg_results2 = moving_average(results2, mv_avg_n)
+# mv_avg_results3 = moving_average(results3, mv_avg_n)
+
+# mv_avg_results2_f = mv_avg_results2[:mv_avg_shape]
+# mv_avg_results3_f = mv_avg_results3[:mv_avg_shape]
+
+# plt.figure(2)
+# plt.plot(x, mv_avg_results, color='red')
+# plt.plot(x, mv_avg_results2_f, color='blue')
+# plt.plot(x, mv_avg_results3_f, color='green')
+# #plt.ylim(20, 30)
+# plt.xlabel('Epoch')
+# plt.ylabel('Spread')
+# plt.legend(['Lowest', 'Middle', 'Highest'])
+# plt.title('Comparing Variances')
+# plt.show()

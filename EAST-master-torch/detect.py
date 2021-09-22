@@ -29,8 +29,8 @@ def resize_img(img):
 	#w_scale = 1.45
 	#h_scale = 1.45
 
-	w_scale = 1
-	h_scale = 1
+	w_scale = 1.25
+	h_scale = 1.25
 
 	resize_w = int(w * w_scale)
 	resize_h = int(h * h_scale)

@@ -43,7 +43,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
 	model_name = './pths2/EASTER-sm1-aug3-no_ignore-375.pth'
-	model.load_state_dict(torch.load(model_name))
+	model.load_state_dict(torch.load(model_name), map_location=device)
 	epoch_start = 375
 	data_parallel = False
 	if torch.cuda.device_count() > 1:

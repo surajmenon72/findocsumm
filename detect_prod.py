@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw
 from model2_prod import EASTER
 import os
 import numpy as np
-#import lanms
+import lanms
 #from loss import Loss
 import math
 

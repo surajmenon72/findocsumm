@@ -212,7 +212,7 @@ def show_image(image, results):
 
 	plt.imshow(orig_image)
 	plt.title('Output')
-	plt.savefig('cv_detect.png')
+	plt.savefig('cv_detect.jpg')
 	#plt.show()
 
 

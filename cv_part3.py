@@ -177,8 +177,8 @@ def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offs
 	    ##This will recognize the text from the image of bounding box
 
 		text = pytesseract.image_to_string(r, config=configuration)
-	    print (text)
-	    exit()
+		print (text)
+		exit()
 		# try:
 		# 	text = pytesseract.image_to_string(r, config=configuration)
 		# except:

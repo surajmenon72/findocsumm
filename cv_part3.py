@@ -122,6 +122,7 @@ def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offs
 
 	image = cv2.imread(img_path)
 	orig = image.copy()
+	(origH, origW) = image.shape[:2]
 
 	boxes = get_boxes_from_model(img_path, model_path, scale=scale, model=model)
 	boxes = translate_boxes(boxes)

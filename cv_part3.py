@@ -118,7 +118,7 @@ def translate_boxes(pre_boxes):
 
 	return new_boxes
 
-def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, remove_boxes=False, scale=2, model='EASTER'):
+def process_image_t(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, remove_boxes=False, scale=2, model='EASTER'):
 
 	image = cv2.imread(img_path)
 	orig = image.copy()
@@ -186,8 +186,6 @@ def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, remo
 		# append bbox coordinate and associated text to the list of results 
 		results.append(((startX, startY, endX, endY), text))
 
-	show_image(orig, results)
-	exit()
 
 	return orig, results
 	#return orig, results_m
@@ -222,4 +220,4 @@ if __name__ == '__main__':
 	model_path  = './EAST-master-torch/pths2/EASTER-sm1-aug3-no_ignore-450.pth'
 	min_confidence = 0.9
 
-	process_image(img_path, model_path, min_confidence, hyst_X=5, hyst_Y=2, remove_boxes=False, scale=2, model='EASTER')
+	process_image_t(img_path, model_path, min_confidence, hyst_X=5, hyst_Y=2, remove_boxes=False, scale=2, model='EASTER')

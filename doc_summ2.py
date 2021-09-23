@@ -1,7 +1,8 @@
 import numpy as np
 import pandas as pd #need openpyxl as well
 from matplotlib import pyplot as plt
-from cv_part2 import process_image, show_image
+#from cv_part2 import process_image, show_image
+from cv_part3 import process_image_t, show_image
 from nlp_part import label_headers, bucket_headers, print_buckets
 import Levenshtein
 from dateutil.parser import *
@@ -680,8 +681,13 @@ args['height'] = 2560
 process_date_x = 15
 process_date_y = 5
 
-image_to_process = args['full_image']
-r_image, results = process_image(True, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y)
+img_path = 'EAST-master-torch/test_img/' + 'apple_tc_full1' + '.jpg'
+model_path  = './EAST-master-torch/pths2/EASTER-sm1-aug3-no_ignore-450.pth'
+min_confidence = 0.9
+
+#image_to_process = args['full_image']
+#r_image, results = process_image(True, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y)
+r_image, results = process_image_t(img_path, model_path, min_confidence, hyst_X=5, hyst_Y=2, remove_boxes=False, scale=2, model='EASTER')
 
 orig_height = r_image.shape[0]
 orig_width = r_image.shape[1]

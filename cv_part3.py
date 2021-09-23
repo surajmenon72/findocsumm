@@ -162,7 +162,7 @@ def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offs
 		if (endY > origH):
 			endY = origH-1
 
-		adjusted_box = (startX, startY, endX, endY)
+		adjusted_box = (int(startX), int(startY), int(endX), int(endY))
 		adjusted_boxes.append(adjusted_box)
 
 	#adjusted_boxes = connect_horizontal_boxes(adjusted_boxes, x_threshold=5, y_threshold=15) 

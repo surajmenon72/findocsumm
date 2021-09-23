@@ -222,4 +222,4 @@ if __name__ == '__main__':
 	model_path  = './EAST-master-torch/pths2/EASTER-sm1-aug3-no_ignore-450.pth'
 	min_confidence = 0.9
 
-	process_image(img_path, model_path, min_confidence, hyst_X=5, hyst_Y=5, remove_boxes=False, scale=2, model='EASTER')
+	process_image(img_path, model_path, min_confidence, hyst_X=5, hyst_Y=2, remove_boxes=False, scale=2, model='EASTER')

@@ -130,9 +130,6 @@ def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offs
 
 	# initialize the list of results
 	results = []
-	
-	#for now, say we don't want any X-shifting
-	x_start_buffer = 0
 
 	boxes = connect_horizontal_boxes(boxes, x_threshold=45, y_threshold=20) 
 
@@ -142,10 +139,15 @@ def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offs
 	# loop over the bounding boxes to find the coordinate of bounding boxes
 	for (startX, startY, endX, endY) in boxes:
 		# scale the coordinates based on the respective ratios in order to reflect bounding box on the original image
-		startX = int(startX * rW) - hyst_X - x_start_buffer
-		startY = int(startY * rH) - hyst_Y 
-		endX = int(endX * rW) + hyst_X  - x_start_buffer
-		endY = int(endY * rH) + hyst_Y 
+		# startX = int(startX * rW) - hyst_X - x_start_buffer
+		# startY = int(startY * rH) - hyst_Y 
+		# endX = int(endX * rW) + hyst_X  - x_start_buffer
+		# endY = int(endY * rH) + hyst_Y 
+
+		startX -= hyst_X
+		startY -= hyst_Y
+		endX += hyst_X
+		endY += hyst_Y
 
 		#bound the bound
 		if (startX < 0):

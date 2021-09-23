@@ -102,58 +102,29 @@ def connect_horizontal_boxes(boxes, x_threshold=30, y_threshold=30):
 
 	return box_it
 
+def translate_boxes(pre_boxes):
+	#assume our input is in x1, y1, x2, y2, ..
+	#we want to output in min_x, min_y, max_x, max_y
+
+	num_boxes = pre_boxes.shape[0]
+	new_boxes = np.zeros((num_boxes, 4))
+	for i in range(num_boxes):
+		c_box = pre_boxes[i, :]
+		new_boxes[i, 0] = np.amin(c_box[0, 2, 4, 6])
+		new_boxes[i, 1] = np.amin(c_box[1, 3, 5, 7])
+		new_boxes[i, 2] = np.amax(c_box[0, 2, 4, 6])
+		new_boxes[i, 3] = np.amax(c_box[1, 3, 5, 7])
+
+
+	return new_boxes
+
 def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offset_X=0, offset_Y=0, remove_boxes=False, scale=2, model='EASTER'):
 
 	boxes = get_boxes_from_model(img_path, model_path, scale=scale, model=model)
+	boxes = translate_boxes(boxes)
 
 	print (boxes.shape)
 	exit()
-
-	#print ('Processing Image')
-	#print (image.shape)
-	print ('.')
-
-
-	#Saving a original image and shape
-	orig = image.copy()
-	(origH, origW) = image.shape[:2]
-
-	# print ('Image Size')
-	# print (origH)
-	# print (origW)
-	# exit()
-
-	# set the new height and width to default 320 by using args #dictionary.  
-	(newW, newH) = (args["width"], args["height"])
-
-	#Calculate the ratio between original and new image for both height and weight. 
-	#This ratio will be used to translate bounding box location on the original image. 
-	rW = origW / float(newW)
-	rH = origH / float(newH)
-
-	# resize the original image to new dimensions
-	image = cv2.resize(image, (newW, newH))
-	(H, W) = image.shape[:2]
-
-	# construct a blob from the image to forward pass it to EAST model
-	blob = cv2.dnn.blobFromImage(image, 1.0, (W, H),
-		(123.68, 116.78, 103.94), swapRB=True, crop=False)
-
-	net = cv2.dnn.readNet(args["east"])
-
-	# We would like to get two outputs from the EAST model. 
-	#1. Probabilty scores for the region whether that contains text or not. 
-	#2. Geometry of the text -- Coordinates of the bounding box detecting a text
-	# The following two layer need to pulled from EAST model for achieving this. 
-	layerNames = [
-		"feature_fusion/Conv_7/Sigmoid",
-		"feature_fusion/concat_3"]
-
-	net.setInput(blob)
-	(scores, geometry) = net.forward(layerNames)
-
-	(boxes, confidence_val) = predictions(scores, geometry, args['min_confidence'])
-	boxes = non_max_suppression(np.array(boxes), probs=confidence_val)
 
 	##Text Detection and Recognition 
 

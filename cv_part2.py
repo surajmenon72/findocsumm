@@ -161,14 +161,7 @@ def process_image(image_read, image_real, east, min_confidence, width, height, h
 	(scores, geometry) = net.forward(layerNames)
 
 	(boxes, confidence_val) = predictions(scores, geometry, args['min_confidence'])
-	print ('Before')
-	print (np.array(boxes).shape)
-	print (np.array(confidence_val).shape)
-	print (np.array(boxes)[0])
 	boxes = non_max_suppression(np.array(boxes), probs=confidence_val)
-	print ('After')
-	print (boxes.shape)
-	exit()
 
 	##Text Detection and Recognition 
 

@@ -118,7 +118,7 @@ def translate_boxes(pre_boxes):
 
 	return new_boxes
 
-def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offset_X=0, offset_Y=0, remove_boxes=False, scale=2, model='EASTER'):
+def process_image(img_path, model_path, min_confidence, hyst_X=5, hyst_Y=5, remove_boxes=False, scale=2, model='EASTER'):
 
 	image = cv2.imread(img_path)
 	orig = image.copy()
@@ -132,7 +132,7 @@ def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offs
 	# initialize the list of results
 	results = []
 
-	boxes = connect_horizontal_boxes(boxes, x_threshold=45, y_threshold=20) 
+	boxes = connect_horizontal_boxes(boxes, x_threshold=20, y_threshold=20) 
 
 
 	adjusted_boxes = []

@@ -239,7 +239,7 @@ def show_image(image, results):
 if __name__ == '__main__':
 	#img_path = '/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png'
 	img_path = 'test_img/' + 'apple_tc_full1' + '.jpg'
-	model_path  = './pths2/EASTER-sm1-aug3-no_ignore-450.pth'
+	model_path  = './EAST-master-torch/pths2/EASTER-sm1-aug3-no_ignore-450.pth'
 	min_confidence = 0.9
 
 	process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offset_X=0, offset_Y=0, remove_boxes=False, scale=2, model='EASTER')

@@ -1,13 +1,15 @@
 import torch
 from torchvision import transforms
 from PIL import Image, ImageDraw
-from model2 import EASTER
+from model2_prod import EASTER
 import os
-from dataset import get_rotate_mat
 import numpy as np
-import lanms
-from loss import Loss
+#import lanms
+#from loss import Loss
 
+def get_rotate_mat(theta):
+	'''positive theta value means rotate clockwise'''
+	return np.array([[math.cos(theta), -math.sin(theta)], [math.sin(theta), math.cos(theta)]])
 
 def resize_img(img):
 	'''resize image to be divisible by 32
@@ -226,6 +228,20 @@ def do_detection(img_path, model_path, res_img, scale=4, model='EAST'):
 	boxes = detect(img, model, device, scale=scale)
 	plot_img = plot_boxes(img, boxes)	
 	plot_img.save(res_img)
+
+def get_boxes_from_model(img_path, model_path, scale=4, model='EAST'):
+	device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+	if (model == 'EAST'):
+		model = EAST(False).to(device)
+	else:
+		model = EASTER(False).to(device)
+	model.load_state_dict(torch.load(model_path, map_location=torch.device('cpu')))
+	model.eval()
+	img = Image.open(img_path)
+	
+	boxes = detect(img, model, device, scale=scale)
+
+	return boxes
 
 test_images = ['test_img2', 'apple_tc_full1', 'adobe_tc_full2', 'mcds_tc_full1', 'cat_tc_full2']
 #test_images = ['test_img2', 'mcds_tc_full1']

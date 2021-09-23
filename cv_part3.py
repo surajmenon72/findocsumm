@@ -120,6 +120,9 @@ def translate_boxes(pre_boxes):
 
 def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offset_X=0, offset_Y=0, remove_boxes=False, scale=2, model='EASTER'):
 
+	image = cv2.imread(img_path)
+	orig = image.copy()
+
 	boxes = get_boxes_from_model(img_path, model_path, scale=scale, model=model)
 	boxes = translate_boxes(boxes)
 
@@ -132,9 +135,6 @@ def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offs
 	x_start_buffer = 0
 
 	boxes = connect_horizontal_boxes(boxes, x_threshold=45, y_threshold=20) 
-
-	print (np.array(boxes).shape)
-	exit()
 
 
 	adjusted_boxes = []
@@ -183,6 +183,9 @@ def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offs
 		# append bbox coordinate and associated text to the list of results 
 		results.append(((startX, startY, endX, endY), text))
 
+	show_image(orig, results)
+	exit()
+
 	return orig, results
 	#return orig, results_m
 
@@ -206,7 +209,8 @@ def show_image(image, results):
 
 	plt.imshow(orig_image)
 	plt.title('Output')
-	plt.show()
+	plt.savefig('cv_detect.png')
+	#plt.show()
 
 
 if __name__ == '__main__':

@@ -110,10 +110,10 @@ def translate_boxes(pre_boxes):
 	new_boxes = np.zeros((num_boxes, 4))
 	for i in range(num_boxes):
 		c_box = pre_boxes[i, :]
-		new_boxes[i, 0] = np.amin(c_box[0, 2, 4, 6])
-		new_boxes[i, 1] = np.amin(c_box[1, 3, 5, 7])
-		new_boxes[i, 2] = np.amax(c_box[0, 2, 4, 6])
-		new_boxes[i, 3] = np.amax(c_box[1, 3, 5, 7])
+		new_boxes[i, 0] = np.amin(c_box[[0, 2, 4, 6]])
+		new_boxes[i, 1] = np.amin(c_box[[1, 3, 5, 7]])
+		new_boxes[i, 2] = np.amax(c_box[[0, 2, 4, 6]])
+		new_boxes[i, 3] = np.amax(c_box[[1, 3, 5, 7]])
 
 
 	return new_boxes
@@ -125,7 +125,7 @@ def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offs
 
 	print (boxes.shape)
 	exit()
-
+	
 	##Text Detection and Recognition 
 
 	# initialize the list of results

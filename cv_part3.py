@@ -176,12 +176,14 @@ def process_image(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, offs
 		configuration = ("-l eng --oem 1 --psm 7")
 	    ##This will recognize the text from the image of bounding box
 
-
-		try:
-			text = pytesseract.image_to_string(r, config=configuration)
-		except:
-			print ('Some bounding box out of order')
-			text = 'GHAJEFKJEKAFJEKFAJEFKEJKFAEK'
+	    text = pytesseract.image_to_string(r, config=configuration)
+	    print (text)
+	    exit()
+		# try:
+		# 	text = pytesseract.image_to_string(r, config=configuration)
+		# except:
+		# 	print ('Some bounding box out of order')
+		# 	text = 'GHAJEFKJEKAFJEKFAJEFKEJKFAEK'
 
 		# append bbox coordinate and associated text to the list of results 
 		results.append(((startX, startY, endX, endY), text))

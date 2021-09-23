@@ -238,7 +238,7 @@ def show_image(image, results):
 
 if __name__ == '__main__':
 	#img_path = '/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png'
-	img_path = 'test_img/' + 'apple_tc_full1' + '.jpg'
+	img_path = 'EAST-master-torch/test_img/' + 'apple_tc_full1' + '.jpg'
 	model_path  = './EAST-master-torch/pths2/EASTER-sm1-aug3-no_ignore-450.pth'
 	min_confidence = 0.9
 

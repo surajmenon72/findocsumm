@@ -173,6 +173,9 @@ def detect(img, model, device, scale=4):
 	img, ratio_h, ratio_w = resize_img(img)
 	with torch.no_grad():
 		score, geo = model(load_pil(img).to(device))
+		print (score.shape)
+		print (geo.shape)
+		exit()
 		#score, geo, _ = model(load_pil(img).to(device))
 	boxes = get_boxes(score.squeeze(0).cpu().numpy(), geo.squeeze(0).cpu().numpy(), scale=scale)
 	return adjust_ratio(boxes, ratio_w, ratio_h)

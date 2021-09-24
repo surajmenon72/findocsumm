@@ -132,7 +132,7 @@ def process_image_t(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, re
 	# initialize the list of results
 	results = []
 
-	boxes = connect_horizontal_boxes(boxes, x_threshold=20, y_threshold=20) 
+	boxes = connect_horizontal_boxes(boxes, x_threshold=30, y_threshold=20) 
 
 
 	adjusted_boxes = []

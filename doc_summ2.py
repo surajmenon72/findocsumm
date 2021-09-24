@@ -683,7 +683,7 @@ process_date_y = 5
 
 img_path = 'EAST-master-torch/test_img/' + 'adobe_tc_full2' + '.jpg'
 model_path  = './EAST-master-torch/pths2/EASTER-sm1-aug3-no_ignore-450.pth'
-min_confidence = 0.9
+min_confidence = 0.99
 
 #image_to_process = args['full_image']
 #r_image, results = process_image(True, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y)

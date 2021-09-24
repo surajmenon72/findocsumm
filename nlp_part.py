@@ -425,3 +425,5 @@ def print_buckets(bucketed_headers, header_labels, headers, dates, dates_full, c
 	#print (df)
 	#df.to_excel(filename, sheet_name='sheet1', index=False)
 	df.to_csv(filename, index=False)
+
+	return df

@@ -744,6 +744,7 @@ header_labels = label_headers(trim_headers, clean_final_results)
 bucketed_headers = bucket_headers(trim_headers, header_labels)
 
 #print buckets w/ data structure as defined by nlp file
-print_buckets(bucketed_headers, header_labels, trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, filename)
+df = print_buckets(bucketed_headers, header_labels, trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, filename)
+
 
 print ('Done!')

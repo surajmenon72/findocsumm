@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 #from cv_part2 import process_image, show_image
 from cv_part3 import process_image_t, show_image
 from nlp_part import label_headers, bucket_headers, print_buckets
+from dataframe_part import save_or_append_dataframe
 import Levenshtein
 from dateutil.parser import *
 import datefinder
@@ -758,5 +759,6 @@ bucketed_headers = bucket_headers(trim_headers, header_labels)
 #print buckets w/ data structure as defined by nlp file
 df = print_buckets(bucketed_headers, header_labels, trim_headers, trim_dates_r, trim_dates, trim_counts, trim_date_contexts, count_contexts, clean_final_results, company)
 
+df = save_or_append_dataframe(df, company)
 
 print ('Done!')

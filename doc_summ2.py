@@ -664,7 +664,7 @@ def print_results(headers, dates, dates_full, counts, date_contexts, count_conte
 #Creating argument dictionary for the default arguments needed in the code. 
 args = {"full_image":"/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png","east":"/Users/surajmenon/Desktop/findocDocs/frozen_east_text_detection.pb", "min_confidence":0.5, "width":320, "height":320}
 
-filename = 'apple.csv'
+filename = 'adobe.csv'
 
 args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_tc_full1.png" #apple
 #args['full_image']="/Users/surajmenon/Desktop/findocDocs/apple_test6.png" #small_apple
@@ -681,7 +681,7 @@ args['height'] = 2560
 process_date_x = 15
 process_date_y = 5
 
-img_path = 'EAST-master-torch/test_img/' + 'apple_tc_full1' + '.jpg'
+img_path = 'EAST-master-torch/test_img/' + 'adobe_tc_full2' + '.jpg'
 model_path  = './EAST-master-torch/pths2/EASTER-sm1-aug3-no_ignore-450.pth'
 min_confidence = 0.9
 

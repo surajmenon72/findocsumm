@@ -10,7 +10,7 @@ revenue_tree = [[['Revenues', 'Sales']], []]
 cogs_tree = [[['Cost of goods sold', 'Cost of sales']], []]
 opex_tree = [[['Operating expenses', 'Operating costs']], [['Research and development'], ['Selling, general, and administrative'], ['Sales and marketing']]]
 income_tree = [[['Operating income', 'Operating profit']], []]
-non_operating_tree = [[['Non-Operating income', 'Non-Operating income expense']], []]
+non_operating_tree = [[['Non Operating income', 'Other Operating income', 'Expense']], []]
 
 trees = [revenue_tree, cogs_tree, opex_tree, income_tree, non_operating_tree]
 
@@ -424,6 +424,6 @@ def print_buckets(bucketed_headers, header_labels, headers, dates, dates_full, c
 
 	#print (df)
 	#df.to_excel(filename, sheet_name='sheet1', index=False)
-	df.to_csv(filename, index=False)
+	#df.to_csv(filename, index=False)
 
 	return df

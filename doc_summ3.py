@@ -668,7 +668,7 @@ def save_images_from_pdf(pdf_path):
 	images = convert_from_path(pdf_path)
 	for i in range(len(images)):
 		img_path = './pdfs/' + company + '_' + 'page' + str(i) + '.png'
-    	images[i].save(img_path, 'PNG')
+		images[i].save(img_path, 'PNG')
 
 def find_income_image(pdf_path, income_page_number=0):
 	#in this function, we may have to go through each of the images and actually parse them..

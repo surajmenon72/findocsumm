@@ -678,7 +678,7 @@ def find_income_image(pdf_path, income_page_number=0):
 	file = words[-1]
 	company = (file.split('.'))[0]
 
-	img_return = './pdfs/' + company + '_' + 'page' + str(income_page_number) + '.png'
+	img_return = './pdfs/' + company + '_' + 'page' + str(income_page_number-1) + '.png'
 	return img_return
 
 ###** MAIN **###

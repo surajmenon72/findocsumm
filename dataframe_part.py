@@ -16,8 +16,7 @@ def save_or_append_dataframe(df, frame_name=None):
 		return
 
 	#append prev and save over
-	if (prev_df != None):
-		full_df = pd.concat([prev_df, df], axis=1, join='inner')
-		full_df.to_csv(save_path)
+	full_df = pd.concat([prev_df, df], axis=1, join='inner')
+	full_df.to_csv(save_path)
 
 	return full_df

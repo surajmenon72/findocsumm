@@ -691,13 +691,13 @@ company = 'apple'
 process_date_x = 15
 process_date_y = 5
 
-pdf_path = './pdfs/apple1.pdf'
+pdf_path = './pdfs/apple2.pdf'
 model_path  = './EAST-master-torch/pths2/EASTER-sm1-aug3-no_ignore-450.pth'
 min_confidence = 0.99
 
 save_images_from_pdf(pdf_path)
 
-img_path = find_income_image(pdf_path, income_page_number=3)
+img_path = find_income_image(pdf_path, income_page_number=4)
 
 #consider propagating the confidence values all the way through
 r_image, results = process_image_t(img_path, model_path, min_confidence, hyst_X=10, hyst_Y=2, remove_boxes=False, scale=2, model='EASTER')

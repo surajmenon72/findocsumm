@@ -687,7 +687,7 @@ min_confidence = 0.99
 
 #image_to_process = args['full_image']
 #r_image, results = process_image(True, image_to_process, args['east'], args['min_confidence'], args['width'], args['height'], hyst_X=process_date_x, hyst_Y=process_date_y)
-r_image, results = process_image_t(img_path, model_path, min_confidence, hyst_X=5, hyst_Y=2, remove_boxes=False, scale=2, model='EASTER')
+r_image, results = process_image_t(img_path, model_path, min_confidence, hyst_X=10, hyst_Y=2, remove_boxes=False, scale=2, model='EASTER')
 
 orig_height = r_image.shape[0]
 orig_width = r_image.shape[1]

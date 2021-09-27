@@ -134,7 +134,6 @@ def process_image_t(img_path, model_path, min_confidence, hyst_X=0, hyst_Y=0, re
 
 	boxes = connect_horizontal_boxes(boxes, x_threshold=30, y_threshold=20) 
 
-
 	adjusted_boxes = []
 
 	# loop over the bounding boxes to find the coordinate of bounding boxes

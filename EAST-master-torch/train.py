@@ -176,7 +176,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 				np.save(save_str, eval_metrics_np)
 
 		else:
-			if ((epoch + 1) % interval):
+			if (epoch + 1) % interval == 0:
 				last_saved_epoch = (epoch+1)
 				state_dict = model.module.state_dict() if data_parallel else model.state_dict()
 				torch.save(state_dict, os.path.join(pths_path, 'model_epoch_{}.pth'.format(epoch+1)))

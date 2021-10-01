@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import torch
 
-file = 'eval_results2/eval_metrics2_eval_metrics-EASTER-sm1-aug3-no_ignore-1--450.npy'
+file = 'eval_results2/eval_metrics2_eval_metrics-EASTER-sm1-aug3-no_ignore-1--535.npy'
 # file2 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug2250-150--425.npy'
 # file3 = 'eval_results/eval_metrics_eval_metrics-EASTER-sm3-aug3250-150--410.npy'
 
@@ -53,7 +53,7 @@ plt.savefig('variances.png')
 def moving_average(x, w):
     return np.convolve(x, np.ones(w), 'valid') / w
 
-mv_avg_n = 3
+mv_avg_n = 10
 begin_epoch = epochs[0]
 end_epoch = epochs[num_samples-1]
 

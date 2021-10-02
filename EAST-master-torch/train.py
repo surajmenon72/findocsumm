@@ -158,6 +158,8 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 		print('epoch_loss is {:.8f}, epoch_time is {:.8f}'.format(epoch_loss/int(file_num/batch_size), time.time()-epoch_time))
 		print(time.asctime(time.localtime(time.time())))
 		print('='*50)
+		print ('EPOCH TRAIN LOSS:')
+		print (epoch_loss)
 
 		if (do_eval == True):
 			if (epoch + 1) % eval_interval == 0:

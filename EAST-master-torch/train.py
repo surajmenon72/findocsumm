@@ -43,7 +43,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	print (device)
 	torch.cuda.empty_cache()
 	print ('Emptied Cache')
-	if (model == 'EAST'):
+	if (model_type == 'EAST'):
 		model = EAST(True, True)
 	else:
 		model = EASTER(True, True)

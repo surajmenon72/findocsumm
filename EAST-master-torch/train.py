@@ -16,6 +16,11 @@ from PIL import Image, ImageDraw
 
 def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, test_batch_size, lr, num_workers, epoch_iter, interval, eval_interval, model='EAST'):
 	file_num = len(os.listdir(train_img_path))
+
+	if (model == 'EAST'):
+		data_scale = 4
+	else:
+		data_scale = 2
 	
 	inv_ds = (1/data_scale)
 	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=True, ignore=True)
@@ -40,10 +45,8 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	print ('Emptied Cache')
 	if (model == 'EAST'):
 		model = EAST(True, True)
-		data_scale = 4
 	else:
 		model = EASTER(True, True)
-		data_scale = 2
 	#model = EAST_STRETCH()
 	model_name = './pths/east_vgg16.pth'
 	#model_name = './pths/EASTER-sm1-aug3-no_ignore-535.pth'
@@ -121,8 +124,10 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'
 					try:
-						res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EAST', limit=True)
-						#res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EASTER', limit=True)
+						if (model == 'EAST'):
+							res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EAST', limit=True)
+						else:
+							res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EASTER', limit=True)
 						words = res.split('_')
 						precision = float(words[1])
 						recall = float(words[2])
@@ -206,5 +211,5 @@ if __name__ == '__main__':
 	epoch_iter     = 900
 	save_interval  = 5
 	eval_interval  = 5
-	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval)	
+	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval, model='EAST')	
 	

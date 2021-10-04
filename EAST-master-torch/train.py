@@ -14,7 +14,7 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 
-def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, test_batch_size, lr, num_workers, epoch_iter, interval, eval_interval, model='EAST'):
+def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, test_batch_size, lr, num_workers, epoch_iter, interval, eval_interval, model_type='EAST'):
 	file_num = len(os.listdir(train_img_path))
 
 	if (model == 'EAST'):
@@ -124,7 +124,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 
 					model_path = './pths/model_epoch_' + str(last_saved_epoch) + '.pth'
 					try:
-						if (model == 'EAST'):
+						if (model_type == 'EAST'):
 							res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EAST', limit=True)
 						else:
 							res = eval_model(model_path, test_img_path, set_scale=data_scale, model='EASTER', limit=True)
@@ -211,5 +211,5 @@ if __name__ == '__main__':
 	epoch_iter     = 900
 	save_interval  = 5
 	eval_interval  = 5
-	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval, model='EAST')	
+	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval, model_type='EAST')	
 	

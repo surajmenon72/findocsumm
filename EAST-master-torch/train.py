@@ -17,7 +17,7 @@ from PIL import Image, ImageDraw
 def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, test_batch_size, lr, num_workers, epoch_iter, interval, eval_interval, model_type='EAST'):
 	file_num = len(os.listdir(train_img_path))
 
-	if (model == 'EAST'):
+	if (model_type == 'EAST'):
 		data_scale = 4
 	else:
 		data_scale = 2

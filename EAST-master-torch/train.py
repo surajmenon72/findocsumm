@@ -14,14 +14,14 @@ import numpy as np
 from PIL import Image, ImageDraw
 
 
-def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, test_batch_size, lr, num_workers, epoch_iter, interval, eval_interval, data_scale):
+def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, batch_size, test_batch_size, lr, num_workers, epoch_iter, interval, eval_interval, model='EAST'):
 	file_num = len(os.listdir(train_img_path))
 	
 	inv_ds = (1/data_scale)
-	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=True)
+	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=True, ignore=True)
 	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
 
-	testset = custom_dataset(test_img_path, test_gt_path, scale=inv_ds, scale_aug=False)
+	testset = custom_dataset(test_img_path, test_gt_path, scale=inv_ds, scale_aug=False, ignore=True)
 	#testset = custom_dataset(test_img_path, test_gt_path, scale=0.5, scale_aug=False)
 
 	train_loader = data.DataLoader(trainset, batch_size=batch_size, \
@@ -38,8 +38,12 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	print (device)
 	torch.cuda.empty_cache()
 	print ('Emptied Cache')
-	model = EAST(True, True)
-	#model = EASTER(True, True)
+	if (model == 'EAST'):
+		model = EAST(True, True)
+		data_scale = 4
+	else:
+		model = EASTER(True, True)
+		data_scale = 2
 	#model = EAST_STRETCH()
 	model_name = './pths/east_vgg16.pth'
 	#model_name = './pths/EASTER-sm1-aug3-no_ignore-535.pth'
@@ -202,6 +206,5 @@ if __name__ == '__main__':
 	epoch_iter     = 900
 	save_interval  = 5
 	eval_interval  = 5
-	data_scale = 4
-	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval, data_scale)	
+	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval)	
 	

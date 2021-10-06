@@ -131,7 +131,7 @@ class merge(nn.Module):
 		y = self.relu6(self.bn6(self.conv6(y)))
 		
 		print ('Conv7 Layer')
-		print (self.conv7)
+		print (self.conv7.weight)
 		exit()
 		y = self.relu7(self.bn7(self.conv7(y)))
 		return y

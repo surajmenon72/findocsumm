@@ -448,6 +448,26 @@ def scale_img(img, vertices, low=0.2, high=1.0, scale_prob=1):
 
 	return scaled_image, new_vertices
 
+def full_scale_img(img, vertices, low=0, high=1.0):
+	scale_num = np.random.uniform(low=low, high=high)
+	scale_factor = 0.5+scale_num
+
+	old_h = img.height
+	old_w = img.width
+	new_h = int(np.around(old_h * scale_factor))
+	new_w = int(np.around(old_w * scale_factor))
+	resize_h = new_h if new_h % 32 == 0 else int(new_h / 32) * 32
+	resize_w = new_w if new_w % 32 == 0 else int(new_w / 32) * 32
+
+	scaled_img = img.resize((resize_w, resize_h), Image.BILINEAR)
+
+	new_vertices = vertices.copy()
+	if (vertices.size) > 0:
+		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (new_h / old_h)
+		new_vertices[:,[0,2,4,6]] = vertices[:,[0,2,4,6]] * (new_w / old_w)
+
+	return scaled_img, new_vertices
+
 def rotate_img(img, vertices, angle_range=10):
 	'''rotate image [-10, 10] degree to aug data
 	Input:
@@ -543,7 +563,7 @@ def extract_vertices(lines):
 
 	
 class custom_dataset(data.Dataset):
-	def __init__(self, img_path, gt_path, scale=0.25, length=512, scale_aug=False, ignore=True):
+	def __init__(self, img_path, gt_path, scale=0.25, length=512, scale_aug=False, ignore=True, full_scale=False):
 		super(custom_dataset, self).__init__()
 		self.img_files = [os.path.join(img_path, img_file) for img_file in sorted(os.listdir(img_path))]
 		self.gt_files  = [os.path.join(gt_path, gt_file) for gt_file in sorted(os.listdir(gt_path))]
@@ -551,6 +571,8 @@ class custom_dataset(data.Dataset):
 		self.length = length
 		self.scale_aug = scale_aug
 		self.scale_len = int(self.length*self.scale)
+		self.ignore = ignore
+		self.full_scale = full_scale
 
 	def __len__(self):
 		return len(self.img_files)
@@ -580,13 +602,17 @@ class custom_dataset(data.Dataset):
 		# res_img = plot_boxes_labels(img, vertices, labels)
 		# res_img.save('./pre_test.bmp')
 
-		if (self.scale_aug == True):
-			img, vertices = scale_img(img, vertices)
+		if (self.full_scale == True):
+			img, vertices = full_scale_img(img, vertices, low=0, high=1.0)
+			img, vertices = rotate_img(img, vertices)
 		else:
-			img, vertices = adjust_height(img, vertices) 
+			if (self.scale_aug == True):
+				img, vertices = scale_img(img, vertices)
+			else:
+				img, vertices = adjust_height(img, vertices) 
 
-		img, vertices = rotate_img(img, vertices)
-		img, vertices = crop_img(img, vertices, labels, self.length)
+			img, vertices = rotate_img(img, vertices)
+			img, vertices = crop_img(img, vertices, labels, self.length)
 
 		# res_img = plot_boxes(img, vertices)
 		# res_img.save('./pre_test2.bmp')
@@ -595,7 +621,7 @@ class custom_dataset(data.Dataset):
                                         transforms.ToTensor(), \
                                         transforms.Normalize(mean=(0.5,0.5,0.5),std=(0.5,0.5,0.5))])
 		
-		score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length, ignore=True)
+		score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length, ignore=self.ignore)
 		#score_map, geo_map, ignored_map = get_score_geo(img, vertices, labels, self.scale, self.length, ignore=False)
 
 		# r_score_map = torch.reshape(score_map, (256, 256))

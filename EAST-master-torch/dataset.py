@@ -463,8 +463,8 @@ def full_scale_img(img, vertices, low=0, high=1.0):
 
 	new_vertices = vertices.copy()
 	if (vertices.size) > 0:
-		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (new_h / old_h)
-		new_vertices[:,[0,2,4,6]] = vertices[:,[0,2,4,6]] * (new_w / old_w)
+		new_vertices[:,[1,3,5,7]] = vertices[:,[1,3,5,7]] * (resize_h / old_h)
+		new_vertices[:,[0,2,4,6]] = vertices[:,[0,2,4,6]] * (resize_w / old_w)
 
 	return scaled_img, new_vertices
 
@@ -604,7 +604,7 @@ class custom_dataset(data.Dataset):
 
 		if (self.full_scale == True):
 			print ('Doing Full Scale')
-			img, vertices = full_scale_img(img, vertices, low=0, high=0.5)
+			img, vertices = full_scale_img(img, vertices, low=0.5, high=1.0)
 			img, vertices = rotate_img(img, vertices)
 		else:
 			if (self.scale_aug == True):

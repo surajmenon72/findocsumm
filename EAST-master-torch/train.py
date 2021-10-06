@@ -210,6 +210,6 @@ if __name__ == '__main__':
 	num_workers    = 0
 	epoch_iter     = 900
 	save_interval  = 5
-	eval_interval  = 5
+	eval_interval  = 2
 	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval, model_type='EAST')	
 	

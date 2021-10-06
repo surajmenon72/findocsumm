@@ -130,6 +130,9 @@ class merge(nn.Module):
 		y = self.relu5(self.bn5(self.conv5(y)))		
 		y = self.relu6(self.bn6(self.conv6(y)))
 		
+		print ('Conv7 Layer')
+		print (conv7)
+		exit()
 		y = self.relu7(self.bn7(self.conv7(y)))
 		return y
 
@@ -179,7 +182,7 @@ class EAST(nn.Module):
 				return score, geo, var_avg
 			else:
 				var_avg = 0
-				return score, geo, var_avg
+				return score, geo, var_avg 
 		else:
 			return score, geo
 		

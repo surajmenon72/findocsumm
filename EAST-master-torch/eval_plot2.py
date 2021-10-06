@@ -25,18 +25,19 @@ num_samples = 6
 epoch_offset = 450
 
 epochs = vec1[epoch_index, :num_samples] - epoch_offset
-variances1 = vec1[variance_index, :num_samples]
-variances2 = vec2[variance_index, :num_samples]
-variances3 = vec3[variance_index, :num_samples]
-variances4 = vec4[variance_index, :num_samples]
-variances5 = vec5[variance_index, :num_samples]
+measure_index = recall_index
+measure1 = vec1[measure_index, :num_samples]
+measure2 = vec2[measure_index, :num_samples]
+measure3 = vec3[measure_index, :num_samples]
+measure4 = vec4[measure_index, :num_samples]
+measure5 = vec5[measure_index, :num_samples]
 
 plt.figure(1)
-plt.plot(epochs, variances1)
-plt.plot(epochs, variances2)
-plt.plot(epochs, variances3)
-plt.plot(epochs, variances4)
-plt.plot(epochs, variances5)
+plt.plot(epochs, measure1)
+plt.plot(epochs, measure2)
+plt.plot(epochs, measure3)
+plt.plot(epochs, measure4)
+plt.plot(epochs, measure5)
 #plt.show()
 #plt.ylim(20, 30)
 plt.xlabel('Epoch')

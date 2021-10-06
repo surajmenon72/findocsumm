@@ -603,6 +603,7 @@ class custom_dataset(data.Dataset):
 		# res_img.save('./pre_test.bmp')
 
 		if (self.full_scale == True):
+			print ('Doing Full Scale')
 			img, vertices = full_scale_img(img, vertices, low=0, high=1.0)
 			img, vertices = rotate_img(img, vertices)
 		else:
@@ -614,8 +615,9 @@ class custom_dataset(data.Dataset):
 			img, vertices = rotate_img(img, vertices)
 			img, vertices = crop_img(img, vertices, labels, self.length)
 
-		# res_img = plot_boxes(img, vertices)
-		# res_img.save('./pre_test2.bmp')
+		res_img = plot_boxes(img, vertices)
+		res_img.save('./pre_test2.bmp')
+		exit()
 
 		transform = transforms.Compose([transforms.ColorJitter(0.5, 0.5, 0.5, 0.25), \
                                         transforms.ToTensor(), \

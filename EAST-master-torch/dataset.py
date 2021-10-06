@@ -604,7 +604,7 @@ class custom_dataset(data.Dataset):
 
 		if (self.full_scale == True):
 			print ('Doing Full Scale')
-			img, vertices = full_scale_img(img, vertices, low=0, high=1.0)
+			img, vertices = full_scale_img(img, vertices, low=0, high=0.5)
 			img, vertices = rotate_img(img, vertices)
 		else:
 			if (self.scale_aug == True):

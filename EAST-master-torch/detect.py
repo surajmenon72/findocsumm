@@ -20,14 +20,14 @@ def resize_img(img):
 	#w_scale = 2.75
 	#h_scale = 2.75
 
-	w_scale = 1.6
-	h_scale = 1.6
+	#w_scale = 1.6
+	#h_scale = 1.6
 
 	#w_scale = 1.875
 	#h_scale = 1.875
 
-	#w_scale = 1.5
-	#h_scale = 1.5
+	w_scale = 1.5
+	h_scale = 1.5
 
 	#w_scale = 1.25
 	#h_scale = 1.25

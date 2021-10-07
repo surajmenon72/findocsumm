@@ -621,7 +621,7 @@ class custom_dataset(data.Dataset):
 
 			img, vertices = crop_img(img, vertices, labels, self.length)
 
-			if (self.full_scale_count == batch_size-1):
+			if (self.full_scale_count == self.batch_size-1):
 				self.full_scale_count = 0
 			else:
 				self.full_scale_count += 1

@@ -23,10 +23,10 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 		data_scale = 2
 	
 	inv_ds = (1/data_scale)
-	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=True, ignore=False, full_scale=True)
+	trainset = custom_dataset(train_img_path, train_gt_path, scale=inv_ds, scale_aug=True, ignore=False, full_scale=True, batch_size=batch_size)
 	#trainset = custom_dataset(train_img_path, train_gt_path, scale=0.5, scale_aug=True)
 
-	testset = custom_dataset(test_img_path, test_gt_path, scale=inv_ds, scale_aug=False, ignore=True, full_scale=False)
+	testset = custom_dataset(test_img_path, test_gt_path, scale=inv_ds, scale_aug=False, ignore=True, full_scale=False, batch_size=batch_size)
 	#testset = custom_dataset(test_img_path, test_gt_path, scale=0.5, scale_aug=False)
 
 	train_loader = data.DataLoader(trainset, batch_size=batch_size, \

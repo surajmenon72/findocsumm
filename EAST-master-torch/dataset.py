@@ -626,8 +626,8 @@ class custom_dataset(data.Dataset):
 			if (self.length > long_side):
 				self.length = long_side
 
-			print (self.full_scale_factor)
-			print (self.length)
+			# print (self.full_scale_factor)
+			# print (self.length)
 
 			img, vertices = crop_img(img, vertices, labels, self.length)
 
@@ -644,9 +644,9 @@ class custom_dataset(data.Dataset):
 			img, vertices = rotate_img(img, vertices)
 			img, vertices = crop_img(img, vertices, labels, self.length)
 
-		res_img = plot_boxes(img, vertices)
-		res_img.save('./pre_test2.bmp')
-		exit()
+		# res_img = plot_boxes(img, vertices)
+		# res_img.save('./pre_test2.bmp')
+		# exit()
 
 		transform = transforms.Compose([transforms.ColorJitter(0.5, 0.5, 0.5, 0.25), \
                                         transforms.ToTensor(), \

@@ -603,8 +603,17 @@ class custom_dataset(data.Dataset):
 		# res_img.save('./pre_test.bmp')
 
 		if (self.full_scale == True):
-			img, vertices = full_scale_img(img, vertices, low=0.5, high=1.0)
+			img, vertices = full_scale_img(img, vertices, low=0, high=1.0)
 			img, vertices = rotate_img(img, vertices)
+			h = img.height
+			w = img.width
+
+			if (h > w):
+				self.length = h-32
+			else:
+				self.length = w-32
+
+			img, vertices = crop_img(img, vertices, labels, self.length)
 		else:
 			if (self.scale_aug == True):
 				img, vertices = scale_img(img, vertices)

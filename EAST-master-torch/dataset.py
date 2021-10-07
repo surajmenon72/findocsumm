@@ -448,9 +448,8 @@ def scale_img(img, vertices, low=0.2, high=1.0, scale_prob=1):
 
 	return scaled_image, new_vertices
 
-def full_scale_img(img, vertices, low=0, high=1.0):
-	scale_num = np.random.uniform(low=low, high=high)
-	scale_factor = 0.5+scale_num
+def full_scale_img(img, vertices, full_scale_factor=1):
+	scale_factor = full_scale_factor
 
 	old_h = img.height
 	old_w = img.width
@@ -563,7 +562,7 @@ def extract_vertices(lines):
 
 	
 class custom_dataset(data.Dataset):
-	def __init__(self, img_path, gt_path, scale=0.25, length=512, scale_aug=False, ignore=True, full_scale=False):
+	def __init__(self, img_path, gt_path, scale=0.25, length=512, scale_aug=False, ignore=True, full_scale=False, batch_size=16):
 		super(custom_dataset, self).__init__()
 		self.img_files = [os.path.join(img_path, img_file) for img_file in sorted(os.listdir(img_path))]
 		self.gt_files  = [os.path.join(gt_path, gt_file) for gt_file in sorted(os.listdir(gt_path))]
@@ -573,6 +572,9 @@ class custom_dataset(data.Dataset):
 		self.scale_len = int(self.length*self.scale)
 		self.ignore = ignore
 		self.full_scale = full_scale
+		self.batch_size = batch_size
+		self.full_scale_factor = 1
+		self.full_scale_count = 0
 
 	def __len__(self):
 		return len(self.img_files)
@@ -603,7 +605,11 @@ class custom_dataset(data.Dataset):
 		# res_img.save('./pre_test.bmp')
 
 		if (self.full_scale == True):
-			img, vertices = full_scale_img(img, vertices, low=0, high=1.0)
+			if (self.full_scale_count == 0):
+				random_num = np.random.uniform(low=0, high=1.0)
+				self.full_scale_factor = 0.5 + random_num
+
+			img, vertices = full_scale_img(img, vertices, self.full_scale_factor)
 			img, vertices = rotate_img(img, vertices)
 			h = img.height
 			w = img.width
@@ -614,6 +620,11 @@ class custom_dataset(data.Dataset):
 				self.length = w-32
 
 			img, vertices = crop_img(img, vertices, labels, self.length)
+
+			if (self.full_scale_count == batch_size-1):
+				self.full_scale_count = 0
+			else:
+				self.full_scale_count += 1
 		else:
 			if (self.scale_aug == True):
 				img, vertices = scale_img(img, vertices)

@@ -619,6 +619,10 @@ class custom_dataset(data.Dataset):
 			else:
 				self.length = w-32
 
+			print (self.full_scale_factor)
+			print (self.length)
+			exit()
+
 			img, vertices = crop_img(img, vertices, labels, self.length)
 
 			if (self.full_scale_count == self.batch_size-1):

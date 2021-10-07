@@ -613,8 +613,8 @@ class custom_dataset(data.Dataset):
 			img, vertices = full_scale_img(img, vertices, self.full_scale_factor)
 			img, vertices = rotate_img(img, vertices)
 
-			self.length = 512*self.full_scale_factor
-			self.length = self.length if self.length  % 32 == 0 else int(self.length / 32) * 32
+			self.length = int(512*self.full_scale_factor)
+			self.length = self.length if self.length % 32 == 0 else int(self.length / 32) * 32
 
 			h = img.height
 			w = img.width

@@ -204,7 +204,7 @@ if __name__ == '__main__':
 	# test_gt_path  = os.path.abspath('/Users/surajmenon/Desktop/findocsumm/data/ICDAR_2015/test_gt')
 	pths_path      = './pths'
 	#batch_size     = 24
-	train_batch_size = 16
+	train_batch_size = 8
 	test_batch_size = 16
 	lr             = 1e-3
 	num_workers    = 0

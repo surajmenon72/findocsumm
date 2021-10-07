@@ -608,7 +608,6 @@ class custom_dataset(data.Dataset):
 			if (self.full_scale_count == 0):
 				random_num = np.random.uniform(low=0, high=1.0)
 				self.full_scale_factor = 0.5 + random_num
-				self.full_scale_factor = 1.5
 
 			img, vertices = full_scale_img(img, vertices, self.full_scale_factor)
 			img, vertices = rotate_img(img, vertices)
@@ -645,8 +644,9 @@ class custom_dataset(data.Dataset):
 			img, vertices = rotate_img(img, vertices)
 			img, vertices = crop_img(img, vertices, labels, self.length)
 
-		# res_img = plot_boxes(img, vertices)
-		# res_img.save('./pre_test2.bmp')
+		res_img = plot_boxes(img, vertices)
+		res_img.save('./pre_test2.bmp')
+		exit()
 
 		transform = transforms.Compose([transforms.ColorJitter(0.5, 0.5, 0.5, 0.25), \
                                         transforms.ToTensor(), \

@@ -607,17 +607,24 @@ class custom_dataset(data.Dataset):
 		if (self.full_scale == True):
 			if (self.full_scale_count == 0):
 				random_num = np.random.uniform(low=0, high=1.0)
-				self.full_scale_factor = 0.1 + random_num
+				self.full_scale_factor = 0.5 + random_num
 
 			img, vertices = full_scale_img(img, vertices, self.full_scale_factor)
 			img, vertices = rotate_img(img, vertices)
+
+			self.length = 512*self.full_scale_factor
+			self.length = self.length if self.length  % 32 == 0 else int(self.length / 32) * 32
+
 			h = img.height
 			w = img.width
 
 			if (h > w):
-				self.length = h-32
+				long_side = h
 			else:
-				self.length = w-32
+				long_side = w
+
+			if (self.length > long_side):
+				self.length = long_side
 
 			print (self.full_scale_factor)
 			print (self.length)

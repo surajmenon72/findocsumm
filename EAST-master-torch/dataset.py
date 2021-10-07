@@ -603,7 +603,6 @@ class custom_dataset(data.Dataset):
 		# res_img.save('./pre_test.bmp')
 
 		if (self.full_scale == True):
-			print ('Doing Full Scale')
 			img, vertices = full_scale_img(img, vertices, low=0.5, high=1.0)
 			img, vertices = rotate_img(img, vertices)
 		else:

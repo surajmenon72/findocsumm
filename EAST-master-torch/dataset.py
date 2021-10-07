@@ -621,7 +621,6 @@ class custom_dataset(data.Dataset):
 
 			print (self.full_scale_factor)
 			print (self.length)
-			exit()
 
 			img, vertices = crop_img(img, vertices, labels, self.length)
 

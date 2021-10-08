@@ -177,15 +177,20 @@ class EASTER(nn.Module):
 		self.merge     = merge()
 		self.output    = output()
 		self.retVar = retVar
+		self.scale_length = 0
 	
 	def forward(self, x, calcVar=False):
+		self.scale_length = int(x.shape[2]/2)
 		device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 		merge_output = self.merge(self.extractor(x))
 		score, geo = self.output(merge_output)
 
+		scale_square = self.scale_length**2
+
 		if (self.retVar):
 			if (calcVar == True):
-				smooshed_output = torch.reshape(merge_output, (16, 32, 65536))
+				#smooshed_output = torch.reshape(merge_output, (16, 32, scale_square))
+				smooshed_output = torch.reshape(merge_output, (8, 32, scale_square))
 				# num_dim = smooshed_output.shape[1]
 				# total_diff = torch.zeros((16, 32, 65536))
 

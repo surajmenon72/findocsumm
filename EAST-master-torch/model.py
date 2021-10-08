@@ -173,12 +173,6 @@ class EAST(nn.Module):
 
 		scale_square = self.scale_length**2
 
-		print ('smooshing')
-		print (merge_output.shape)
-		print (scale_square)
-		smooshed_output = torch.reshape(merge_output, (8, 32, scale_square))
-		exit()
-
 		if (self.retVar):
 			if (calcVar == True):
 				#smooshed_output = torch.reshape(merge_output, (16, 32, scale_square))

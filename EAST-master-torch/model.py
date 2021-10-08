@@ -172,8 +172,6 @@ class EAST(nn.Module):
 		score, geo = self.output(merge_output)
 
 		scale_square = self.scale_length**2
-		print (scale_square)
-		exit()
 
 		if (self.retVar):
 			if (calcVar == True):

@@ -176,12 +176,13 @@ class EAST(nn.Module):
 		print ('smooshing')
 		print (merge_output.shape)
 		print (scale_square)
-		smooshed_output = torch.reshape(merge_output, (16, 32, scale_square))
+		smooshed_output = torch.reshape(merge_output, (8, 32, scale_square))
 		exit()
 
 		if (self.retVar):
 			if (calcVar == True):
-				smooshed_output = torch.reshape(merge_output, (16, 32, scale_square))
+				#smooshed_output = torch.reshape(merge_output, (16, 32, scale_square))
+				smooshed_output = torch.reshape(merge_output, (8, 32, scale_square))
 				smooshed_var = torch.var(smooshed_output, axis=1, unbiased=True)
 				var_full = torch.mean(smooshed_var, dim=1)
 				var_avg = torch.mean(var_full, axis=0)

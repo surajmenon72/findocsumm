@@ -1,9 +1,9 @@
 import numpy as np
 
 file1 = 'eval_results2/eval_metrics2_eval_metrics-EASTER-sm1-aug3-no_ignore-1--450.npy'
-file2 = 'eval_results2/eval_metrics2_eval_metrics-EASTER-sm1-aug3-no_ignore-500.npy'
+file2 = 'eval_results2/eval_metrics2_eval_metrics-EASTER-sm1-aug3-no_ignore-fs-485.npy'
 
-out_file = 'eval_results2/eval_metrics2_eval_metrics-EASTER-sm1-aug3-no_ignore-1--500.npy'
+out_file = 'eval_results2/eval_metrics2_eval_metrics-EASTER-sm1-aug3-no_ignore-fs-1--485.npy'
 
 vec1 = np.load(file1)
 vec2 = np.load(file2)

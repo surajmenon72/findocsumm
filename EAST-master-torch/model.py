@@ -171,14 +171,12 @@ class EAST(nn.Module):
 		merge_output = self.merge(self.extractor(x))
 		score, geo = self.output(merge_output)
 
-		print (self.scale_length)
+		scale_square = self.scale_length**2
+		print (scale_square)
 		exit()
 
 		if (self.retVar):
 			if (calcVar == True):
-				scale_square = self.scale_length**2
-				print (scale_square)
-				exit()
 				smooshed_output = torch.reshape(merge_output, (16, 32, scale_square))
 				smooshed_var = torch.var(smooshed_output, axis=1, unbiased=True)
 				var_full = torch.mean(smooshed_var, dim=1)

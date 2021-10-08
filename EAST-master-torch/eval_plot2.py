@@ -6,7 +6,8 @@ file1 = 'eval_results2/eval_metrics2_eval_metrics-EAST-llr-.3.npy'
 file2 = 'eval_results2/eval_metrics2_eval_metrics-EAST-llr-.45.npy'
 file3 = 'eval_results2/eval_metrics2_eval_metrics-EAST-llr-.6.npy'
 file4 = 'eval_results2/eval_metrics2_eval_metrics-EAST-llr-.8.npy'
-file5 = 'eval_results2/eval_metrics2_eval_metrics-EAST-llr-1.npy'
+#file5 = 'eval_results2/eval_metrics2_eval_metrics-EAST-llr-1.npy'
+file5 = 'eval_results2/eval_metrics2_eval_metrics-EAST-llr-fs-462.npy'
 file6 = 'eval_results2/eval_metrics2_eval_metrics-EAST-llr-None.npy'
 
 vec1 = np.load(file1)
@@ -36,10 +37,10 @@ measure5 = vec5[measure_index, :num_samples]
 measure6 = vec6[measure_index, :num_samples]
 
 plt.figure(1)
-plt.plot(epochs, measure1)
-plt.plot(epochs, measure2)
-plt.plot(epochs, measure3)
-plt.plot(epochs, measure4)
+# plt.plot(epochs, measure1)
+# plt.plot(epochs, measure2)
+# plt.plot(epochs, measure3)
+# plt.plot(epochs, measure4)
 plt.plot(epochs, measure5)
 plt.plot(epochs, measure6)
 #plt.show()

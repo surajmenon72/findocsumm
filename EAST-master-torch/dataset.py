@@ -607,7 +607,8 @@ class custom_dataset(data.Dataset):
 		if (self.full_scale == True):
 			if (self.full_scale_count == 0):
 				random_num = np.random.uniform(low=0, high=1.0)
-				self.full_scale_factor = 0.5 + random_num
+				#self.full_scale_factor = 0.5 + random_num
+				self.full_scale_factor = 0.5 + 0.0
 
 			img, vertices = full_scale_img(img, vertices, self.full_scale_factor)
 			img, vertices = rotate_img(img, vertices)

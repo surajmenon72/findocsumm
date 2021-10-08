@@ -166,6 +166,8 @@ class EAST(nn.Module):
 		self.retVar = retVar
 	
 	def forward(self, x, calcVar=False):
+		print (x.shape)
+		exit()
 		merge_output = self.merge(self.extractor(x))
 		score, geo = self.output(merge_output)
 

@@ -626,8 +626,8 @@ class custom_dataset(data.Dataset):
 			if (self.length > long_side):
 				self.length = long_side
 
-			# print (self.full_scale_factor)
-			# print (self.length)
+			print (self.full_scale_factor)
+			print (self.length)
 
 			img, vertices = crop_img(img, vertices, labels, self.length)
 

@@ -49,10 +49,10 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 		model = EASTER(True, True)
 	#model = EAST_STRETCH()
 	#model_name = './pths/east_vgg16.pth'
-	model_name = './pths/EAST-llr-fs-1.5-456.pth'
+	model_name = './pths/EASTER-sm1-aug3-no_ignore-fs-485.pth'
 	model.load_state_dict(torch.load(model_name, map_location=device))
 	#model.load_state_dict(torch.load(model_name, map_location=torch.device('cpu')))
-	epoch_start = 456
+	epoch_start = 485
 	data_parallel = False
 	if torch.cuda.device_count() > 1:
 		model = nn.DataParallel(model)
@@ -61,7 +61,7 @@ def train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path,
 	optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 	scheduler = lr_scheduler.MultiStepLR(optimizer, milestones=[epoch_iter//2], gamma=.1)
 
-	use_scheduler = True
+	use_scheduler = False
 	do_eval = True
 
 	eval_epochs = []
@@ -210,6 +210,6 @@ if __name__ == '__main__':
 	num_workers    = 0
 	epoch_iter     = 900
 	save_interval  = 5
-	eval_interval  = 2
-	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval, model_type='EAST')	
+	eval_interval  = 5
+	train(train_img_path, train_gt_path, test_img_path, test_gt_path, pths_path, train_batch_size, test_batch_size, lr, num_workers, epoch_iter, save_interval, eval_interval, model_type='EASTER')	
 	

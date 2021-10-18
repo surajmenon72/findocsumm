@@ -206,7 +206,7 @@ if __name__ == '__main__':
 	#batch_size     = 24
 	train_batch_size = 8
 	test_batch_size = 8
-	lr             = 1e-4
+	lr             = 1e-3
 	num_workers    = 0
 	epoch_iter     = 900
 	save_interval  = 5

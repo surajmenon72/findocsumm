@@ -606,7 +606,7 @@ class custom_dataset(data.Dataset):
 
 		if (self.full_scale == True):
 			if (self.full_scale_count == 0):
-				random_num = np.random.uniform(low=0, high=0.5)
+				random_num = np.random.uniform(low=0, high=1.0)
 				self.full_scale_factor = 0.5 + random_num
 				#self.full_scale_factor = 1.0
 

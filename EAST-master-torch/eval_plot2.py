@@ -37,7 +37,7 @@ num_samples = 8
 epoch_offset = 450
 
 epochs = vec2[epoch_index, :num_samples] - epoch_offset
-measure_index = variance_index
+measure_index = precision_index
 #measure1 = vec1[measure_index, :num_samples]
 measure2 = vec2[measure_index, :num_samples]
 measure3 = vec3[measure_index, :num_samples]
